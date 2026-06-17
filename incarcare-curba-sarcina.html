@@ -3,180 +3,326 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Încărcare curba de sarcină | SVT Energy Navigator</title>
-  <link rel="stylesheet" href="./styles.css"/>
+  <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="./upload-flow.css"/>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
-<body class="svt-flow-page">
-  <main class="svt-flow-shell">
-    <div class="svt-flow-top">
-      <a class="svt-back" href="./testeaza-gratuit.html">← Înapoi</a>
-      <span class="svt-step-pill">Pasul 2 din 3 · Date consum</span>
+<body class="svt-wizard-compatible">
+
+<nav class="svt-wizard-nav">
+  <a class="svt-wizard-logo" href="./testeaza-gratuit.html">
+    <div class="svt-wizard-logomark">✦</div>
+    <div class="svt-wizard-logotxt">SVT Energy Navigator <span>by Servelect</span></div>
+  </a>
+  <div class="svt-wizard-dots">
+    <div class="svt-wizard-dot active"></div>
+    <div class="svt-wizard-dot"></div>
+    <div class="svt-wizard-dot"></div>
+  </div>
+</nav>
+
+<div class="svt-wizard-progress-wrap">
+  <div class="svt-wizard-progress"></div>
+</div>
+
+<div class="svt-wizard-app">
+  <main class="svt-wizard-form">
+    <div class="svt-wizard-eyebrow">Pasul 1 din 10</div>
+    <h1 class="svt-wizard-title">Curba ta de consum zilnic</h1>
+    <p class="svt-wizard-sub">Avem nevoie de consumul orar pe o zi tipică — electric și termic. Acesta este punctul de pornire pentru toate calculele.</p>
+
+    <div class="svt-tab-toggle">
+      <button class="svt-tab-btn active" type="button" data-tab="electric">⚡ Electric</button>
+      <button class="svt-tab-btn" type="button" data-tab="termic">🌡️ Termic</button>
     </div>
 
-    <section class="svt-upload-hero">
-      <div class="svt-upload-title">
-        <p class="svt-kicker">ÎNCĂRCARE DATE</p>
-        <h1>Încărcare curba de sarcină zilnică electrică și termică</h1>
-        <p>Încarcă un fișier CSV sau XLSX cu date orare sau la 15 minute. Platforma detectează automat coloanele și calculează când consumi energie scumpă din rețea.</p>
+    <section id="tab-electric">
+      <label class="field-label">Cum preferi să încarci datele de consum electric?</label>
+      <div class="svt-radio-group">
+        <div class="svt-radio-pill"><input type="radio" name="upload_type_e" id="ue1" value="fisier" checked><label for="ue1">Încarc fișier</label></div>
+        <div class="svt-radio-pill"><input type="radio" name="upload_type_e" id="ue2" value="manual"><label for="ue2">Introduc manual</label></div>
+        <div class="svt-radio-pill"><input type="radio" name="upload_type_e" id="ue3" value="factura"><label for="ue3">Am doar factura lunară</label></div>
       </div>
 
-      <aside class="svt-requirements">
-        <h2>De ce este nevoie?</h2>
-        <div class="svt-req-list">
-          <div class="svt-req"><span>1</span><div><strong>Dată și oră</strong><small>Ex: 2025-06-16 07:30 sau 16.06.2025 07:30</small></div></div>
-          <div class="svt-req"><span>2</span><div><strong>Consum electric</strong><small>kWh pe interval sau kW mediu pe interval</small></div></div>
-          <div class="svt-req"><span>3</span><div><strong>Consum termic</strong><small>Opțional: gaz, apă caldă, abur, pompă de căldură</small></div></div>
-          <div class="svt-req"><span>4</span><div><strong>PV / prețuri</strong><small>Opțional: producție PV sau preț RON/kWh</small></div></div>
+      <div style="margin-top:20px;">
+        <div class="svt-upload-zone" id="uploadZoneE">
+          <div class="svt-upload-icon">📂</div>
+          <div class="svt-upload-main">Trage fișierul aici sau apasă să selectezi</div>
+          <div class="svt-upload-sub">Export din contorul inteligent, distribuitorul local (DEER, E.ON, etc.) sau contabil</div>
+          <div class="svt-upload-formats">
+            <span class="svt-fmt-pill">CSV</span>
+            <span class="svt-fmt-pill">XLSX</span>
+            <span class="svt-fmt-pill">TXT</span>
+            <span class="svt-fmt-pill">model inclus</span>
+          </div>
+          <input type="file" id="fileE" accept=".csv,.txt,.xlsx,.xls" style="display:none">
         </div>
-      </aside>
-    </section>
-
-    <section class="svt-upload-card">
-      <div class="svt-drop" id="dropZone">
-        <div class="svt-drop-icon">⇧</div>
-        <h2>Trage fișierul aici sau selectează manual</h2>
-        <p>Acceptă CSV, TXT, XLSX. Pentru test poți folosi modelul inclus.</p>
-        <input id="fileInput" class="svt-file-input" type="file" accept=".csv,.txt,.xlsx,.xls"/>
-        <button class="svt-btn" type="button" id="chooseFileBtn">Alege fișier</button>
-        <a class="svt-btn secondary" href="./assets/templates/model_curba_sarcina.csv" download>Descarcă model CSV</a>
-      </div>
-
-      <div id="uploadMessage"></div>
-
-      <div class="svt-panel svt-hidden" id="detectedPanel">
-        <h2>Date detectate</h2>
-        <div class="svt-grid-3">
-          <div class="svt-stat"><strong id="statRows">0</strong><small>rânduri citite</small></div>
-          <div class="svt-stat"><strong id="statInterval">-</strong><small>interval detectat</small></div>
-          <div class="svt-stat"><strong id="statColumns">0</strong><small>coloane detectate</small></div>
+        <div class="svt-file-chosen" id="fileNameE">
+          <span>✅</span><span class="svt-file-name" id="fileNameEtxt"></span>
         </div>
       </div>
 
-      <div class="svt-panel svt-hidden" id="mappingPanel">
-        <h2>Confirmă coloanele</h2>
-        <div class="svt-map-grid">
-          <div class="svt-field"><label>Dată / oră *</label><select id="mapTimestamp"></select></div>
-          <div class="svt-field"><label>Consum electric *</label><select id="mapElectric"></select></div>
-          <div class="svt-field"><label>Consum termic</label><select id="mapThermal"></select></div>
-          <div class="svt-field"><label>Producție PV</label><select id="mapPv"></select></div>
-          <div class="svt-field"><label>Preț RON/kWh</label><select id="mapPrice"></select></div>
-          <div class="svt-field"><label>Unitate electrică</label><select id="unitElectric"><option value="kwh">kWh / interval</option><option value="kw">kW mediu</option></select></div>
-          <div class="svt-field"><label>Tarif fix actual</label><input id="fixedPrice" value="0.75" inputmode="decimal"/></div>
-          <div class="svt-field"><label>Putere contractată kW</label><input id="contractPower" value="250" inputmode="decimal"/></div>
-        </div>
-        <div class="svt-actions">
-          <button class="svt-btn secondary" type="button" id="revalidateBtn">Revalidează</button>
-          <button class="svt-btn" type="button" id="runAnalysisBtn">Generează analiza</button>
-        </div>
+      <div class="svt-info-box" style="margin-top:16px;">
+        <strong>De unde obții fișierul?</strong> Intri pe portalul distribuitorului tău (ex. myeer.ro, myeon.ro) → Consum → Export date orare. Dacă nu ai acces, îl poate solicita contabilul sau responsabilul tehnic.
+        <div style="margin-top:8px;"><a href="./assets/templates/model_curba_sarcina.csv" download style="color:var(--g600);font-weight:700;">Descarcă model CSV pentru test</a></div>
       </div>
 
-      <div class="svt-panel svt-hidden" id="previewPanel">
-        <h2>Preview date</h2>
-        <div class="svt-table-wrap">
-          <table class="svt-preview-table" id="previewTable"></table>
-        </div>
+      <label class="field-label" style="margin-top:24px;">Puterea maximă racordată la rețea (kW)</label>
+      <input type="number" placeholder="ex. 250" min="1" id="putereRacord">
+      <div class="hint">Găsești această valoare în contractul cu distribuitorul sau pe avizul tehnic de racordare (ATR).</div>
+
+      <label class="field-label">Tariful de energie actual (RON/kWh)</label>
+      <input type="number" placeholder="ex. 0.75" step="0.01" id="tarifActual">
+      <div class="hint">Din ultima factură — prețul pe kWh fără TVA.</div>
+
+      <label class="field-label">Tip tarif actual</label>
+      <div class="svt-radio-group" style="margin-top:6px;">
+        <div class="svt-radio-pill"><input type="radio" name="tip_tarif" id="tt1" value="fix" checked><label for="tt1">Fix (același tot timpul)</label></div>
+        <div class="svt-radio-pill"><input type="radio" name="tip_tarif" id="tt2" value="bioraza"><label for="tt2">Biorată (zi/noapte)</label></div>
+        <div class="svt-radio-pill"><input type="radio" name="tip_tarif" id="tt3" value="pzu"><label for="tt3">Dinamic PZU</label></div>
       </div>
     </section>
+
+    <section id="tab-termic" style="display:none;">
+      <label class="field-label">Ai consum termic monitorizat (căldură, abur, apă caldă)?</label>
+      <div class="svt-radio-group">
+        <div class="svt-radio-pill"><input type="radio" name="has_termic" id="ht1" value="da" checked><label for="ht1">Da</label></div>
+        <div class="svt-radio-pill"><input type="radio" name="has_termic" id="ht2" value="nu"><label for="ht2">Nu / nu știu</label></div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="svt-upload-zone" id="uploadZoneT">
+          <div class="svt-upload-icon">🌡️</div>
+          <div class="svt-upload-main">Încarc datele de consum termic</div>
+          <div class="svt-upload-sub">Date orare sau zilnice de la contorul de căldură / centrala termică</div>
+          <div class="svt-upload-formats">
+            <span class="svt-fmt-pill">CSV</span>
+            <span class="svt-fmt-pill">XLSX</span>
+            <span class="svt-fmt-pill">opțional</span>
+          </div>
+          <input type="file" id="fileT" accept=".csv,.txt,.xlsx,.xls" style="display:none">
+        </div>
+        <div class="svt-file-chosen" id="fileNameT">
+          <span>✅</span><span class="svt-file-name" id="fileNameTtxt"></span>
+        </div>
+      </div>
+
+      <label class="field-label" style="margin-top:20px;">Sursa principală de căldură</label>
+      <select id="sursaTermica">
+        <option value="">Selectează...</option>
+        <option>Centrală pe gaz natural</option>
+        <option>Centrală pe păcură / motorină</option>
+        <option>Pompă de căldură</option>
+        <option>Cogenerare (CHP)</option>
+        <option>Rețea termică urbană</option>
+        <option>Altele</option>
+      </select>
+
+      <label class="field-label">Consumul anual estimat de gaz / energie termică</label>
+      <div class="svt-two-col">
+        <input type="number" placeholder="Cantitate" id="consumTermicAnual">
+        <select id="unitateTermic"><option>MWh</option><option>m³</option></select>
+      </div>
+    </section>
+
+    <div id="uploadMessage"></div>
+
+    <section class="svt-wizard-preview" id="previewPanel">
+      <div class="svt-wizard-preview-head">
+        <div><strong>Date încărcate și mapare coloane</strong><br><small id="previewMeta">-</small></div>
+        <button class="svt-btn-back-wizard" type="button" id="validateBtn">Validează</button>
+      </div>
+      <div class="svt-wizard-map">
+        <div><label class="field-label">Dată/oră *</label><select id="mapTimestamp"></select></div>
+        <div><label class="field-label">Consum electric *</label><select id="mapElectric"></select></div>
+        <div><label class="field-label">Unitate electrică</label><select id="unitElectric"><option value="kwh">kWh / interval</option><option value="kw">kW mediu</option></select></div>
+        <div><label class="field-label">Consum termic</label><select id="mapThermal"></select></div>
+        <div><label class="field-label">Producție PV</label><select id="mapPv"></select></div>
+        <div><label class="field-label">Preț RON/kWh</label><select id="mapPrice"></select></div>
+      </div>
+      <div class="svt-wizard-table-wrap">
+        <table class="svt-wizard-preview-table" id="previewTable"></table>
+      </div>
+    </section>
+
+    <div class="svt-wizard-navbtns">
+      <a class="svt-btn-back-wizard" href="./testeaza-gratuit.html">← Înapoi</a>
+      <button class="svt-btn-next-wizard" type="button" id="continueBtn">Continuă →</button>
+      <span class="svt-step-counter">1 / 10</span>
+    </div>
   </main>
+</div>
 
-  <script src="./assets/js/svt-upload-parser.js"></script>
-  <script src="./assets/js/svt-price-profiles.js"></script>
-  <script src="./assets/js/svt-analysis-engine.js"></script>
-  <script>
-    const state = { raw:null, columns:[], rows:[] };
-    const fileInput = document.getElementById('fileInput');
-    const chooseFileBtn = document.getElementById('chooseFileBtn');
-    const dropZone = document.getElementById('dropZone');
-    const msg = document.getElementById('uploadMessage');
+<script src="./assets/js/svt-upload-parser.js"></script>
+<script src="./assets/js/svt-price-profiles.js"></script>
+<script src="./assets/js/svt-analysis-engine.js"></script>
+<script>
+  const state = { electricRaw:null, thermalRaw:null };
 
-    chooseFileBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
-    ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('is-drag'); }));
-    ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('is-drag'); }));
-    dropZone.addEventListener('drop', e => handleFile(e.dataTransfer.files[0]));
+  document.querySelectorAll('.svt-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.svt-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-electric').style.display = btn.dataset.tab === 'electric' ? 'block' : 'none';
+      document.getElementById('tab-termic').style.display = btn.dataset.tab === 'termic' ? 'block' : 'none';
+    });
+  });
 
-    async function handleFile(file) {
-      if (!file) return;
-      showMessage('Se citește fișierul...', 'warn');
-      try {
-        const parsed = await SVTUploadParser.parseFile(file);
-        state.raw = parsed;
-        state.columns = parsed.columns;
-        state.rows = parsed.rows;
+  setupUpload('uploadZoneE', 'fileE', 'fileNameE', 'fileNameEtxt', 'electricRaw');
+  setupUpload('uploadZoneT', 'fileT', 'fileNameT', 'fileNameTtxt', 'thermalRaw');
+
+  function setupUpload(zoneId, inputId, fileBoxId, fileTextId, stateKey) {
+    const zone = document.getElementById(zoneId);
+    const input = document.getElementById(inputId);
+    zone.addEventListener('click', () => input.click());
+    ['dragenter','dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('is-drag'); }));
+    ['dragleave','drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('is-drag'); }));
+    zone.addEventListener('drop', e => {
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f, zone, fileBoxId, fileTextId, stateKey);
+    });
+    input.addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (f) handleFile(f, zone, fileBoxId, fileTextId, stateKey);
+    });
+  }
+
+  async function handleFile(file, zone, fileBoxId, fileTextId, stateKey) {
+    showMsg('Se citește fișierul: ' + file.name, 'warn');
+    try {
+      const parsed = await SVTUploadParser.parseFile(file);
+      state[stateKey] = parsed;
+      zone.classList.add('has-file');
+      document.getElementById(fileBoxId).classList.add('visible');
+      document.getElementById(fileTextId).textContent = file.name;
+
+      if (stateKey === 'electricRaw') {
         fillMapping(parsed);
         renderPreview(parsed);
-        document.getElementById('detectedPanel').classList.remove('svt-hidden');
-        document.getElementById('mappingPanel').classList.remove('svt-hidden');
-        document.getElementById('previewPanel').classList.remove('svt-hidden');
-        document.getElementById('statRows').textContent = parsed.rows.length;
-        document.getElementById('statInterval').textContent = parsed.detected.intervalLabel || 'necunoscut';
-        document.getElementById('statColumns').textContent = parsed.columns.length;
-        showMessage('Fișier încărcat. Confirmă coloanele și apasă Generează analiza.', 'ok');
-      } catch (err) {
-        showMessage(err.message || String(err), 'error');
+        document.getElementById('previewPanel').classList.add('visible');
+        document.getElementById('previewMeta').textContent = `${parsed.rows.length} rânduri · ${parsed.columns.length} coloane · interval ${parsed.detected.intervalLabel || 'necunoscut'}`;
       }
-    }
 
-    function fillMapping(parsed) {
-      const selects = ['mapTimestamp','mapElectric','mapThermal','mapPv','mapPrice'];
-      selects.forEach(id => {
-        const sel = document.getElementById(id);
-        sel.innerHTML = '<option value="">— fără —</option>' + parsed.columns.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-      });
-      document.getElementById('mapTimestamp').value = parsed.detected.timestamp || '';
-      document.getElementById('mapElectric').value = parsed.detected.electric || '';
-      document.getElementById('mapThermal').value = parsed.detected.thermal || '';
-      document.getElementById('mapPv').value = parsed.detected.pv || '';
-      document.getElementById('mapPrice').value = parsed.detected.price || '';
+      showMsg('Fișier încărcat. Completează câmpurile și continuă.', 'ok');
+    } catch (e) {
+      showMsg(e.message || String(e), 'error');
     }
+  }
 
-    function renderPreview(parsed) {
-      const table = document.getElementById('previewTable');
-      const rows = parsed.rows.slice(0, 12);
-      table.innerHTML = `<thead><tr>${parsed.columns.map(c=>`<th>${escapeHtml(c)}</th>`).join('')}</tr></thead>` +
-        `<tbody>${rows.map(r=>`<tr>${parsed.columns.map(c=>`<td>${escapeHtml(r[c] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
-    }
-
-    document.getElementById('revalidateBtn').addEventListener('click', () => {
-      const result = buildDataset();
-      if (result.ok) showMessage(`Validare OK: ${result.dataset.rows.length} intervale normalizate.`, 'ok');
-      else showMessage(result.error, 'error');
+  function fillMapping(parsed) {
+    const ids = ['mapTimestamp','mapElectric','mapThermal','mapPv','mapPrice'];
+    ids.forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">— fără —</option>' + parsed.columns.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
     });
+    mapTimestamp.value = parsed.detected.timestamp || '';
+    mapElectric.value = parsed.detected.electric || '';
+    mapThermal.value = parsed.detected.thermal || '';
+    mapPv.value = parsed.detected.pv || '';
+    mapPrice.value = parsed.detected.price || '';
+  }
 
-    document.getElementById('runAnalysisBtn').addEventListener('click', () => {
-      const result = buildDataset();
-      if (!result.ok) { showMessage(result.error, 'error'); return; }
-      const analysis = SVTAnalysisEngine.analyze(result.dataset);
-      sessionStorage.setItem('svtDataset', JSON.stringify(result.dataset));
-      sessionStorage.setItem('svtAnalysis', JSON.stringify(analysis));
-      window.location.href = './raport-costuri.html';
-    });
+  function renderPreview(parsed) {
+    const rows = parsed.rows.slice(0, 10);
+    previewTable.innerHTML = `<thead><tr>${parsed.columns.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>` +
+      `<tbody>${rows.map(r => `<tr>${parsed.columns.map(c => `<td>${esc(r[c] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  }
 
-    function buildDataset() {
-      try {
-        const mapping = {
-          timestamp: document.getElementById('mapTimestamp').value,
-          electric: document.getElementById('mapElectric').value,
-          thermal: document.getElementById('mapThermal').value,
-          pv: document.getElementById('mapPv').value,
-          price: document.getElementById('mapPrice').value,
-          unitElectric: document.getElementById('unitElectric').value,
-          fixedPrice: SVTUploadParser.toNumber(document.getElementById('fixedPrice').value) || 0.75,
-          contractPower: SVTUploadParser.toNumber(document.getElementById('contractPower').value) || 250
-        };
-        const dataset = SVTUploadParser.normalize(state.raw, mapping);
-        return { ok:true, dataset };
-      } catch (e) {
-        return { ok:false, error:e.message || String(e) };
+  validateBtn.addEventListener('click', () => {
+    const built = buildDataset();
+    if (!built.ok) showMsg(built.error, 'error');
+    else showMsg(`Validare OK: ${built.dataset.rows.length} intervale normalizate.`, 'ok');
+  });
+
+  continueBtn.addEventListener('click', () => {
+    const built = buildDataset();
+    if (!built.ok) { showMsg(built.error, 'error'); return; }
+
+    const wizardData = collectWizardData();
+    sessionStorage.setItem('svtData', JSON.stringify(wizardData));
+    sessionStorage.setItem('svtDataset', JSON.stringify(built.dataset));
+
+    const analysis = SVTAnalysisEngine.analyze(built.dataset);
+    analysis.wizardData = wizardData;
+    sessionStorage.setItem('svtAnalysis', JSON.stringify(analysis));
+
+    window.location.href = './svt-analiza.html';
+  });
+
+  function collectWizardData() {
+    return {
+      firma: 'Firma dvs.',
+      email: '',
+      uploadTypeElectric: document.querySelector('input[name="upload_type_e"]:checked')?.value || 'fisier',
+      hasTermic: document.querySelector('input[name="has_termic"]:checked')?.value || 'da',
+      putereRacord: putereRacord.value || '250',
+      tarifActual: tarifActual.value || '0.75',
+      tipTarif: document.querySelector('input[name="tip_tarif"]:checked')?.value || 'fix',
+      sursaTermica: sursaTermica.value || '',
+      consumTermicAnual: consumTermicAnual.value || '',
+      unitateTermic: unitateTermic.value || 'MWh',
+      consumAnual: '',
+      judet: 'Cluj',
+      pvKwp: ''
+    };
+  }
+
+  function buildDataset() {
+    try {
+      if (!state.electricRaw) throw new Error('Încarcă mai întâi curba de sarcină electrică.');
+      const mapping = {
+        timestamp: mapTimestamp.value,
+        electric: mapElectric.value,
+        thermal: mapThermal.value,
+        pv: mapPv.value,
+        price: mapPrice.value,
+        unitElectric: unitElectric.value,
+        fixedPrice: SVTUploadParser.toNumber(tarifActual.value) || 0.75,
+        contractPower: SVTUploadParser.toNumber(putereRacord.value) || 250
+      };
+      const dataset = SVTUploadParser.normalize(state.electricRaw, mapping);
+
+      if (state.thermalRaw && !mapping.thermal) {
+        const thermalDetected = state.thermalRaw.detected.electric || state.thermalRaw.detected.thermal;
+        const timeDetected = state.thermalRaw.detected.timestamp;
+        if (thermalDetected && timeDetected) {
+          const tDataset = SVTUploadParser.normalize(state.thermalRaw, {
+            timestamp: timeDetected,
+            electric: thermalDetected,
+            unitElectric: 'kwh',
+            fixedPrice: mapping.fixedPrice,
+            contractPower: mapping.contractPower
+          });
+          const byTime = new Map(tDataset.rows.map(r => [r.timestamp.slice(0,16), r.electricKwh]));
+          dataset.rows.forEach(r => {
+            const key = r.timestamp.slice(0,16);
+            if (byTime.has(key)) r.thermalKwh = byTime.get(key);
+          });
+        }
       }
-    }
 
-    function showMessage(text, type) {
-      msg.innerHTML = `<div class="svt-alert ${type}">${escapeHtml(text)}</div>`;
+      dataset.meta.wizardCompatible = true;
+      dataset.meta.putereRacordKw = SVTUploadParser.toNumber(putereRacord.value) || 250;
+      dataset.meta.tipTarif = document.querySelector('input[name="tip_tarif"]:checked')?.value || 'fix';
+      dataset.meta.sursaTermica = sursaTermica.value || '';
+      dataset.meta.consumTermicAnual = SVTUploadParser.toNumber(consumTermicAnual.value) || 0;
+      dataset.meta.unitateTermic = unitateTermic.value || 'MWh';
+
+      return { ok:true, dataset };
+    } catch(e) {
+      return { ok:false, error:e.message || String(e) };
     }
-    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));}
-  </script>
+  }
+
+  function showMsg(text, type) {
+    uploadMessage.innerHTML = `<div class="svt-alert ${type}">${esc(text)}</div>`;
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
+  }
+</script>
 </body>
 </html>
