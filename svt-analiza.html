@@ -3,123 +3,58 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>SVT Energy Navigator – Raport energetic</title>
-  <link rel="stylesheet" href="./styles.css"/>
-  <link rel="stylesheet" href="./upload-flow.css"/>
+  <title>SVT Analiza | Energy Navigator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--g:#07943f;--navy:#071826;--muted:#64748b;--border:#dce5ef;--bg:#f8fafc}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,system-ui,sans-serif;color:var(--navy)}.shell{width:min(1120px,calc(100% - 40px));margin:0 auto;padding:28px 0 50px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.btn{height:44px;padding:0 18px;border-radius:11px;border:1px solid var(--border);background:#fff;color:var(--navy);font-weight:900;text-decoration:none;display:inline-flex;align-items:center;gap:8px}.btn.green{background:linear-gradient(135deg,#07943f,#05aa48);color:#fff;border:0}.hero{background:#fff;border:1px solid var(--border);border-radius:24px;padding:26px 30px;margin-bottom:16px;box-shadow:0 14px 40px rgba(15,23,42,.05)}.hero h1{margin:0;font-size:34px;letter-spacing:-.05em}.hero p{color:var(--muted);line-height:1.5}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}.metric,.card{background:#fff;border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:0 12px 35px rgba(15,23,42,.04)}.metric strong{display:block;font-size:26px;letter-spacing:-.04em}.metric small{color:var(--muted);font-size:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.chart{height:280px}.findings{display:grid;gap:10px}.finding{border:1px solid #e8eef5;border-radius:14px;padding:13px}.finding strong{display:block}.finding span{display:block;color:var(--muted);font-size:13px;margin-top:4px;line-height:1.45}@media(max-width:850px){.metrics,.grid2{grid-template-columns:1fr}.chart{height:230px}}
+  </style>
 </head>
-<body class="svt-report-page">
-  <div id="loading" class="svt-loading">
-    <div>
-      <div class="svt-spinner"></div>
-      <h1>Se generează analiza...</h1>
-      <p>Datele încărcate sunt transformate în raport energetic.</p>
+<body>
+  <main class="shell">
+    <div class="top">
+      <a class="btn" href="./incarcare-curba-sarcina.html">← Încarcă alt fișier</a>
+      <button class="btn green" onclick="window.print()">Salvează PDF</button>
     </div>
-  </div>
-
-  <main id="report" class="svt-report-shell svt-hidden">
-    <div class="svt-flow-top">
-      <a class="svt-back" href="./incarcare-curba-sarcina.html">← Încarcă alt fișier</a>
-      <button class="svt-btn secondary" onclick="window.print()">Salvează PDF</button>
-    </div>
-
-    <section class="svt-report-header">
-      <div>
-        <p class="svt-kicker">RAPORT FUNCȚIONAL · MODUL 1</p>
-        <h1>Când consum energie scumpă din rețea?</h1>
-        <p>Raport calculat din datele încărcate în wizard și din fișierul: <strong id="reportFile">-</strong>. Analiza identifică intervalele cu cost mare, potențialul de mutare consum și economia estimată.</p>
-      </div>
-      <div class="svt-score"><div><span id="scoreValue">-</span><small>/100</small></div></div>
+    <section class="hero">
+      <h1>Când consum energie scumpă din rețea?</h1>
+      <p id="summary">Se încarcă analiza...</p>
     </section>
-
-    <section class="svt-metrics">
-      <div class="svt-metric"><div class="icon">💸</div><strong id="kpiCost">-</strong><small>cost estimat la tariful fix</small></div>
-      <div class="svt-metric"><div class="icon">🟢</div><strong id="kpiSaving">-</strong><small>economie totală posibilă</small></div>
-      <div class="svt-metric"><div class="icon">⚡</div><strong id="kpiPeak">-</strong><small>vârf de putere estimat</small></div>
-      <div class="svt-metric"><div class="icon">▥</div><strong id="kpiEnergy">-</strong><small>energie electrică analizată</small></div>
+    <section class="metrics">
+      <div class="metric"><strong id="mEnergy">-</strong><small>energie analizată</small></div>
+      <div class="metric"><strong id="mCost">-</strong><small>cost estimat</small></div>
+      <div class="metric"><strong id="mSaving">-</strong><small>economie posibilă</small></div>
+      <div class="metric"><strong id="mPeak">-</strong><small>vârf estimat</small></div>
     </section>
-
-
-    <section class="svt-card" id="wizardSummaryCard">
-      <h2>Date preluate din wizard</h2>
-      <p>Aceste date vin din structura `svt-wizard.html`: putere racordată, tarif actual, tip tarif și partea electrică/termică.</p>
-      <div class="svt-grid-3" style="margin-top:14px">
-        <div class="svt-stat"><strong id="wsPutere">-</strong><small>putere racordată</small></div>
-        <div class="svt-stat"><strong id="wsTarif">-</strong><small>tarif actual</small></div>
-        <div class="svt-stat"><strong id="wsTipTarif">-</strong><small>tip tarif</small></div>
-        <div class="svt-stat"><strong id="wsTermic">-</strong><small>sursă termică</small></div>
-        <div class="svt-stat"><strong id="wsConsumTermic">-</strong><small>consum termic anual</small></div>
-        <div class="svt-stat"><strong id="wsFisier">-</strong><small>fișier analizat</small></div>
-      </div>
+    <section class="grid2">
+      <div class="card"><h2>Curba de sarcină</h2><div class="chart"><canvas id="loadChart"></canvas></div></div>
+      <div class="card"><h2>Cost pe ore</h2><div class="chart"><canvas id="hourChart"></canvas></div></div>
     </section>
-
-
-    <section class="svt-card">
-      <div class="svt-card-head"><div><h2>Curba de sarcină încărcată</h2><p>Consum electric și producție PV, dacă a fost încărcată.</p></div></div>
-      <div class="svt-chart"><canvas id="chartLoad"></canvas></div>
-    </section>
-
-    <section class="svt-two">
-      <div class="svt-card">
-        <h2>Cost pe ore</h2><p>Orele cu cost mare devin prioritare pentru optimizare.</p>
-        <div class="svt-chart"><canvas id="chartCostHour"></canvas></div>
-      </div>
-      <div class="svt-card">
-        <h2>Tarif fix vs. PZU</h2><p>Simulare folosind prețurile încărcate sau profil PZU standard.</p>
-        <div class="svt-chart"><canvas id="chartPzu"></canvas></div>
-      </div>
-    </section>
-
-    <section class="svt-card">
-      <h2>Intervale scumpe detectate</h2>
-      <p>Top intervale în care consumul din rețea generează cost ridicat.</p>
-      <div id="findings" class="svt-findings" style="margin-top:14px"></div>
-    </section>
-
-    <section class="svt-card">
-      <h2>Recomandări prioritizate</h2>
-      <p>Recomandări generate pe baza datelor încărcate, fără AI extern și fără valori demo forțate.</p>
-      <div id="recommendations" class="svt-findings" style="margin-top:14px"></div>
-    </section>
-
-    <section class="svt-card">
-      <h2>Ce ar trebui să fac mâine?</h2>
-      <p>Plan simplu bazat pe intervalele scumpe detectate și consumul tău real.</p>
-      <div id="plan" class="svt-plan" style="margin-top:14px"></div>
-    </section>
-
-    <div class="svt-footer-actions">
-      <a class="svt-btn secondary" href="./testeaza-gratuit.html">← Alege altă analiză</a>
-      <a class="svt-btn" href="./incarcare-curba-sarcina.html">Încarcă alt fișier</a>
-    </div>
+    <section class="card" style="margin-top:16px"><h2>Intervale scumpe detectate</h2><div id="findings" class="findings"></div></section>
+    <section class="card" style="margin-top:16px"><h2>Recomandări</h2><div id="recs" class="findings"></div></section>
   </main>
-
-  <script src="./assets/js/svt-price-profiles.js"></script>
   <script src="./assets/js/svt-analysis-engine.js"></script>
-  <script src="./assets/js/svt-report-renderer.js"></script>
   <script>
-    setTimeout(() => {
-      let analysis = null;
-      try { analysis = JSON.parse(sessionStorage.getItem('svtAnalysis') || 'null'); } catch(e) {}
-      if (!analysis) {
-        document.getElementById('loading').innerHTML = '<div><h1>Nu există date analizate</h1><p>Te rugăm să încarci curba de sarcină înainte de raport.</p><p><a class="svt-btn" href="./incarcare-curba-sarcina.html">Încarcă date</a></p></div>';
-        return;
-      }
-      document.getElementById('loading').classList.add('svt-hidden');
-      document.getElementById('report').classList.remove('svt-hidden');
-      
-      try {
-        const wd = analysis.wizardData || JSON.parse(sessionStorage.getItem('svtData') || '{}');
-        const meta = analysis.meta || {};
-        document.getElementById('wsPutere').textContent = (wd.putereRacord || meta.putereRacordKw || meta.contractPowerKw || '-') + ' kW';
-        document.getElementById('wsTarif').textContent = (wd.tarifActual || meta.fixedPriceRonKwh || '-') + ' RON/kWh';
-        document.getElementById('wsTipTarif').textContent = wd.tipTarif || meta.tipTarif || '-';
-        document.getElementById('wsTermic').textContent = wd.sursaTermica || meta.sursaTermica || 'necompletat';
-        document.getElementById('wsConsumTermic').textContent = wd.consumTermicAnual ? (wd.consumTermicAnual + ' ' + (wd.unitateTermic || 'MWh')) : (meta.consumTermicAnual ? (meta.consumTermicAnual + ' ' + (meta.unitateTermic || 'MWh')) : 'necompletat');
-        document.getElementById('wsFisier').textContent = meta.fileName || '-';
-      } catch(e) {}
-      SVTReportRenderer.render(analysis);
-    }, 850);
+    const analysis = JSON.parse(sessionStorage.getItem('svtAnalysis') || 'null');
+    const dataset = JSON.parse(sessionStorage.getItem('svtDataset') || 'null');
+    if (!analysis || !dataset) {
+      document.getElementById('summary').innerHTML = 'Nu există date analizate. <a href="./incarcare-curba-sarcina.html">Încarcă un fișier</a>.';
+    } else {
+      const t=analysis.totals, meta=analysis.meta||dataset.meta||{};
+      summary.textContent = `Fișier: ${meta.fileName || '-'} · profil detectat: ${meta.sourceProfile || '-'} · ${meta.rowsCount || dataset.rows.length} intervale · ${meta.intervalMinutes || '-'} min · unitate sursă: ${meta.unit || 'kWh'}.`;
+      mEnergy.textContent = fmt(t.electricKwh,0)+' kWh';
+      mCost.textContent = fmt(t.fixedCostRon,0)+' RON';
+      mSaving.textContent = fmt(t.totalPossibleSavingRon,0)+' RON';
+      mPeak.textContent = fmt(t.maxDemandKw,1)+' kW';
+      const curve = (analysis.charts.loadCurve || []).filter((_,i)=>i%Math.max(1,Math.ceil((analysis.charts.loadCurve||[]).length/160))===0);
+      new Chart(loadChart,{type:'line',data:{labels:curve.map(x=>x.label),datasets:[{label:'kWh',data:curve.map(x=>x.electricKwh),borderColor:'#07943f',backgroundColor:'rgba(7,148,63,.12)',fill:true,tension:.28,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8}},y:{beginAtZero:true}}}});
+      new Chart(hourChart,{type:'bar',data:{labels:(analysis.charts.costByHour||[]).map(x=>String(x.hour).padStart(2,'0')),datasets:[{label:'RON',data:(analysis.charts.costByHour||[]).map(x=>x.cost),backgroundColor:'rgba(7,148,63,.72)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+      findings.innerHTML = (analysis.expensiveIntervals||[]).slice(0,8).map(x=>`<div class="finding"><strong>${x.localLabel} · ${fmt(x.kwh,2)} kWh · ${fmt(x.price,3)} RON/kWh</strong><span>Cost estimat: ${fmt(x.cost,2)} RON. Este un interval prioritar pentru mutare/eșalonare consum.</span></div>`).join('');
+      recs.innerHTML = (analysis.recommendations||[]).map(r=>`<div class="finding"><strong>${r.title}</strong><span>${r.body}<br><b>Economie estimată:</b> ${fmt(r.savingRon,0)} RON · ${r.difficulty}</span></div>`).join('');
+    }
+    function fmt(v,d=0){return (Number(v)||0).toLocaleString('ro-RO',{maximumFractionDigits:d,minimumFractionDigits:d});}
   </script>
 </body>
 </html>
