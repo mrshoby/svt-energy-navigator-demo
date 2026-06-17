@@ -8,8 +8,7 @@
   <link rel="stylesheet" href="./styles.css" />
 
   <style>
-    /* v31 — Testează gratuit layout după referința utilizatorului. Self-contained. */
-    :root {
+    :root{
       --svt-green:#07943f;
       --svt-green-2:#05aa48;
       --svt-green-soft:#e8f6ed;
@@ -17,64 +16,45 @@
       --svt-text:#10203d;
       --svt-muted:#5b6b86;
       --svt-border:#dce5ef;
-      --svt-card:#ffffff;
-      --svt-bg:#fbfdfc;
       --svt-shadow:0 16px 46px rgba(15,23,42,.075);
-      --svt-radius:18px;
     }
-
-    * {
-      box-sizing:border-box;
-    }
-
-    body.svt-trial-v31 {
-      margin:0 !important;
+    *{box-sizing:border-box}
+    body.svt-trial-v311{
+      margin:0!important;
       min-height:100vh;
       background:
-        radial-gradient(circle at 75% 22%, rgba(7,148,63,.055), transparent 26%),
-        radial-gradient(circle at 14% 84%, rgba(7,148,63,.07), transparent 28%),
+        radial-gradient(circle at 76% 22%,rgba(7,148,63,.055),transparent 26%),
+        radial-gradient(circle at 14% 86%,rgba(7,148,63,.075),transparent 28%),
         linear-gradient(180deg,#fff 0%,#fbfdfc 100%);
       color:var(--svt-text);
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       overflow-x:hidden;
     }
-
-    body.svt-trial-v31::after {
+    body.svt-trial-v311::after{
       content:"";
       position:fixed;
-      left:-80px;
-      right:-80px;
-      bottom:-92px;
-      height:210px;
-      pointer-events:none;
-      opacity:.18;
-      background:
-        repeating-radial-gradient(ellipse at center, rgba(7,148,63,.30) 0 1px, transparent 1px 9px);
+      left:-80px;right:-80px;bottom:-92px;height:210px;
+      pointer-events:none;opacity:.18;
+      background:repeating-radial-gradient(ellipse at center,rgba(7,148,63,.30) 0 1px,transparent 1px 9px);
       mask-image:linear-gradient(to top,#000,transparent 78%);
       transform:skewY(-3deg);
       z-index:0;
     }
-
-    .svt-trial-shell {
+    .svt-trial-shell{
       position:relative;
       z-index:1;
-      width:min(1240px, calc(100% - 72px));
+      width:min(1240px,calc(100% - 72px));
       min-height:100vh;
       margin:0 auto;
-      padding:64px 0 42px;
+      padding:76px 0 42px;
       display:grid;
-      grid-template-columns: minmax(390px, 0.78fr) minmax(620px, 1.42fr);
-      grid-template-rows:auto 1fr auto;
-      column-gap:44px;
-      row-gap:22px;
-      align-items:start;
+      grid-template-columns:1fr;
+      gap:24px;
     }
-
-    .svt-trial-left {
-      padding-top:58px;
+    .svt-trial-head{
+      max-width:1120px;
     }
-
-    .svt-trial-kicker {
+    .svt-trial-kicker{
       margin:0 0 20px;
       color:var(--svt-green);
       font-size:15px;
@@ -83,90 +63,31 @@
       text-transform:uppercase;
       font-weight:1000;
     }
-
-    .svt-trial-title {
-      max-width:590px;
+    .svt-trial-title{
       margin:0;
       color:var(--svt-navy);
-      font-size:clamp(50px, 6vw, 76px);
-      line-height:.96;
-      letter-spacing:-.075em;
+      font-size:clamp(42px,4.75vw,72px);
+      line-height:1.02;
+      letter-spacing:-.068em;
       font-weight:1000;
+      white-space:nowrap;
     }
-
-    .svt-trial-subtitle {
-      max-width:555px;
-      margin:24px 0 0;
+    .svt-trial-subtitle{
+      margin:22px 0 0;
       color:var(--svt-muted);
-      font-size:20px;
-      line-height:1.5;
+      font-size:21px;
+      line-height:1.45;
       font-weight:520;
       letter-spacing:-.012em;
+      white-space:nowrap;
     }
-
-    .svt-trial-progress {
-      justify-self:end;
-      width:190px;
-      min-height:88px;
-      margin-top:80px;
-      padding:17px 16px;
-      border:1px solid var(--svt-border);
-      border-radius:14px;
-      background:rgba(255,255,255,.86);
-      box-shadow:0 12px 34px rgba(15,23,42,.055);
-    }
-
-    .svt-trial-progress strong {
-      display:block;
-      margin-bottom:14px;
-      color:#52627a;
-      font-size:14px;
-      line-height:1;
-      font-weight:800;
-    }
-
-    .svt-progress-dots {
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .svt-progress-dot {
-      width:26px;
-      height:26px;
-      border-radius:999px;
+    .svt-trial-options{
       display:grid;
-      place-items:center;
-      border:2px solid #d7e1ed;
-      color:#9aa8ba;
-      background:#fff;
-      font-size:12px;
-      font-weight:1000;
-    }
-
-    .svt-progress-dot.active {
-      color:#fff;
-      background:var(--svt-green);
-      border-color:var(--svt-green);
-      box-shadow:0 8px 20px rgba(7,148,63,.18);
-    }
-
-    .svt-progress-line {
-      width:28px;
-      height:2px;
-      background:#d7e1ed;
-      border-radius:999px;
-    }
-
-    .svt-trial-options {
-      grid-column:1 / -1;
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
+      grid-template-columns:repeat(2,minmax(0,1fr));
       gap:10px 22px;
-      margin-top:4px;
+      margin-top:0;
     }
-
-    .svt-option-card {
+    .svt-option-card{
       position:relative;
       min-height:86px;
       width:100%;
@@ -179,46 +100,38 @@
       align-items:center;
       text-align:left;
       color:var(--svt-navy);
-      transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+      transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease;
       overflow:hidden;
     }
-
-    .svt-option-card.is-active {
+    .svt-option-card.is-active{
       border-color:var(--svt-green);
-      background:linear-gradient(135deg, rgba(7,148,63,.085), rgba(255,255,255,.98));
+      background:linear-gradient(135deg,rgba(7,148,63,.085),rgba(255,255,255,.98));
       cursor:pointer;
       box-shadow:0 18px 50px rgba(7,148,63,.11);
     }
-
-    .svt-option-card.is-active:hover {
+    .svt-option-card.is-active:hover{
       transform:translateY(-2px);
       box-shadow:0 22px 58px rgba(7,148,63,.14);
     }
-
-    .svt-option-card.is-disabled {
+    .svt-option-card.is-disabled{
       cursor:not-allowed;
       opacity:.76;
       filter:saturate(.82);
     }
-
-    .svt-option-card.is-disabled::after {
+    .svt-option-card.is-disabled::after{
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.40));
+      background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.42));
       pointer-events:none;
     }
-
-    .svt-option-number {
+    .svt-option-number{
       position:absolute;
       left:28px;
       top:50%;
       transform:translateY(-50%);
-      width:42px;
-      height:42px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
+      width:42px;height:42px;border-radius:999px;
+      display:grid;place-items:center;
       background:#fff;
       border:1px solid #e1e9f2;
       color:var(--svt-green);
@@ -227,34 +140,26 @@
       font-variant-numeric:tabular-nums;
       box-shadow:0 7px 18px rgba(15,23,42,.045);
     }
-
-    .svt-option-icon {
+    .svt-option-icon{
       position:absolute;
       left:84px;
       top:50%;
       transform:translateY(-50%);
-      width:58px;
-      height:58px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
+      width:58px;height:58px;border-radius:999px;
+      display:grid;place-items:center;
       color:var(--svt-green);
       background:var(--svt-green-soft);
     }
-
-    .svt-option-icon svg {
-      width:30px;
-      height:30px;
+    .svt-option-icon svg{
+      width:30px;height:30px;
       stroke:currentColor;
       stroke-width:2.05;
       stroke-linecap:round;
       stroke-linejoin:round;
       fill:none;
     }
-
-    .svt-option-title {
+    .svt-option-title{
       display:block;
-      max-width:430px;
       color:var(--svt-navy);
       font-size:18px;
       line-height:1.18;
@@ -262,38 +167,30 @@
       font-weight:1000;
       white-space:normal;
     }
-
-    .svt-option-arrow,
-    .svt-option-check {
+    .svt-option-arrow,.svt-option-check{
       position:absolute;
       right:24px;
       top:50%;
       transform:translateY(-50%);
       z-index:2;
     }
-
-    .svt-option-arrow {
+    .svt-option-arrow{
       color:#213552;
       font-size:31px;
       line-height:1;
       font-weight:400;
       opacity:.9;
     }
-
-    .svt-option-check {
-      width:30px;
-      height:30px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
+    .svt-option-check{
+      width:30px;height:30px;border-radius:999px;
+      display:grid;place-items:center;
       background:var(--svt-green);
       color:#fff;
       font-size:17px;
       font-weight:1000;
       box-shadow:0 9px 20px rgba(7,148,63,.22);
     }
-
-    .svt-soon-badge {
+    .svt-soon-badge{
       position:absolute;
       right:54px;
       top:50%;
@@ -314,10 +211,8 @@
       letter-spacing:.01em;
       white-space:nowrap;
     }
-
-    .svt-trial-bottom {
-      grid-column:1 / -1;
-      margin-top:28px;
+    .svt-trial-bottom{
+      margin-top:10px;
       padding-top:24px;
       border-top:1px solid #e4ebf2;
       display:flex;
@@ -325,11 +220,8 @@
       align-items:center;
       gap:20px;
     }
-
-    .svt-bottom-btn {
-      width:210px;
-      min-width:210px;
-      height:58px;
+    .svt-bottom-btn{
+      width:210px;min-width:210px;height:58px;
       border-radius:12px;
       border:1px solid var(--svt-border);
       display:inline-flex;
@@ -343,217 +235,62 @@
       cursor:pointer;
       font-family:inherit;
     }
-
-    .svt-bottom-btn.back {
+    .svt-bottom-btn.back{
       color:var(--svt-navy);
       background:rgba(255,255,255,.94);
       box-shadow:0 13px 30px rgba(15,23,42,.055);
     }
-
-    .svt-bottom-btn.next {
+    .svt-bottom-btn.next{
       color:#fff;
       border-color:transparent;
-      background:linear-gradient(135deg, var(--svt-green), var(--svt-green-2));
+      background:linear-gradient(135deg,var(--svt-green),var(--svt-green-2));
       box-shadow:0 16px 36px rgba(7,148,63,.22);
     }
-
-    @media (max-width:1050px) {
-      .svt-trial-shell {
-        grid-template-columns:1fr;
-        width:min(760px, calc(100% - 36px));
-        padding-top:34px;
-      }
-
-      .svt-trial-left {
-        padding-top:0;
-      }
-
-      .svt-trial-progress {
-        justify-self:start;
-        margin-top:0;
-      }
-
-      .svt-trial-options {
-        grid-template-columns:1fr;
-      }
+    @media(max-width:1100px){
+      .svt-trial-title,.svt-trial-subtitle{white-space:normal}
+      .svt-trial-options{grid-template-columns:1fr}
     }
-
-    @media (max-width:620px) {
-      .svt-trial-title {
-        font-size:clamp(38px, 12vw, 56px);
-      }
-
-      .svt-trial-subtitle {
-        font-size:17px;
-      }
-
-      .svt-option-card {
-        min-height:78px;
-        padding:12px 48px 12px 118px;
-      }
-
-      .svt-option-number {
-        left:15px;
-        width:36px;
-        height:36px;
-        font-size:13px;
-      }
-
-      .svt-option-icon {
-        left:58px;
-        width:48px;
-        height:48px;
-      }
-
-      .svt-option-icon svg {
-        width:25px;
-        height:25px;
-      }
-
-      .svt-option-title {
-        font-size:15px;
-      }
-
-      .svt-soon-badge {
-        right:42px;
-        top:16px;
-        transform:none;
-      }
-
-      .svt-trial-bottom {
-        flex-direction:column-reverse;
-        align-items:stretch;
-      }
-
-      .svt-bottom-btn {
-        width:100%;
-        min-width:0;
-      }
+    @media(max-width:620px){
+      .svt-trial-shell{width:calc(100% - 28px);padding-top:36px}
+      .svt-trial-title{font-size:clamp(36px,11vw,54px)}
+      .svt-trial-subtitle{font-size:17px}
+      .svt-option-card{min-height:78px;padding:12px 48px 12px 118px}
+      .svt-option-number{left:15px;width:36px;height:36px;font-size:13px}
+      .svt-option-icon{left:58px;width:48px;height:48px}
+      .svt-option-icon svg{width:25px;height:25px}
+      .svt-option-title{font-size:15px}
+      .svt-soon-badge{right:42px;top:16px;transform:none}
+      .svt-trial-bottom{flex-direction:column-reverse;align-items:stretch}
+      .svt-bottom-btn{width:100%;min-width:0}
     }
   </style>
 </head>
 
-<body class="svt-trial-v31">
+<body class="svt-trial-v311">
   <main class="svt-trial-shell">
-    <section class="svt-trial-left" aria-labelledby="trialTitle">
+    <section class="svt-trial-head" aria-labelledby="trialTitle">
       <p class="svt-trial-kicker">SVT ENERGY NAVIGATOR</p>
       <h1 class="svt-trial-title" id="trialTitle">Alege întrebarea care te interesează cel mai mult</h1>
-      <p class="svt-trial-subtitle">
-        Începem cu un singur obiectiv,<br />
-        apoi construim analiza pas cu pas.
-      </p>
+      <p class="svt-trial-subtitle">Începem cu un singur obiectiv, apoi construim analiza pas cu pas.</p>
     </section>
-
-    <aside class="svt-trial-progress" aria-label="Progres">
-      <strong>Pasul 1 din 3</strong>
-      <div class="svt-progress-dots" aria-hidden="true">
-        <span class="svt-progress-dot active">1</span>
-        <span class="svt-progress-line"></span>
-        <span class="svt-progress-dot">2</span>
-        <span class="svt-progress-line"></span>
-        <span class="svt-progress-dot">3</span>
-      </div>
-    </aside>
 
     <section class="svt-trial-options" aria-label="Întrebări disponibile">
       <button class="svt-option-card is-active" type="button" aria-pressed="true" data-target="./incarcare-curba-sarcina.html">
         <span class="svt-option-number">01</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/><path d="M17 6h2v2"/></svg>
-        </span>
+        <span class="svt-option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/><path d="M17 6h2v2"/></svg></span>
         <span class="svt-option-title">Când consum energie scumpă din rețea?</span>
         <span class="svt-option-check" aria-hidden="true">✓</span>
       </button>
 
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">02</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/><path d="M8 21h8"/></svg>
-        </span>
-        <span class="svt-option-title">Când nu valorific optim energia produsă local?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">03</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M5 5h14v16H5z"/><path d="M14 14h4"/><path d="M16 12v4"/></svg>
-        </span>
-        <span class="svt-option-title">Cât va produce estimativ sistemul meu în următoarele 24 ore?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">04</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-        </span>
-        <span class="svt-option-title">Câtă energie aș mai putea produce local?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">05</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M12 3v9h9"/><path d="M21 12A9 9 0 1 1 12 3"/><path d="M16 4.5a9 9 0 0 1 4.5 4.5"/></svg>
-        </span>
-        <span class="svt-option-title">Cât din energia suplimentar produsă ar fi utilizabilă?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">06</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/><path d="M12 7v5l4 2"/></svg>
-        </span>
-        <span class="svt-option-title">Ce consumuri aș putea muta în timp?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">07</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1.8"/><path d="M10 7h4"/><path d="M10 17h4"/><path d="M12 10v4"/><path d="M10.5 12h3"/></svg>
-        </span>
-        <span class="svt-option-title">Ce economie aș obține cu BESS, pompă de căldură, boiler, puffer sau cogenerare?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">08</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 16 4-5 3 3 5-8"/></svg>
-        </span>
-        <span class="svt-option-title">Ce economie aș obține astăzi cu tarif dinamic PZU?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">09</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M4 19h16"/><rect x="6" y="11" width="3" height="8"/><rect x="11" y="7" width="3" height="12"/><rect x="16" y="3" width="3" height="16"/><path d="m16 3 3 3"/></svg>
-        </span>
-        <span class="svt-option-title">Cât m-ar costa o investiție integrată pentru reducerea costurilor electrice și termice?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
-
-      <button class="svt-option-card is-disabled" type="button" disabled aria-disabled="true">
-        <span class="svt-option-number">10</span>
-        <span class="svt-option-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3"/><path d="M22 12h-3"/><path d="M12 22v-3"/><path d="M2 12h3"/></svg>
-        </span>
-        <span class="svt-option-title">Ce ar trebui să fac mâine pentru a reduce costul?</span>
-        <span class="svt-soon-badge">În curând</span>
-        <span class="svt-option-arrow" aria-hidden="true">›</span>
-      </button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">02</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/><path d="M8 21h8"/></svg></span><span class="svt-option-title">Când nu valorific optim energia produsă local?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">03</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M5 5h14v16H5z"/><path d="M14 14h4"/><path d="M16 12v4"/></svg></span><span class="svt-option-title">Cât va produce estimativ sistemul meu în următoarele 24 ore?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">04</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span><span class="svt-option-title">Câtă energie aș mai putea produce local?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">05</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M12 3v9h9"/><path d="M21 12A9 9 0 1 1 12 3"/><path d="M16 4.5a9 9 0 0 1 4.5 4.5"/></svg></span><span class="svt-option-title">Cât din energia suplimentar produsă ar fi utilizabilă?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">06</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/><path d="M12 7v5l4 2"/></svg></span><span class="svt-option-title">Ce consumuri aș putea muta în timp?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">07</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1.8"/><path d="M10 7h4"/><path d="M10 17h4"/><path d="M12 10v4"/><path d="M10.5 12h3"/></svg></span><span class="svt-option-title">Ce economie aș obține cu BESS, pompă de căldură, boiler, puffer sau cogenerare?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">08</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 16 4-5 3 3 5-8"/></svg></span><span class="svt-option-title">Ce economie aș obține astăzi cu tarif dinamic PZU?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">09</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M4 19h16"/><rect x="6" y="11" width="3" height="8"/><rect x="11" y="7" width="3" height="12"/><rect x="16" y="3" width="3" height="16"/><path d="m16 3 3 3"/></svg></span><span class="svt-option-title">Cât m-ar costa o investiție integrată pentru reducerea costurilor electrice și termice?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
+      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">10</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3"/><path d="M22 12h-3"/><path d="M12 22v-3"/><path d="M2 12h3"/></svg></span><span class="svt-option-title">Ce ar trebui să fac mâine pentru a reduce costul?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
     </section>
 
     <footer class="svt-trial-bottom">
@@ -563,14 +300,7 @@
   </main>
 
   <script>
-    const continueBtn = document.getElementById('svtContinueBtn');
-    const activeCard = document.querySelector('.svt-option-card.is-active');
-
-    activeCard?.addEventListener('click', () => {
-      document.querySelectorAll('.svt-option-card.is-active').forEach(card => card.setAttribute('aria-pressed', 'true'));
-    });
-
-    continueBtn?.addEventListener('click', () => {
+    document.getElementById('svtContinueBtn')?.addEventListener('click', () => {
       window.location.href = './incarcare-curba-sarcina.html';
     });
   </script>

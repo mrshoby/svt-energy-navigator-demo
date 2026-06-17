@@ -4,325 +4,284 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
+  <meta name="description" content="Încarcă fișierul cu consumul zilnic pentru analiza SVT Energy Navigator."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./upload-flow.css"/>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root{
+      --g:#07943f;--g2:#05aa48;--gs:#e8f6ed;--navy:#071826;--muted:#66758f;--border:#dce5ef;--card:#fff;
+      --shadow:0 22px 70px rgba(15,23,42,.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 70% 20%,rgba(7,148,63,.05),transparent 28%),
+        linear-gradient(180deg,#fff 0%,#fbfdfc 100%);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--navy);
+      overflow-x:hidden;
+    }
+    body::after{
+      content:"";
+      position:fixed;left:-70px;right:-70px;bottom:-90px;height:220px;z-index:0;pointer-events:none;opacity:.16;
+      background:repeating-radial-gradient(ellipse at center,rgba(7,148,63,.32) 0 1px,transparent 1px 9px);
+      mask-image:linear-gradient(to top,#000,transparent 80%);
+      transform:skewY(-3deg);
+    }
+    .topbar{
+      position:relative;z-index:2;
+      width:min(1240px,calc(100% - 72px));
+      height:72px;margin:30px auto 0;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--border);
+      border-radius:18px;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 24px 0 28px;
+      box-shadow:0 12px 34px rgba(15,23,42,.045);
+    }
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .brand img{height:42px;width:auto;display:block}
+    .brand-text{font-size:14px;font-weight:900;color:var(--navy)}
+    .brand-text small{display:block;color:var(--g);font-size:10px;font-weight:800;margin-top:1px}
+    .nav{display:flex;align-items:center;gap:38px;font-size:15px;font-weight:800;color:#132642}
+    .nav a{text-decoration:none;color:inherit}
+    .nav-cta{height:48px;border-radius:11px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff!important;padding:0 24px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 14px 32px rgba(7,148,63,.2)}
+    .shell{
+      position:relative;z-index:1;
+      width:min(710px,calc(100% - 40px));
+      margin:52px auto 44px;
+      background:rgba(255,255,255,.94);
+      border:1px solid var(--border);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:28px 54px 30px;
+    }
+    .steps{
+      width:min(520px,100%);
+      margin:0 auto 32px;
+      display:grid;
+      grid-template-columns:44px 1fr 44px 1fr 44px 1fr 44px;
+      align-items:start;
+      gap:8px;
+      text-align:center;
+    }
+    .step-dot{width:32px;height:32px;border-radius:999px;border:2px solid #cbd6e4;background:#fff;color:#64748b;display:grid;place-items:center;font-weight:1000;margin:0 auto}
+    .step-dot.active{background:var(--g);border-color:var(--g);color:#fff;box-shadow:0 8px 18px rgba(7,148,63,.22)}
+    .step-line{height:2px;background:#dbe3ec;margin-top:15px;border-radius:999px}
+    .step-label{grid-row:2;font-size:12px;font-weight:900;color:#53647d;margin-top:7px}
+    .step-label.active{color:var(--g)}
+    .eyebrow{text-align:center;margin:0 0 15px;color:var(--g);font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:1000}
+    h1{text-align:center;margin:0;color:var(--navy);font-size:38px;line-height:1.08;letter-spacing:-.055em;font-weight:1000}
+    .sub{text-align:center;margin:12px auto 30px;color:var(--muted);font-size:15px;line-height:1.45;max-width:560px;font-weight:580}
+    .tabs{
+      width:390px;max-width:100%;
+      margin:0 auto 24px;
+      display:grid;grid-template-columns:1fr 1fr;
+      border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;
+    }
+    .tab{height:56px;border:0;background:#fff;color:#66758f;font-weight:1000;font-size:16px;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}
+    .tab.active{color:var(--g);background:linear-gradient(180deg,#fff,#f7fff9);box-shadow:inset 0 -3px 0 var(--g)}
+    .upload-zone{
+      min-height:194px;
+      border:1.5px dashed #9ed4b4;
+      border-radius:14px;
+      background:linear-gradient(180deg,#fff,#fbfefc);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+      padding:24px;
+      cursor:pointer;
+      transition:.18s;
+    }
+    .upload-zone:hover,.upload-zone.drag{border-color:var(--g);background:#f4fbf6}
+    .upload-zone.has-file{border-style:solid;border-color:var(--g);background:#f3fbf6}
+    .cloud{width:56px;height:56px;border-radius:999px;background:var(--gs);color:var(--g);display:grid;place-items:center;margin-bottom:14px}
+    .cloud svg{width:34px;height:34px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .upload-main{font-size:15px;font-weight:1000;color:var(--navy)}
+    .upload-sub{font-size:12px;color:var(--muted);margin-top:7px;font-weight:650}
+    .choose{height:38px;margin-top:18px;padding:0 22px;border:1.5px solid var(--g);border-radius:9px;background:#fff;color:var(--g);font-size:14px;font-weight:1000;font-family:inherit;cursor:pointer}
+    .upload-note{text-align:center;color:#738199;font-size:12px;font-weight:700;margin:13px 0 24px}
+    .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .field label{display:block;margin-bottom:7px;color:var(--navy);font-size:12px;font-weight:1000}
+    .input-wrap{height:42px;border:1px solid var(--border);border-radius:8px;background:#fff;display:flex;align-items:center;overflow:hidden}
+    .input-wrap input,.input-wrap select{width:100%;height:100%;border:0;outline:0;background:#fff;padding:0 12px;font-family:inherit;font-size:14px;font-weight:700;color:#172846}
+    .unit{height:100%;min-width:54px;border-left:1px solid var(--border);display:grid;place-items:center;color:#53647d;font-size:14px;font-weight:800;background:#fbfcfe}
+    .bottom{
+      margin-top:36px;padding-top:18px;border-top:1px solid #e7edf4;display:flex;justify-content:space-between;align-items:center;gap:18px
+    }
+    .btn{width:168px;height:50px;border-radius:9px;border:1px solid var(--border);font-family:inherit;font-size:16px;font-weight:1000;display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;cursor:pointer}
+    .btn.back{background:#fff;color:var(--navy)}
+    .btn.next{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border:0;box-shadow:0 13px 32px rgba(7,148,63,.22)}
+    .file-input{display:none}
+    .alert{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:13px;font-weight:750;line-height:1.4}
+    .alert.ok{background:#e8f6ed;color:#075f32;border:1px solid #c8e8d2}
+    .alert.err{background:#fcebeb;color:#a32d2d;border:1px solid #f7c1c1}
+    @media(max-width:900px){.topbar{width:calc(100% - 28px)}.nav{display:none}.shell{padding:26px 22px}.form-grid{grid-template-columns:1fr}.bottom{flex-direction:column-reverse}.btn{width:100%}}
+  </style>
 </head>
-<body class="svt-wizard-compatible">
+<body>
+  <header class="topbar">
+    <a class="brand" href="./index.html" aria-label="Servelect">
+      <img src="./assets/logo_servelect.png" alt="Servelect" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <span class="brand-text" style="display:none">SERVELECT<small>Energy is money! We save both.</small></span>
+    </a>
+    <nav class="nav" aria-label="Navigare">
+      <a href="./index.html#solutii">Soluții</a>
+      <a href="./index.html#beneficii">Beneficii</a>
+      <a href="./index.html#cum-functioneaza">Cum funcționează</a>
+      <a href="./index.html#resurse">Resurse</a>
+      <a href="./index.html#despre-noi">Despre noi</a>
+      <a class="nav-cta" href="./testeaza-gratuit.html">Testează gratuit →</a>
+    </nav>
+  </header>
 
-<nav class="svt-wizard-nav">
-  <a class="svt-wizard-logo" href="./testeaza-gratuit.html">
-    <div class="svt-wizard-logomark">✦</div>
-    <div class="svt-wizard-logotxt">SVT Energy Navigator <span>by Servelect</span></div>
-  </a>
-  <div class="svt-wizard-dots">
-    <div class="svt-wizard-dot active"></div>
-    <div class="svt-wizard-dot"></div>
-    <div class="svt-wizard-dot"></div>
-  </div>
-</nav>
+  <main class="shell">
+    <section class="steps" aria-label="Progres analiză">
+      <div class="step-dot active">1</div><div class="step-line"></div>
+      <div class="step-dot">2</div><div class="step-line"></div>
+      <div class="step-dot">3</div><div class="step-line"></div>
+      <div class="step-dot">4</div>
+      <div class="step-label active" style="grid-column:1">Consum</div>
+      <div class="step-label" style="grid-column:3">Procesare</div>
+      <div class="step-label" style="grid-column:5">Rezultate</div>
+      <div class="step-label" style="grid-column:7">Recomandări</div>
+    </section>
 
-<div class="svt-wizard-progress-wrap">
-  <div class="svt-wizard-progress"></div>
-</div>
+    <p class="eyebrow">PAS 1 DIN 4</p>
+    <h1>Curba ta de consum zilnic</h1>
+    <p class="sub">Încarcă datele de consum și completează detaliile pentru o analiză precisă.</p>
 
-<div class="svt-wizard-app">
-  <main class="svt-wizard-form">
-    <div class="svt-wizard-eyebrow">Pasul 1 din 10</div>
-    <h1 class="svt-wizard-title">Curba ta de consum zilnic</h1>
-    <p class="svt-wizard-sub">Avem nevoie de consumul orar pe o zi tipică — electric și termic. Acesta este punctul de pornire pentru toate calculele.</p>
+    <section class="tabs" aria-label="Tip consum">
+      <button class="tab active" type="button" data-tab="electric">⚡ Electric</button>
+      <button class="tab" type="button" data-tab="termic">♨️ Termic</button>
+    </section>
 
-    <div class="svt-tab-toggle">
-      <button class="svt-tab-btn active" type="button" data-tab="electric">⚡ Electric</button>
-      <button class="svt-tab-btn" type="button" data-tab="termic">🌡️ Termic</button>
-    </div>
-
-    <section id="tab-electric">
-      <label class="field-label">Cum preferi să încarci datele de consum electric?</label>
-      <div class="svt-radio-group">
-        <div class="svt-radio-pill"><input type="radio" name="upload_type_e" id="ue1" value="fisier" checked><label for="ue1">Încarc fișier</label></div>
-        <div class="svt-radio-pill"><input type="radio" name="upload_type_e" id="ue2" value="manual"><label for="ue2">Introduc manual</label></div>
-        <div class="svt-radio-pill"><input type="radio" name="upload_type_e" id="ue3" value="factura"><label for="ue3">Am doar factura lunară</label></div>
+    <section class="upload-zone" id="dropZone">
+      <input class="file-input" id="fileInput" type="file" accept=".csv,.txt,.xlsx,.xls,.pdf"/>
+      <div class="cloud" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M16 16 12 12l-4 4"/><path d="M12 12v9"/><path d="M20.4 17.4A5 5 0 0 0 18 8h-1.3A7 7 0 1 0 5 16.3"/></svg>
       </div>
+      <div class="upload-main" id="uploadTitle">Încarcă fișierul cu consumul tău</div>
+      <div class="upload-sub" id="uploadSub">Excel (.xlsx, .xls) sau CSV · max. 10 MB</div>
+      <button class="choose" type="button">Alege fișier</button>
+    </section>
+    <p class="upload-note" id="uploadNote">ⓘ Asigură-te că fișierul conține valorile de consum orar (kWh).</p>
+    <div id="message"></div>
 
-      <div style="margin-top:20px;">
-        <div class="svt-upload-zone" id="uploadZoneE">
-          <div class="svt-upload-icon">📂</div>
-          <div class="svt-upload-main">Trage fișierul aici sau apasă să selectezi</div>
-          <div class="svt-upload-sub">Export din contorul inteligent, distribuitorul local (DEER, E.ON, etc.) sau contabil</div>
-          <div class="svt-upload-formats">
-            <span class="svt-fmt-pill">CSV</span>
-            <span class="svt-fmt-pill">XLSX</span>
-            <span class="svt-fmt-pill">TXT</span>
-            <span class="svt-fmt-pill">model inclus</span>
-          </div>
-          <input type="file" id="fileE" accept=".csv,.txt,.xlsx,.xls" style="display:none">
+    <section class="form-grid">
+      <div class="field">
+        <label for="putere">Putere contractată</label>
+        <div class="input-wrap"><input id="putere" value="100" inputmode="decimal"><span class="unit">kW</span></div>
+      </div>
+      <div class="field">
+        <label for="tarifDistributie">Tarif de distribuție</label>
+        <div class="input-wrap">
+          <select id="tarifDistributie">
+            <option>Joasă tensiune</option>
+            <option>Medie tensiune</option>
+            <option>Înaltă tensiune</option>
+          </select>
         </div>
-        <div class="svt-file-chosen" id="fileNameE">
-          <span>✅</span><span class="svt-file-name" id="fileNameEtxt"></span>
+      </div>
+      <div class="field">
+        <label for="tipTarif">Tip de tarif</label>
+        <div class="input-wrap">
+          <select id="tipTarif">
+            <option>Simplu</option>
+            <option>Zi / noapte</option>
+            <option>Dinamic PZU</option>
+          </select>
         </div>
-      </div>
-
-      <div class="svt-info-box" style="margin-top:16px;">
-        <strong>De unde obții fișierul?</strong> Intri pe portalul distribuitorului tău (ex. myeer.ro, myeon.ro) → Consum → Export date orare. Dacă nu ai acces, îl poate solicita contabilul sau responsabilul tehnic.
-        <div style="margin-top:8px;"><a href="./assets/templates/model_curba_sarcina.csv" download style="color:var(--g600);font-weight:700;">Descarcă model CSV pentru test</a></div>
-      </div>
-
-      <label class="field-label" style="margin-top:24px;">Puterea maximă racordată la rețea (kW)</label>
-      <input type="number" placeholder="ex. 250" min="1" id="putereRacord">
-      <div class="hint">Găsești această valoare în contractul cu distribuitorul sau pe avizul tehnic de racordare (ATR).</div>
-
-      <label class="field-label">Tariful de energie actual (RON/kWh)</label>
-      <input type="number" placeholder="ex. 0.75" step="0.01" id="tarifActual">
-      <div class="hint">Din ultima factură — prețul pe kWh fără TVA.</div>
-
-      <label class="field-label">Tip tarif actual</label>
-      <div class="svt-radio-group" style="margin-top:6px;">
-        <div class="svt-radio-pill"><input type="radio" name="tip_tarif" id="tt1" value="fix" checked><label for="tt1">Fix (același tot timpul)</label></div>
-        <div class="svt-radio-pill"><input type="radio" name="tip_tarif" id="tt2" value="bioraza"><label for="tt2">Biorată (zi/noapte)</label></div>
-        <div class="svt-radio-pill"><input type="radio" name="tip_tarif" id="tt3" value="pzu"><label for="tt3">Dinamic PZU</label></div>
       </div>
     </section>
 
-    <section id="tab-termic" style="display:none;">
-      <label class="field-label">Ai consum termic monitorizat (căldură, abur, apă caldă)?</label>
-      <div class="svt-radio-group">
-        <div class="svt-radio-pill"><input type="radio" name="has_termic" id="ht1" value="da" checked><label for="ht1">Da</label></div>
-        <div class="svt-radio-pill"><input type="radio" name="has_termic" id="ht2" value="nu"><label for="ht2">Nu / nu știu</label></div>
-      </div>
-
-      <div style="margin-top:20px;">
-        <div class="svt-upload-zone" id="uploadZoneT">
-          <div class="svt-upload-icon">🌡️</div>
-          <div class="svt-upload-main">Încarc datele de consum termic</div>
-          <div class="svt-upload-sub">Date orare sau zilnice de la contorul de căldură / centrala termică</div>
-          <div class="svt-upload-formats">
-            <span class="svt-fmt-pill">CSV</span>
-            <span class="svt-fmt-pill">XLSX</span>
-            <span class="svt-fmt-pill">opțional</span>
-          </div>
-          <input type="file" id="fileT" accept=".csv,.txt,.xlsx,.xls" style="display:none">
-        </div>
-        <div class="svt-file-chosen" id="fileNameT">
-          <span>✅</span><span class="svt-file-name" id="fileNameTtxt"></span>
-        </div>
-      </div>
-
-      <label class="field-label" style="margin-top:20px;">Sursa principală de căldură</label>
-      <select id="sursaTermica">
-        <option value="">Selectează...</option>
-        <option>Centrală pe gaz natural</option>
-        <option>Centrală pe păcură / motorină</option>
-        <option>Pompă de căldură</option>
-        <option>Cogenerare (CHP)</option>
-        <option>Rețea termică urbană</option>
-        <option>Altele</option>
-      </select>
-
-      <label class="field-label">Consumul anual estimat de gaz / energie termică</label>
-      <div class="svt-two-col">
-        <input type="number" placeholder="Cantitate" id="consumTermicAnual">
-        <select id="unitateTermic"><option>MWh</option><option>m³</option></select>
-      </div>
-    </section>
-
-    <div id="uploadMessage"></div>
-
-    <section class="svt-wizard-preview" id="previewPanel">
-      <div class="svt-wizard-preview-head">
-        <div><strong>Date încărcate și mapare coloane</strong><br><small id="previewMeta">-</small></div>
-        <button class="svt-btn-back-wizard" type="button" id="validateBtn">Validează</button>
-      </div>
-      <div class="svt-wizard-map">
-        <div><label class="field-label">Dată/oră *</label><select id="mapTimestamp"></select></div>
-        <div><label class="field-label">Consum electric *</label><select id="mapElectric"></select></div>
-        <div><label class="field-label">Unitate electrică</label><select id="unitElectric"><option value="kwh">kWh / interval</option><option value="kw">kW mediu</option></select></div>
-        <div><label class="field-label">Consum termic</label><select id="mapThermal"></select></div>
-        <div><label class="field-label">Producție PV</label><select id="mapPv"></select></div>
-        <div><label class="field-label">Preț RON/kWh</label><select id="mapPrice"></select></div>
-      </div>
-      <div class="svt-wizard-table-wrap">
-        <table class="svt-wizard-preview-table" id="previewTable"></table>
-      </div>
-    </section>
-
-    <div class="svt-wizard-navbtns">
-      <a class="svt-btn-back-wizard" href="./testeaza-gratuit.html">← Înapoi</a>
-      <button class="svt-btn-next-wizard" type="button" id="continueBtn">Continuă →</button>
-      <span class="svt-step-counter">1 / 10</span>
-    </div>
+    <footer class="bottom">
+      <a class="btn back" href="./testeaza-gratuit.html">← Înapoi</a>
+      <button class="btn next" type="button" id="continueBtn">Continuă →</button>
+    </footer>
   </main>
-</div>
 
-<script src="./assets/js/svt-upload-parser.js"></script>
-<script src="./assets/js/svt-price-profiles.js"></script>
-<script src="./assets/js/svt-analysis-engine.js"></script>
-<script>
-  const state = { electricRaw:null, thermalRaw:null };
+  <script src="./assets/js/svt-upload-parser.js"></script>
+  <script src="./assets/js/svt-price-profiles.js"></script>
+  <script src="./assets/js/svt-analysis-engine.js"></script>
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const input = document.getElementById('fileInput');
+    const msg = document.getElementById('message');
+    let parsed = null;
 
-  document.querySelectorAll('.svt-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.svt-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-electric').style.display = btn.dataset.tab === 'electric' ? 'block' : 'none';
-      document.getElementById('tab-termic').style.display = btn.dataset.tab === 'termic' ? 'block' : 'none';
+    dropZone.addEventListener('click', () => input.click());
+    ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('drag'); }));
+    dropZone.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if(f) readFile(f); });
+    input.addEventListener('change', e => { const f = e.target.files[0]; if(f) readFile(f); });
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const isTermic = tab.dataset.tab === 'termic';
+        document.getElementById('uploadTitle').textContent = isTermic ? 'Încarcă fișierul cu consumul termic' : 'Încarcă fișierul cu consumul tău';
+        document.getElementById('uploadSub').textContent = isTermic ? 'CSV sau XLSX cu energie termică / gaz' : 'Excel (.xlsx, .xls) sau CSV · max. 10 MB';
+        document.getElementById('uploadNote').textContent = isTermic ? 'ⓘ Fișierul termic este opțional și poate fi adăugat ulterior.' : 'ⓘ Asigură-te că fișierul conține valorile de consum orar (kWh).';
+      });
     });
-  });
 
-  setupUpload('uploadZoneE', 'fileE', 'fileNameE', 'fileNameEtxt', 'electricRaw');
-  setupUpload('uploadZoneT', 'fileT', 'fileNameT', 'fileNameTtxt', 'thermalRaw');
-
-  function setupUpload(zoneId, inputId, fileBoxId, fileTextId, stateKey) {
-    const zone = document.getElementById(zoneId);
-    const input = document.getElementById(inputId);
-    zone.addEventListener('click', () => input.click());
-    ['dragenter','dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('is-drag'); }));
-    ['dragleave','drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('is-drag'); }));
-    zone.addEventListener('drop', e => {
-      const f = e.dataTransfer.files[0];
-      if (f) handleFile(f, zone, fileBoxId, fileTextId, stateKey);
-    });
-    input.addEventListener('change', e => {
-      const f = e.target.files[0];
-      if (f) handleFile(f, zone, fileBoxId, fileTextId, stateKey);
-    });
-  }
-
-  async function handleFile(file, zone, fileBoxId, fileTextId, stateKey) {
-    showMsg('Se citește fișierul: ' + file.name, 'warn');
-    try {
-      const parsed = await SVTUploadParser.parseFile(file);
-      state[stateKey] = parsed;
-      zone.classList.add('has-file');
-      document.getElementById(fileBoxId).classList.add('visible');
-      document.getElementById(fileTextId).textContent = file.name;
-
-      if (stateKey === 'electricRaw') {
-        fillMapping(parsed);
-        renderPreview(parsed);
-        document.getElementById('previewPanel').classList.add('visible');
-        document.getElementById('previewMeta').textContent = `${parsed.rows.length} rânduri · ${parsed.columns.length} coloane · interval ${parsed.detected.intervalLabel || 'necunoscut'}`;
-      }
-
-      showMsg('Fișier încărcat. Completează câmpurile și continuă.', 'ok');
-    } catch (e) {
-      showMsg(e.message || String(e), 'error');
-    }
-  }
-
-  function fillMapping(parsed) {
-    const ids = ['mapTimestamp','mapElectric','mapThermal','mapPv','mapPrice'];
-    ids.forEach(id => {
-      const sel = document.getElementById(id);
-      sel.innerHTML = '<option value="">— fără —</option>' + parsed.columns.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    });
-    mapTimestamp.value = parsed.detected.timestamp || '';
-    mapElectric.value = parsed.detected.electric || '';
-    mapThermal.value = parsed.detected.thermal || '';
-    mapPv.value = parsed.detected.pv || '';
-    mapPrice.value = parsed.detected.price || '';
-  }
-
-  function renderPreview(parsed) {
-    const rows = parsed.rows.slice(0, 10);
-    previewTable.innerHTML = `<thead><tr>${parsed.columns.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>` +
-      `<tbody>${rows.map(r => `<tr>${parsed.columns.map(c => `<td>${esc(r[c] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody>`;
-  }
-
-  validateBtn.addEventListener('click', () => {
-    const built = buildDataset();
-    if (!built.ok) showMsg(built.error, 'error');
-    else showMsg(`Validare OK: ${built.dataset.rows.length} intervale normalizate.`, 'ok');
-  });
-
-  continueBtn.addEventListener('click', () => {
-    const built = buildDataset();
-    if (!built.ok) { showMsg(built.error, 'error'); return; }
-
-    const wizardData = collectWizardData();
-    sessionStorage.setItem('svtData', JSON.stringify(wizardData));
-    sessionStorage.setItem('svtDataset', JSON.stringify(built.dataset));
-
-    const analysis = SVTAnalysisEngine.analyze(built.dataset);
-    analysis.wizardData = wizardData;
-    sessionStorage.setItem('svtAnalysis', JSON.stringify(analysis));
-
-    window.location.href = './svt-analiza.html';
-  });
-
-  function collectWizardData() {
-    return {
-      firma: 'Firma dvs.',
-      email: '',
-      uploadTypeElectric: document.querySelector('input[name="upload_type_e"]:checked')?.value || 'fisier',
-      hasTermic: document.querySelector('input[name="has_termic"]:checked')?.value || 'da',
-      putereRacord: putereRacord.value || '250',
-      tarifActual: tarifActual.value || '0.75',
-      tipTarif: document.querySelector('input[name="tip_tarif"]:checked')?.value || 'fix',
-      sursaTermica: sursaTermica.value || '',
-      consumTermicAnual: consumTermicAnual.value || '',
-      unitateTermic: unitateTermic.value || 'MWh',
-      consumAnual: '',
-      judet: 'Cluj',
-      pvKwp: ''
-    };
-  }
-
-  function buildDataset() {
-    try {
-      if (!state.electricRaw) throw new Error('Încarcă mai întâi curba de sarcină electrică.');
-      const mapping = {
-        timestamp: mapTimestamp.value,
-        electric: mapElectric.value,
-        thermal: mapThermal.value,
-        pv: mapPv.value,
-        price: mapPrice.value,
-        unitElectric: unitElectric.value,
-        fixedPrice: SVTUploadParser.toNumber(tarifActual.value) || 0.75,
-        contractPower: SVTUploadParser.toNumber(putereRacord.value) || 250
-      };
-      const dataset = SVTUploadParser.normalize(state.electricRaw, mapping);
-
-      if (state.thermalRaw && !mapping.thermal) {
-        const thermalDetected = state.thermalRaw.detected.electric || state.thermalRaw.detected.thermal;
-        const timeDetected = state.thermalRaw.detected.timestamp;
-        if (thermalDetected && timeDetected) {
-          const tDataset = SVTUploadParser.normalize(state.thermalRaw, {
-            timestamp: timeDetected,
-            electric: thermalDetected,
-            unitElectric: 'kwh',
-            fixedPrice: mapping.fixedPrice,
-            contractPower: mapping.contractPower
-          });
-          const byTime = new Map(tDataset.rows.map(r => [r.timestamp.slice(0,16), r.electricKwh]));
-          dataset.rows.forEach(r => {
-            const key = r.timestamp.slice(0,16);
-            if (byTime.has(key)) r.thermalKwh = byTime.get(key);
-          });
+    async function readFile(file){
+      try{
+        show('Se citește fișierul: ' + file.name, 'ok');
+        if (!window.SVTUploadParser) {
+          throw new Error('Lipsește parserul SVT. Aplică întâi patch-ul v30/v30.1 sau încarcă CSV manual.');
         }
+        parsed = await SVTUploadParser.parseFile(file);
+        dropZone.classList.add('has-file');
+        document.getElementById('uploadTitle').textContent = 'Fișier încărcat: ' + file.name;
+        document.getElementById('uploadSub').textContent = parsed.rows.length + ' rânduri detectate · ' + parsed.detected.intervalLabel;
+        show('Fișier validat. Poți continua către procesare.', 'ok');
+      }catch(e){
+        show(e.message || String(e), 'err');
+      }
+    }
+
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      const putere = Number(String(document.getElementById('putere').value).replace(',', '.')) || 100;
+      const tipTarif = document.getElementById('tipTarif').value;
+      const tarifDistributie = document.getElementById('tarifDistributie').value;
+
+      const svtData = {
+        putereRacord: putere,
+        tipTarif,
+        tarifDistributie,
+        tarifActual: tipTarif === 'Dinamic PZU' ? '0.60' : '0.75',
+        firma:'Firma dvs.',
+        judet:'Cluj'
+      };
+      sessionStorage.setItem('svtData', JSON.stringify(svtData));
+
+      if (parsed && window.SVTUploadParser && window.SVTAnalysisEngine) {
+        const dataset = SVTUploadParser.normalize(parsed, {
+          timestamp: parsed.detected.timestamp,
+          electric: parsed.detected.electric,
+          thermal: parsed.detected.thermal,
+          pv: parsed.detected.pv,
+          price: parsed.detected.price,
+          unitElectric: 'kwh',
+          fixedPrice: svtData.tarifActual,
+          contractPower: putere
+        });
+        sessionStorage.setItem('svtDataset', JSON.stringify(dataset));
+        const analysis = SVTAnalysisEngine.analyze(dataset);
+        analysis.wizardData = svtData;
+        sessionStorage.setItem('svtAnalysis', JSON.stringify(analysis));
       }
 
-      dataset.meta.wizardCompatible = true;
-      dataset.meta.putereRacordKw = SVTUploadParser.toNumber(putereRacord.value) || 250;
-      dataset.meta.tipTarif = document.querySelector('input[name="tip_tarif"]:checked')?.value || 'fix';
-      dataset.meta.sursaTermica = sursaTermica.value || '';
-      dataset.meta.consumTermicAnual = SVTUploadParser.toNumber(consumTermicAnual.value) || 0;
-      dataset.meta.unitateTermic = unitateTermic.value || 'MWh';
+      window.location.href = './svt-analiza.html';
+    });
 
-      return { ok:true, dataset };
-    } catch(e) {
-      return { ok:false, error:e.message || String(e) };
+    function show(text,type){
+      msg.innerHTML = '<div class="alert '+type+'">'+String(text).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;","'":"&#039;"}[m]))+'</div>';
     }
-  }
-
-  function showMsg(text, type) {
-    uploadMessage.innerHTML = `<div class="svt-alert ${type}">${esc(text)}</div>`;
-  }
-
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
-  }
-</script>
+  </script>
 </body>
 </html>
