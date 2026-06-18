@@ -11,6 +11,7 @@
   <!-- SVT V52 Q4 LOCAL PRODUCTION POTENTIAL -->
   <!-- SVT V53 Q3 MIDNIGHT FORECAST -->
   <!-- SVT V54 FULL FIX -->
+  <!-- SVT V55 CLEAN DROPDOWN SCROLL LISTS -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -296,6 +297,20 @@
     .q2-drop input{display:none}
     @media(max-width:850px){.insight-grid{grid-template-columns:1fr}}
 
+  
+    /* v55: cleaner dropdown and scrollable result lists */
+    .top-list{
+      max-height:232px;
+      overflow-y:auto;
+      padding-right:6px;
+      scrollbar-width:thin;
+      scrollbar-color:#b8d8c5 #f8fbf9;
+    }
+    .top-list::-webkit-scrollbar{width:8px}
+    .top-list::-webkit-scrollbar-track{background:#f8fbf9;border-radius:99px}
+    .top-list::-webkit-scrollbar-thumb{background:#b8d8c5;border-radius:99px}
+    .top-list .top-row{min-height:66px}
+
   </style>
 </head>
 <body>
@@ -424,12 +439,6 @@
       const isInvoice = data.meta?.loadMethod === 'invoice' || ctx.hasInvoiceOnly;
 
       box.innerHTML = `
-        <div class="result-head">
-          <div>
-            <h2>Când consum din rețea energie scumpă?</h2>
-            <p>${isInvoice ? 'Estimare din factura lunară. Pentru răspuns exact, folosește curba orară.' : 'Răspuns calculat din curba încărcată.'} Tarif fix: ${fmt(data.meta?.fixedTariffRonKwh || ctx.fixedTariffRonKwh,3)} lei/kWh.</p>
-          </div>
-        </div>
         <div class="answer-summary" id="answerSummary"></div>
         <div class="chart-wrap"><canvas id="question1Chart"></canvas></div>
         <div class="top-list" id="topIntervals"></div>
@@ -465,7 +474,7 @@
         }
       });
 
-      const top = (data.expensiveIntervals || []).slice(0,5);
+      const top = (data.expensiveIntervals || []).slice(0,60);
       document.getElementById('topIntervals').innerHTML = top.map(x => `
         <div class="top-row">
           <div class="rank">${x.rank}</div>
@@ -705,15 +714,9 @@
         const consumption = Number(r.consumptionKwh || 0);
         const surplus = Math.max(production - consumption, Number(r.surplusKwh || 0), 0);
         return {...r, surplusKwh:surplus};
-      }).filter(r => r.surplusKwh > 0).sort((a,b)=>b.surplusKwh - a.surplusKwh).slice(0,5);
+      }).filter(r => r.surplusKwh > 0).sort((a,b)=>b.surplusKwh - a.surplusKwh).slice(0,60);
 
       box.innerHTML = `
-        <div class="result-head">
-          <div>
-            <h2>Când nu valorific optim energia produsă local?</h2>
-            <p>Răspuns calculat din consum + producție locală/PV. Zonele cu surplus mare arată când energia produsă nu este consumată local.</p>
-          </div>
-        </div>
         <div class="answer-summary" id="answerSummaryQ2">
           <div class="summary-card"><strong>${fmt(totals.production)} kWh</strong><span>producție locală totală</span></div>
           <div class="summary-card"><strong>${fmt(totals.self)} kWh</strong><span>energie consumată local</span></div>
@@ -981,19 +984,13 @@
       const peakLabel = data.totals?.peakLabel || '-';
       const irradiation = data.totals?.irradiationKwhM2 || 0;
       box.innerHTML = `
-        <div class="result-head">
-          <div>
-            <h2>Cât va produce estimativ sistemul meu în următoarele 24 ore?</h2>
-            <p>Estimare calculată cu prognoză meteo reală Open-Meteo și parametrii sistemului PV introduși.</p>
-            <div class="q3-result-meta">
+        <div class="q3-result-meta">
               <span class="q3-chip">${fmt(data.inputs?.kwp || 0,1)} kWp</span>
               <span class="q3-chip">${fmt(data.inputs?.tilt || 0,0)}° înclinare</span>
               <span class="q3-chip">${fmt(data.inputs?.azimuth || 0,0)}° azimut</span>
               <span class="q3-chip">${fmt(data.inputs?.losses || 0,1)}% pierderi</span>
               <span class="q3-chip">Interval: ${esc(data.forecastWindow?.label || 'ziua următoare')} · 00:00–23:00</span>
             </div>
-          </div>
-        </div>
         <div class="answer-summary">
           <div class="summary-card"><strong>${fmt(total)} kWh</strong><span>producție estimată următoarele 24h</span></div>
           <div class="summary-card"><strong>${fmt(peak)} kWh</strong><span>vârf orar estimat · ${esc(peakLabel)}</span></div>
@@ -1294,18 +1291,12 @@
       const surplusMwh = (r.surplusKwh || 0) / 1000;
 
       box.innerHTML = `
-        <div class="result-head">
-          <div>
-            <h2>Câtă energie ar mai putea fi produsă local?</h2>
-            <p>Estimare de potențial PV suplimentar pe baza suprafeței disponibile, locației și parametrilor tehnici introduși/preluați din întrebările anterioare.</p>
-            <div class="q4-result-meta">
+        <div class="q4-result-meta">
               <span class="q4-chip">${fmt(i.surfaceM2,0)} m² brut</span>
               <span class="q4-chip">${fmt(i.usablePercent,0)}% utilizabil</span>
               <span class="q4-chip">${fmt(i.density,1)} m²/kWp</span>
               <span class="q4-chip">${fmt(i.netSpecificYield,0)} kWh/kWp/an net</span>
             </div>
-          </div>
-        </div>
         <div class="answer-summary">
           <div class="summary-card"><strong>${fmt(r.additionalKwp,1)} kWp</strong><span>putere PV suplimentară posibilă</span></div>
           <div class="summary-card"><strong>${fmt(annualMwh,1)} MWh/an</strong><span>energie locală suplimentară estimată</span></div>
