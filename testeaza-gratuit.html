@@ -10,6 +10,7 @@
   <!-- SVT V51 ENGINE LOAD FIX -->
   <!-- SVT V52 Q4 LOCAL PRODUCTION POTENTIAL -->
   <!-- SVT V53 Q3 MIDNIGHT FORECAST -->
+  <!-- SVT V54 FULL FIX -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -263,6 +264,38 @@
     @media(max-width:900px){.q4-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:620px){.q4-grid{grid-template-columns:1fr}.q4-actions{justify-content:stretch}.q4-actions .btn{width:100%;min-width:0}}
 
+  
+    /* v54: explanation and clean upload controls */
+    .insight-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    .insight-card{
+      border:1px solid #dfe9e4;
+      background:#fbfefc;
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 10px 24px rgba(15,23,42,.04);
+    }
+    .insight-card h3{
+      margin:0 0 8px;
+      font-size:15px;
+      color:var(--navy);
+      font-weight:1000;
+      letter-spacing:-.02em;
+    }
+    .insight-card p,.insight-card li{
+      color:#475569;
+      font-size:13px;
+      line-height:1.48;
+      font-weight:700;
+    }
+    .insight-card ul{margin:8px 0 0 18px;padding:0;display:grid;gap:6px}
+    .q2-drop input{display:none}
+    @media(max-width:850px){.insight-grid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -440,6 +473,40 @@
           <div class="cost">${fmt(x.gridCostRon)} lei</div>
         </div>
       `).join('');
+
+      const hasPv = !!(data?.meta?.hasProduction || rows.some(r => Number(r.productionKwh || 0) > 0));
+      const firstTop = top[0] || {};
+      const interpretation = hasPv
+        ? `Punctele roșii arată intervalele în care costul rămâne ridicat după scăderea producției locale. Cu tarif fix, problema nu este prețul orar, ci cantitatea de energie cumpărată din rețea. Dacă vârfurile apar seara sau noaptea, producția PV nu acoperă acele ore.`
+        : `Punctele roșii arată intervalele cu cel mai mare cost. Pentru că tariful este fix, costul crește direct cu consumul din rețea. Graficul indică orele în care consumul este cel mai mare și unde merită analizate pornirile simultane de echipamente.`;
+
+      const recommendationItems = hasPv
+        ? [
+            'Mută, unde procesul permite, consumurile flexibile în intervalele cu producție PV locală.',
+            'Analizează BESS dacă vârfurile costisitoare apar după apus sau înainte de producția solară.',
+            'Verifică echipamentele care pornesc simultan în intervalul cel mai scump: ' + (firstTop.localLabel || 'intervalul marcat cu roșu') + '.'
+          ]
+        : [
+            'Identifică procesele care generează vârfurile roșii și verifică dacă pot fi eșalonate.',
+            'Analizează potențial PV local pentru acoperirea consumului diurn.',
+            'Dacă vârfurile apar constant în același interval, stabilește reguli operaționale de pornire pe rând a consumatorilor mari.'
+          ];
+
+      const parent = document.getElementById('topIntervals');
+      if(parent && !document.getElementById('q1InsightGrid')){
+        parent.insertAdjacentHTML('afterend', `
+          <div class="insight-grid" id="q1InsightGrid">
+            <div class="insight-card">
+              <h3>Interpretare grafic</h3>
+              <p>${esc(interpretation)}</p>
+            </div>
+            <div class="insight-card">
+              <h3>Recomandări</h3>
+              <ul>${recommendationItems.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+            </div>
+          </div>
+        `);
+      }
     }
 
     function handleQuestion2(cardArg){
@@ -483,13 +550,13 @@
             <h2 class="q2-upload-title">Date incomplete pentru această întrebare</h2>
             <p class="q2-upload-text">Pentru „Când nu valorific optim energia produsă local?” este necesar un fișier de producție locală/PV. Încarcă PVGIS Timeseries, export inverter sau CSV/XLSX cu producție pe interval.</p>
           </div>
-          <label class="q2-drop" id="q2Drop">
+          <div class="q2-drop" id="q2Drop" role="button" tabindex="0">
             <input id="q2ProductionInput" type="file" multiple hidden accept=".csv,.txt,.xlsx,.xls,.xlsm,.html,.htm">
             <span>
               <strong>Încarcă fișier / fișiere producție locală</strong>
               <span>PVGIS Timeseries, export inverter, CSV/XLSX/HTML</span>
             </span>
-          </label>
+          </div>
           <div class="q2-file-name" id="q2FileName"></div>
         </div>
       `;
@@ -499,7 +566,19 @@
       const fileName = document.getElementById('q2FileName');
       ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
       ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
-      drop.addEventListener('click', e => { if(e.target !== input) input.click(); });
+      const openQ2Picker = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        input.click();
+      };
+      input.addEventListener('click', e => e.stopPropagation());
+      drop.addEventListener('click', openQ2Picker);
+      drop.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' '){
+          openQ2Picker(e);
+        }
+      });
       drop.addEventListener('drop', async e => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files || []);
@@ -693,11 +772,17 @@
         card.classList.remove('loading');
         if(stored){
           try{
-            renderQuestion3Result(box, JSON.parse(stored));
-            card.classList.add('done');
-            return;
+            const parsed = JSON.parse(stored);
+            // v54: nu mai afișăm rezultate vechi calculate în modul rolling 24h.
+            // Acceptăm doar prognoze v54, generate pentru zi completă 00:00–23:00.
+            if(parsed?.version === 'v54-calendar-day' && parsed?.forecastWindow?.startHour === '00:00'){
+              renderQuestion3Result(box, parsed);
+              card.classList.add('done');
+              return;
+            }
           }catch(e){}
         }
+        sessionStorage.removeItem('svtForecastQ3');
         renderQuestion3Form(box, card);
       }, 450);
     }
@@ -797,11 +882,17 @@
           </div>
         `;
 
+        const nowLocalForRequest = new Date();
+        const forecastStart = new Date(nowLocalForRequest.getFullYear(), nowLocalForRequest.getMonth(), nowLocalForRequest.getDate() + 1, 0, 0, 0, 0);
+        const forecastEnd = new Date(forecastStart.getTime() + 24 * 3600000);
+        const apiDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
         const url = new URL('https://api.open-meteo.com/v1/forecast');
         url.searchParams.set('latitude', String(lat));
         url.searchParams.set('longitude', String(lon));
         url.searchParams.set('hourly', 'shortwave_radiation,temperature_2m,cloud_cover');
-        url.searchParams.set('forecast_days', '3');
+        url.searchParams.set('start_date', apiDate(forecastStart));
+        url.searchParams.set('end_date', apiDate(forecastStart));
         url.searchParams.set('timezone', 'auto');
 
         const res = await fetch(url.toString());
@@ -813,12 +904,6 @@
         const temp = hourly.temperature_2m || [];
         const cloud = hourly.cloud_cover || [];
 
-        const nowLocal = new Date();
-        // v53: pentru grafic clar, alegem o zi calendaristică completă:
-        // de la următorul 00:00 până la 23:00, nu de la ora curentă.
-        const forecastStart = new Date(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate() + 1, 0, 0, 0, 0);
-        const forecastEnd = new Date(forecastStart.getTime() + 24 * 3600000);
-
         let allRows = times.map((t,i) => ({
           time:t,
           date:new Date(t),
@@ -827,20 +912,17 @@
           cloud:Number(cloud[i] || 0)
         })).filter(r => !isNaN(r.date));
 
+        // v54: API-ul este cerut direct pentru data completă dorită.
+        // Totuși filtrăm strict încă o dată ca graficul să fie 00:00–23:00.
         let rows = allRows.filter(r => r.date >= forecastStart && r.date < forecastEnd).slice(0,24);
 
-        // fallback: dacă API-ul returnează altă fereastră, luăm prima zi completă disponibilă de la 00:00.
         if(rows.length < 20){
-          const firstMidnight = allRows.find(r => r.date.getHours() === 0);
-          if(firstMidnight){
-            const start = new Date(firstMidnight.date.getFullYear(), firstMidnight.date.getMonth(), firstMidnight.date.getDate(), 0, 0, 0, 0);
-            const end = new Date(start.getTime() + 24 * 3600000);
-            rows = allRows.filter(r => r.date >= start && r.date < end).slice(0,24);
-          }
+          const targetDate = apiDate(forecastStart);
+          rows = allRows.filter(r => String(r.time || '').slice(0,10) === targetDate).slice(0,24);
         }
 
-        if(rows.length < 6) rows = allRows.slice(0,24);
-        if(!rows.length) throw new Error('Nu am primit date orare de radiație solară din API.');
+        if(rows.length < 6) throw new Error('Nu am primit o zi completă de prognoză orară din API.');
+        rows = rows.slice(0,24);
 
         const orientationFactor = clamp(1 - Math.abs(azimuth) / 180 * 0.28, 0.62, 1.02);
         const tiltFactor = clamp(1 - Math.abs(tilt - 30) / 120, 0.72, 1.03);
@@ -859,11 +941,14 @@
         });
 
         const payload = {
+          version:'v54-calendar-day',
           source:'Open-Meteo Forecast API',
           url:url.toString(),
           forecastWindow:{
             start: forecastStart ? forecastStart.toISOString() : null,
             end: forecastEnd ? forecastEnd.toISOString() : null,
+            startHour:'00:00',
+            endHour:'23:00',
             label: forecastStart ? forecastStart.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit', year:'numeric'}) : 'zi disponibilă'
           },
           inputs:{kwp,lat,lon,tilt,azimuth,losses,orientationFactor,tiltFactor,lossFactor},
