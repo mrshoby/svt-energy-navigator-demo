@@ -150,10 +150,10 @@
 
             <div id="fileModeBox">
               <div class="upload-zone" id="dropZone">
-                <input id="fileInput" type="file" hidden accept=".csv,.txt,.xlsx,.xls,.xlsm,.html,.htm">
+                <input id="fileInput" type="file" hidden multiple accept=".csv,.txt,.xlsx,.xls,.xlsm,.html,.htm">
                 <div class="upload-ico">☁</div>
-                <div class="upload-title">Încarcă fișierul cu consumul tău electric</div>
-                <div class="upload-meta">Excel (.xlsx, .xls), CSV sau HTML exportat din portal · max. 10 MB</div>
+                <div class="upload-title">Încarcă fișierul / fișierele cu consumul tău electric</div>
+                <div class="upload-meta">Excel (.xlsx, .xls), CSV sau HTML exportat din portal · poți selecta mai multe fișiere · max. 10 MB / fișier</div>
                 <button type="button" class="upload-btn" id="chooseBtn">Alege fișier</button>
                 <div class="file-name" id="fileName"></div>
               </div>
@@ -230,10 +230,10 @@
               <h3 class="mini-title">Producție locală (opțional)</h3>
               <div class="production-existing-banner" id="productionExistingBanner">DATE PRODUCȚIE EXISTENTE ÎN FIȘIERUL DE CONSUM ÎNCĂRCAT MAI SUS</div>
               <div class="upload-zone" id="productionDrop" style="min-height:170px">
-                <input id="productionInput" type="file" hidden accept=".csv,.txt,.xlsx,.xls,.xlsm,.html,.htm">
+                <input id="productionInput" type="file" hidden multiple accept=".csv,.txt,.xlsx,.xls,.xlsm,.html,.htm">
                 <div class="upload-ico">☀</div>
                 <div class="upload-title">Încarcă fișierul cu producția locală</div>
-                <div class="upload-meta">Excel, CSV sau HTML · același interval orar ca la consum, dacă este posibil</div>
+                <div class="upload-meta">Excel, CSV, HTML, PVGIS Timeseries sau export inverter · poți selecta mai multe fișiere</div>
                 <button type="button" class="upload-btn" id="productionChoose">Alege fișier</button>
                 <div class="file-name" id="productionFileName"></div>
               </div>
@@ -316,12 +316,19 @@
 
     let currentTab = 'electric';
     let loadMethod = 'file';
-    let consumptionFile = null;
-    let productionFile = null;
+    let consumptionFiles = [];
+    let productionFiles = [];
     let invoiceFile = null;
     let embeddedProductionDetected = false;
 
     function showMessage(type, text){ message.className = 'message ' + type; message.textContent = text; }
+
+    function fileListText(files, singular, plural){
+      if(!files || !files.length) return '';
+      const names = files.map(f => f.name);
+      if(files.length === 1) return `${singular}: ${names[0]}`;
+      return `${plural} (${files.length}): ${names.join(', ')}`;
+    }
 
     function setTab(tab){
       currentTab = tab;
@@ -343,42 +350,143 @@
       validateForm();
     }
 
-    async function handlePickedFile(file, targetNameEl, targetZoneEl, targetType){
-      if(!file) return;
-      if(file.size > 10 * 1024 * 1024){ showMessage('err', 'Fișierul este prea mare. Dimensiunea maximă permisă este 10 MB.'); return; }
-      targetNameEl.textContent = `Fișier selectat: ${file.name}`;
+    function validateFiles(files){
+      for(const file of files){
+        if(file.size > 10 * 1024 * 1024){
+          throw new Error(`Fișierul ${file.name} este prea mare. Dimensiunea maximă permisă este 10 MB / fișier.`);
+        }
+      }
+    }
+
+    function aggregateDatasets(datasets, mode, tariff){
+      const map = new Map();
+      const fileNames = [];
+      const profiles = new Set();
+      let hasEmbeddedProduction = false;
+
+      for(const ds of datasets){
+        if(!ds || !ds.rows) continue;
+        if(ds.meta?.fileName) fileNames.push(ds.meta.fileName);
+        if(ds.meta?.sourceProfile) profiles.add(ds.meta.sourceProfile);
+        if(ds.meta?.hasEmbeddedProduction || ds.meta?.productionDetectedInMainFile) hasEmbeddedProduction = true;
+
+        for(const r of ds.rows){
+          const t = new Date(r.timestamp).getTime();
+          if(!Number.isFinite(t)) continue;
+          const key = String(t);
+          const existing = map.get(key) || {
+            timestamp:new Date(t).toISOString(),
+            localLabel:new Date(t).toLocaleString('ro-RO',{dateStyle:'short',timeStyle:'short'}),
+            hour:new Date(t).getHours(),
+            minute:new Date(t).getMinutes(),
+            electricKwh:0,
+            electricExportKwh:0,
+            reactiveInductiveKvarh:0,
+            reactiveCapacitiveKvarh:0,
+            thermalKwh:0,
+            pvKwh:0,
+            priceRonKwh:tariff
+          };
+
+          if(mode === 'production'){
+            existing.pvKwh += Number(r.pvKwh || r.electricKwh || 0);
+          } else {
+            existing.electricKwh += Number(r.electricKwh || 0);
+            existing.electricExportKwh += Number(r.electricExportKwh || 0);
+            existing.reactiveInductiveKvarh += Number(r.reactiveInductiveKvarh || 0);
+            existing.reactiveCapacitiveKvarh += Number(r.reactiveCapacitiveKvarh || 0);
+            existing.thermalKwh += Number(r.thermalKwh || 0);
+            existing.pvKwh += Number(r.pvKwh || 0);
+          }
+          map.set(key, existing);
+        }
+      }
+
+      const rows = Array.from(map.values()).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+      const start = rows[0]?.timestamp || null;
+      const end = rows[rows.length-1]?.timestamp || null;
+      const intervalMinutes = rows.length > 1 ? Math.max(1, Math.round((new Date(rows[1].timestamp)-new Date(rows[0].timestamp))/60000)) : 60;
+
+      return {
+        rows,
+        meta:{
+          fileName:fileNames.length > 1 ? `${fileNames.length} fișiere încărcate` : (fileNames[0] || 'fișier încărcat'),
+          fileNames,
+          sourceProfile:profiles.size > 1 ? 'multi_file_merged' : (Array.from(profiles)[0] || (mode === 'production' ? 'production_multi_file' : 'electric_multi_file')),
+          intervalMinutes,
+          fixedPriceRonKwh:tariff,
+          rowsCount:rows.length,
+          start,
+          end,
+          hasEmbeddedProduction,
+          productionDetectedInMainFile:hasEmbeddedProduction,
+          parserVersion:'v44'
+        }
+      };
+    }
+
+    async function parseAndMergeFiles(files, mode, tariff){
+      const arr = Array.from(files || []);
+      validateFiles(arr);
+      const datasets = [];
+      for(const file of arr){
+        const ds = await SVTLoadCurveProfiles.parseFile(file, {mode, fixedPriceRonKwh:tariff});
+        datasets.push(ds);
+      }
+      return aggregateDatasets(datasets, mode, tariff);
+    }
+
+    async function handlePickedFiles(files, targetNameEl, targetZoneEl, targetType){
+      const arr = Array.from(files || []).filter(Boolean);
+      if(!arr.length) return;
+
+      try{
+        validateFiles(arr);
+      } catch(e){
+        showMessage('err', e.message || String(e));
+        return;
+      }
+
       targetZoneEl.classList.add('has-file');
-      if(targetType === 'consumption') {
-        consumptionFile = file;
+
+      if(targetType === 'consumption'){
+        consumptionFiles = arr;
+        targetNameEl.textContent = fileListText(arr, 'Fișier selectat', 'Fișiere selectate');
         embeddedProductionDetected = false;
-        try {
-          const previewDataset = await SVTLoadCurveProfiles.parseFile(file, {mode:'electric', fixedPriceRonKwh:Number(fixedTariff.value || 0.75)});
+        productionBox.classList.remove('embedded');
+
+        try{
+          const previewDataset = await parseAndMergeFiles(consumptionFiles, 'electric', Number(fixedTariff.value || 0.75));
           embeddedProductionDetected = !!(previewDataset?.meta?.productionDetectedInMainFile || previewDataset?.rows?.some(r => Number(r.pvKwh || 0) > 0));
           if(embeddedProductionDetected){
             hasProduction.checked = true;
             productionBox.classList.add('visible','embedded');
             const banner = document.getElementById('productionExistingBanner');
             if(banner) banner.textContent = 'DATE PRODUCȚIE EXISTENTE ÎN FIȘIERUL DE CONSUM ÎNCĂRCAT MAI SUS';
-            showMessage('ok', `Fișier selectat: ${file.name}. Am detectat și date de producție locală în acest fișier.`);
+            showMessage('ok', `${arr.length === 1 ? 'Fișier selectat' : 'Fișiere selectate'}: ${arr.length}. Am detectat și date de producție locală în datele de consum.`);
           } else {
-            productionBox.classList.remove('embedded');
             if(!hasProduction.checked) productionBox.classList.remove('visible');
-            showMessage('ok', `Fișier selectat: ${file.name}`);
+            showMessage('ok', `${arr.length === 1 ? 'Fișier selectat' : 'Fișiere selectate'}: ${arr.length}. Datele vor fi unite cronologic pe grafic.`);
           }
-        } catch(e) {
-          showMessage('ok', `Fișier selectat: ${file.name}`);
+        } catch(e){
+          showMessage('ok', `${arr.length === 1 ? 'Fișier selectat' : 'Fișiere selectate'}: ${arr.length}. Datele vor fi procesate la continuare.`);
         }
       }
-      if(targetType === 'production') {
-        productionFile = file;
+
+      if(targetType === 'production'){
+        productionFiles = arr;
+        targetNameEl.textContent = fileListText(arr, 'Fișier de producție selectat', 'Fișiere de producție selectate');
         productionBox.classList.remove('embedded');
         embeddedProductionDetected = false;
-        showMessage('ok', `Fișier de producție selectat: ${file.name}`);
+        showMessage('ok', `${arr.length === 1 ? 'Fișier de producție selectat' : 'Fișiere de producție selectate'}: ${arr.length}. Datele PVGIS/inverter vor fi unite cronologic.`);
       }
-      if(targetType === 'invoice') {
-        invoiceFile = file;
-        showMessage('ok', `Factură selectată: ${file.name}`);
+
+      if(targetType === 'invoice'){
+        invoiceFile = arr[0];
+        targetNameEl.textContent = fileListText([invoiceFile], 'Factură selectată', 'Facturi selectate');
+        showMessage('ok', `Factură selectată: ${invoiceFile.name}`);
       }
+
       validateForm();
     }
 
@@ -387,15 +495,22 @@
       zone.addEventListener('click', e => { if(e.target !== btn) input.click(); });
       ['dragenter','dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag'); }));
       ['dragleave','drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('drag'); }));
-      zone.addEventListener('drop', e => { const file = e.dataTransfer.files?.[0]; if(file) handlePickedFile(file, nameEl, zone, type); });
-      input.addEventListener('change', e => { const file = e.target.files?.[0]; if(file) handlePickedFile(file, nameEl, zone, type); });
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files || []);
+        if(files.length) handlePickedFiles(files, nameEl, zone, type);
+      });
+      input.addEventListener('change', e => {
+        const files = Array.from(e.target.files || []);
+        if(files.length) handlePickedFiles(files, nameEl, zone, type);
+      });
     }
 
     function validateForm(){
       const tariffOk = Number(fixedTariff.value) > 0;
       let dataOk = true;
       if(currentTab === 'electric'){
-        if(loadMethod === 'file') dataOk = !!consumptionFile;
+        if(loadMethod === 'file') dataOk = consumptionFiles.length > 0;
         else {
           const c = Number(document.getElementById('invoiceConsumption').value || 0);
           const d = Number(document.getElementById('invoiceDays').value || 0);
@@ -472,14 +587,15 @@
         let dataset;
 
         if(currentTab === 'electric' && loadMethod === 'file'){
-          dataset = await SVTLoadCurveProfiles.parseFile(consumptionFile, {mode:'electric', fixedPriceRonKwh:tariff});
+          dataset = await parseAndMergeFiles(consumptionFiles, 'electric', tariff);
         } else {
           dataset = buildInvoiceDataset();
         }
 
-        if(hasProduction.checked && productionFile && !embeddedProductionDetected){
-          const productionDataset = await SVTLoadCurveProfiles.parseFile(productionFile, {mode:'production', fixedPriceRonKwh:tariff});
+        if(hasProduction.checked && productionFiles.length && !embeddedProductionDetected){
+          const productionDataset = await parseAndMergeFiles(productionFiles, 'production', tariff);
           dataset = SVTAnalysisEngine.mergeProduction(dataset, productionDataset);
+          dataset.meta.productionFileNames = productionDataset.meta.fileNames || [];
         }
 
         if(embeddedProductionDetected || dataset?.meta?.productionDetectedInMainFile || dataset?.rows?.some(r => Number(r.pvKwh || 0) > 0)){
@@ -491,6 +607,8 @@
         const analysis = SVTAnalysisEngine.analyzeQuestion1(dataset, {fixedTariffRonKwh:tariff});
         analysis.meta.loadMethod = loadMethod;
         analysis.meta.invoiceFileName = invoiceFile ? invoiceFile.name : null;
+        analysis.meta.fileNames = dataset.meta.fileNames || [];
+        analysis.meta.productionFileNames = dataset.meta.productionFileNames || [];
 
         sessionStorage.setItem('svtDataset', JSON.stringify(dataset));
         sessionStorage.setItem('svtAnalysis', JSON.stringify(analysis));
@@ -499,7 +617,9 @@
           fixedTariffRonKwh:tariff,
           loadMethod,
           hasProduction:analysis.meta.hasProduction || !!dataset.meta.hasEmbeddedProduction,
-          invoiceFileName:invoiceFile ? invoiceFile.name : null
+          invoiceFileName:invoiceFile ? invoiceFile.name : null,
+          fileNames:dataset.meta.fileNames || [],
+          productionFileNames:dataset.meta.productionFileNames || []
         }));
 
         const navigatorContext = {
@@ -507,10 +627,12 @@
           loadMethod,
           hasElectricData: currentTab === 'electric',
           hasThermalData: currentTab === 'termic',
-          hasProduction: !!((hasProduction.checked && productionFile) || embeddedProductionDetected),
+          hasProduction: !!((hasProduction.checked && productionFiles.length) || embeddedProductionDetected || dataset.meta.hasEmbeddedProduction),
           hasInvoiceOnly: loadMethod === 'invoice',
-          hasHourlyFile: loadMethod === 'file' && !!consumptionFile,
+          hasHourlyFile: loadMethod === 'file' && consumptionFiles.length > 0,
           fixedTariffRonKwh: tariff,
+          fileCount: consumptionFiles.length,
+          productionFileCount: productionFiles.length,
           thermal: {
             monitored: document.getElementById('thermalMonitored')?.value || '',
             source: document.getElementById('thermalSource')?.value || '',
@@ -538,6 +660,8 @@
       if(!hasProduction.checked){
         productionBox.classList.remove('embedded');
         embeddedProductionDetected = false;
+        productionFiles = [];
+        productionFileName.textContent = '';
       }
     });
     fixedTariff.addEventListener('input', validateForm);

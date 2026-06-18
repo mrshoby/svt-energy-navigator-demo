@@ -113,6 +113,44 @@
       .chart-wrap{height:300px}
       .bottom{flex-direction:column-reverse;align-items:stretch}.btn{width:100%;min-width:0}
     }
+  
+    /* v44: narrower question cards and adaptive one-line text */
+    .questions{
+      max-width:880px !important;
+      margin-left:auto !important;
+      margin-right:auto !important;
+      gap:9px !important;
+    }
+    .q-card{
+      height:60px !important;
+      min-height:60px !important;
+      padding:10px 132px 10px 76px !important;
+      border-radius:14px !important;
+    }
+    .q-no{
+      left:18px !important;
+      width:36px !important;
+      height:36px !important;
+      font-size:13px !important;
+    }
+    .q-title{
+      font-size:15px !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      line-height:1 !important;
+    }
+    .q-card.is-long .q-title{font-size:13.2px !important;letter-spacing:-.025em !important}
+    .q-card.is-xlong .q-title{font-size:12px !important;letter-spacing:-.035em !important}
+    .badge{right:18px !important;height:24px !important;font-size:10px !important}
+    .answer-slot{right:22px !important;width:30px !important;height:30px !important}
+    @media(max-width:760px){
+      .questions{max-width:100% !important}
+      .q-card{height:auto !important;min-height:68px !important;padding:10px 78px 10px 70px !important}
+      .q-title{font-size:13.5px !important;white-space:normal !important;line-height:1.18 !important}
+      .q-card.is-long .q-title,.q-card.is-xlong .q-title{font-size:12.8px !important}
+    }
+
   </style>
 </head>
 <body>
@@ -181,7 +219,7 @@
         const isActive = mode === 'electric' && analysis?.chartRows?.length && (q.id === 1 || (q.id === 2 && hasPvData));
         return `
           <div class="q-item" data-q-item="${q.id}">
-            <button class="q-card ${isActive ? 'available' : 'soon'}" type="button" data-q="${q.id}" ${isActive ? '' : 'disabled'}>
+            <button class="q-card ${q.title.length > 92 ? 'is-xlong' : q.title.length > 64 ? 'is-long' : ''} ${isActive ? 'available' : 'soon'}" type="button" data-q="${q.id}" ${isActive ? '' : 'disabled'}>
               <span class="q-no">${displayNumber(idx)}</span>
               <span class="q-title">${esc(q.title)}</span>
               ${isActive ? '<span class="answer-slot" title="Aici apare bifa după răspuns">✓</span>' : '<span class="badge">În curând</span>'}
