@@ -16,6 +16,7 @@
   <!-- SVT V57 Q5 USEFUL ADDITIONAL ENERGY -->
   <!-- SVT V58 Q5 STORAGE QUOTA FIX -->
   <!-- SVT V59 Q5 NATIVE BARS LAYOUT FIX -->
+  <!-- SVT V60 HOTFIX TESTEAZA RENDER RESTORE -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -2062,6 +2063,7 @@
         ${renderQ5DayBoard(data.intervalRows || [])}
         </div>
       `;
+    }
 
     function renderQ5DayBoard(rows){
       const relevant = (rows || []).filter(r => Number(r.additionalPvKwh || 0) > 0 || Number(r.directKwh || 0) > 0 || Number(r.surplusKwh || 0) > 0);
