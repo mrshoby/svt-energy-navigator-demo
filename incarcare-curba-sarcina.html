@@ -417,6 +417,29 @@
       try{
         showMessage('warn', 'Procesăm datele...');
         const tariff = Number(fixedTariff.value || 0.75);
+
+        if(currentTab === 'termic'){
+          const navigatorContext = {
+            selectedMode: 'termic',
+            loadMethod: 'thermal',
+            hasElectricData: false,
+            hasThermalData: true,
+            hasProduction: false,
+            fixedTariffRonKwh: tariff,
+            thermal: {
+              monitored: document.getElementById('thermalMonitored')?.value || '',
+              source: document.getElementById('thermalSource')?.value || '',
+              annualValue: Number(document.getElementById('annualThermal')?.value || 0),
+              unit: document.getElementById('thermalUnit')?.value || ''
+            },
+            createdAt: new Date().toISOString()
+          };
+          sessionStorage.setItem('svtNavigatorContext', JSON.stringify(navigatorContext));
+          localStorage.setItem('svtNavigatorContext', JSON.stringify(navigatorContext));
+          window.location.href = './testeaza-gratuit.html';
+          return;
+        }
+
         let dataset;
 
         if(currentTab === 'electric' && loadMethod === 'file'){
@@ -445,7 +468,27 @@
           invoiceFileName:invoiceFile ? invoiceFile.name : null
         }));
 
-        window.location.href = './svt-analiza.html';
+        const navigatorContext = {
+          selectedMode: currentTab,
+          loadMethod,
+          hasElectricData: currentTab === 'electric',
+          hasThermalData: currentTab === 'termic',
+          hasProduction: !!hasProduction.checked && !!productionFile,
+          hasInvoiceOnly: loadMethod === 'invoice',
+          hasHourlyFile: loadMethod === 'file' && !!consumptionFile,
+          fixedTariffRonKwh: tariff,
+          thermal: {
+            monitored: document.getElementById('thermalMonitored')?.value || '',
+            source: document.getElementById('thermalSource')?.value || '',
+            annualValue: Number(document.getElementById('annualThermal')?.value || 0),
+            unit: document.getElementById('thermalUnit')?.value || ''
+          },
+          createdAt: new Date().toISOString()
+        };
+        sessionStorage.setItem('svtNavigatorContext', JSON.stringify(navigatorContext));
+        localStorage.setItem('svtNavigatorContext', JSON.stringify(navigatorContext));
+
+        window.location.href = './testeaza-gratuit.html';
       } catch(err){
         console.error(err);
         showMessage('err', err.message || 'Nu am putut procesa datele încărcate.');

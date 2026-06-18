@@ -1,331 +1,130 @@
 <!doctype html>
 <html lang="ro">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Testează gratuit | SVT Energy Navigator</title>
-  <meta name="description" content="Alege întrebarea care te interesează cel mai mult și începe analiza SVT Energy Navigator." />
-  <link rel="stylesheet" href="./styles.css" />
-
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Întrebări disponibile | SVT Energy Navigator</title>
+  <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
-    :root{
-      --svt-green:#07943f;
-      --svt-green-2:#05aa48;
-      --svt-green-soft:#e8f6ed;
-      --svt-navy:#071826;
-      --svt-text:#10203d;
-      --svt-muted:#5b6b86;
-      --svt-border:#dce5ef;
-      --svt-shadow:0 16px 46px rgba(15,23,42,.075);
-    }
+    :root{--green:#07943f;--green2:#05aa48;--soft:#e8f6ed;--navy:#071826;--text:#10203d;--muted:#66758f;--border:#dce5ef;--shadow:0 14px 34px rgba(15,23,42,.06)}
     *{box-sizing:border-box}
-    body.svt-trial-v37{
-      margin:0!important;
-      min-height:100vh;
-      background:
-        radial-gradient(circle at 76% 22%,rgba(7,148,63,.055),transparent 26%),
-        radial-gradient(circle at 14% 86%,rgba(7,148,63,.075),transparent 28%),
-        linear-gradient(180deg,#fff 0%,#fbfdfc 100%);
-      color:var(--svt-text);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      overflow-x:hidden;
-    }
-    body.svt-trial-v37::after{
-      content:"";
-      position:fixed;
-      left:-80px;right:-80px;bottom:-92px;height:210px;
-      pointer-events:none;opacity:.18;
-      background:repeating-radial-gradient(ellipse at center,rgba(7,148,63,.30) 0 1px,transparent 1px 9px);
-      mask-image:linear-gradient(to top,#000,transparent 78%);
-      transform:skewY(-3deg);
-      z-index:0;
-    }
-    .svt-trial-shell{
-      position:relative;
-      z-index:1;
-      width:min(1380px,calc(100% - 72px));
-      min-height:100vh;
-      margin:0 auto;
-      padding:46px 0 36px;
-      display:grid;
-      grid-template-columns:1fr;
-      gap:16px;
-      overflow:hidden;
-    }
-    .svt-trial-head{
-      max-width:100%;
-      min-width:0;
-    }
-    .svt-trial-kicker{
-      margin:0 0 18px;
-      color:var(--svt-green);
-      font-size:15px;
-      line-height:1;
-      letter-spacing:.13em;
-      text-transform:uppercase;
-      font-weight:1000;
-    }
-    .svt-trial-title{
-      margin:0;
-      max-width:none;
-      color:var(--svt-navy);
-      font-size:clamp(36px,3.15vw,54px);
-      line-height:1;
-      letter-spacing:-.055em;
-      font-weight:1000;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:clip;
-    }
-    .svt-trial-subtitle{
-      margin:7px 0 0;
-      max-width:920px;
-      color:var(--svt-muted);
-      font-size:18px;
-      line-height:1.35;
-      font-weight:520;
-      letter-spacing:-.012em;
-      white-space:normal;
-      text-wrap:balance;
-    }
-    .svt-trial-options{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:8px 16px;
-      margin-top:0;
-    }
-    .svt-option-card{
-      position:relative;
-      min-height:62px;
-      width:100%;
-      padding:9px 44px 9px 118px;
-      border:1px solid #e0e8f1;
-      border-radius:13px;
-      background:rgba(255,255,255,.93);
-      box-shadow:0 10px 30px rgba(15,23,42,.055);
-      display:flex;
-      align-items:center;
-      text-align:left;
-      color:var(--svt-navy);
-      transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease;
-      overflow:hidden;
-    }
-    .svt-option-card.is-active{
-      border-color:var(--svt-green);
-      background:linear-gradient(135deg,rgba(7,148,63,.085),rgba(255,255,255,.98));
-      cursor:pointer;
-      box-shadow:0 18px 50px rgba(7,148,63,.11);
-    }
-    .svt-option-card.is-active:hover{transform:translateY(-2px);box-shadow:0 22px 58px rgba(7,148,63,.14)}
-    .svt-option-card.is-disabled{cursor:not-allowed;opacity:.76;filter:saturate(.82)}
-    .svt-option-card.is-disabled::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.42));pointer-events:none}
-    .svt-option-number{
-      position:absolute;left:18px;top:50%;transform:translateY(-50%);
-      width:34px;height:34px;border-radius:999px;display:grid;place-items:center;
-      background:#fff;border:1px solid #e1e9f2;color:var(--svt-green);
-      font-size:13px;font-weight:1000;font-variant-numeric:tabular-nums;
-      box-shadow:0 6px 14px rgba(15,23,42,.04);
-    }
-    .svt-option-icon{
-      position:absolute;left:62px;top:50%;transform:translateY(-50%);
-      width:42px;height:42px;border-radius:999px;display:grid;place-items:center;
-      color:var(--svt-green);background:var(--svt-green-soft);
-    }
-    .svt-option-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.05;stroke-linecap:round;stroke-linejoin:round;fill:none}
-    .svt-option-title{
-      display:block;color:var(--svt-navy);
-      font-size:13.5px;line-height:1.1;letter-spacing:-.015em;font-weight:900;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
-    }
-    .svt-option-arrow,.svt-option-check{position:absolute;right:24px;top:50%;transform:translateY(-50%);z-index:2}
-    .svt-option-arrow{color:#213552;font-size:24px;line-height:1;font-weight:400;opacity:.75}
-    .svt-option-check{width:25px;height:25px;border-radius:999px;display:grid;place-items:center;background:var(--svt-green);color:#fff;font-size:14px;font-weight:1000;box-shadow:0 7px 16px rgba(7,148,63,.18)}
-    .svt-soon-badge{
-      position:absolute;right:40px;top:50%;transform:translateY(-50%);z-index:3;
-      height:22px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;
-      background:#eef8f1;border:1px solid #cfeadb;color:var(--svt-green);
-      font-size:9px;line-height:1;font-weight:1000;letter-spacing:.01em;white-space:nowrap;
-    }
-    .svt-trial-bottom{
-      margin-top:10px;padding-top:24px;border-top:1px solid #e4ebf2;
-      display:flex;justify-content:space-between;align-items:center;gap:20px;
-    }
-    .svt-bottom-btn{
-      width:210px;min-width:210px;height:58px;border-radius:12px;border:1px solid var(--svt-border);
-      display:inline-flex;align-items:center;justify-content:center;gap:12px;
-      font-size:17px;line-height:1;font-weight:1000;text-decoration:none;cursor:pointer;font-family:inherit;
-    }
-    .svt-bottom-btn.back{color:var(--svt-navy);background:rgba(255,255,255,.94);box-shadow:0 13px 30px rgba(15,23,42,.055)}
-    .svt-bottom-btn.next{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--svt-green),var(--svt-green-2));box-shadow:0 16px 36px rgba(7,148,63,.22)}
-    @media(max-width:1100px){.svt-trial-shell{width:min(1040px,calc(100% - 32px));padding-top:34px}.svt-trial-title{font-size:clamp(30px,4.4vw,48px);white-space:nowrap}.svt-option-card{min-height:60px;padding-left:108px}.svt-option-number{left:16px}.svt-option-icon{left:56px}}.svt-trial-options{grid-template-columns:1fr}.svt-trial-title{font-size:clamp(31px,5vw,48px);white-space:normal}.svt-option-card{min-height:60px}}.svt-trial-options{grid-template-columns:1fr}.svt-trial-title{font-size:clamp(36px,7vw,56px)}}
-    @media(max-width:760px){.svt-trial-options{grid-template-columns:1fr}.svt-trial-title{white-space:normal}.svt-trial-shell{width:calc(100% - 28px)}}
-    @media(max-width:620px){
-      .svt-trial-shell{width:calc(100% - 28px)}
-      .svt-trial-title{font-size:clamp(34px,10vw,48px)}
-      .svt-trial-subtitle{font-size:17px}
-      .svt-option-card{min-height:58px;padding:10px 42px 10px 104px}
-      .svt-option-number{left:15px;width:36px;height:36px;font-size:13px}
-      .svt-option-icon{left:58px;width:48px;height:48px}
-      .svt-option-icon svg{width:25px;height:25px}
-      .svt-option-title{font-size:12.5px}
-      .svt-soon-badge{right:42px;top:16px;transform:none}
-      .svt-trial-bottom{flex-direction:column-reverse;align-items:stretch}
-      .svt-bottom-btn{width:100%;min-width:0}
-    }
-
-    /* v37.2 hard override: keep questions in 2 columns on desktop/tablet */
-    .svt-trial-options{
-      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-      gap:8px 16px !important;
-    }
-    .svt-option-card{
-      min-height:58px !important;
-      padding-top:8px !important;
-      padding-bottom:8px !important;
-      padding-left:108px !important;
-      padding-right:40px !important;
-    }
-    .svt-option-title{
-      font-size:12.8px !important;
-      white-space:nowrap !important;
-      overflow:hidden !important;
-      text-overflow:ellipsis !important;
-    }
-    @media(max-width:560px){
-      .svt-trial-options{grid-template-columns:1fr !important}
-      .svt-trial-title{white-space:normal !important}
-    }
-
-
-    /* v38 compact cards: narrower/shorter questions, text remains one line */
-    .svt-trial-shell{
-      width:min(1180px,calc(100% - 72px)) !important;
-      gap:12px !important;
-      padding-top:42px !important;
-    }
-    .svt-trial-title{
-      font-size:clamp(34px,2.95vw,50px) !important;
-      white-space:nowrap !important;
-      line-height:1 !important;
-    }
-    .svt-trial-subtitle{
-      margin-top:5px !important;
-      font-size:17px !important;
-      line-height:1.25 !important;
-    }
-    .svt-trial-options{
-      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-      gap:7px 14px !important;
-      max-width:1120px !important;
-    }
-    .svt-option-card{
-      min-height:48px !important;
-      height:48px !important;
-      padding:6px 34px 6px 90px !important;
-      border-radius:11px !important;
-      box-shadow:0 8px 22px rgba(15,23,42,.045) !important;
-    }
-    .svt-option-number{
-      left:13px !important;
-      width:28px !important;
-      height:28px !important;
-      font-size:11px !important;
-    }
-    .svt-option-icon{
-      left:48px !important;
-      width:32px !important;
-      height:32px !important;
-    }
-    .svt-option-icon svg{
-      width:17px !important;
-      height:17px !important;
-    }
-    .svt-option-title{
-      font-size:11.6px !important;
-      line-height:1 !important;
-      white-space:nowrap !important;
-      overflow:hidden !important;
-      text-overflow:ellipsis !important;
-      letter-spacing:-.01em !important;
-    }
-    .svt-option-check{
-      width:21px !important;
-      height:21px !important;
-      right:16px !important;
-      font-size:12px !important;
-    }
-    .svt-option-arrow{
-      right:16px !important;
-      font-size:19px !important;
-    }
-    .svt-soon-badge{
-      right:32px !important;
-      height:18px !important;
-      padding:0 6px !important;
-      font-size:8px !important;
-    }
-    .svt-trial-bottom{
-      margin-top:4px !important;
-      padding-top:16px !important;
-    }
-    .svt-bottom-btn{
-      height:50px !important;
-      font-size:15px !important;
-    }
-    @media(max-width:760px){
-      .svt-trial-title{white-space:normal !important}
-    }
-    @media(max-width:560px){
-      .svt-trial-options{grid-template-columns:1fr !important}
-    }
-
+    body{margin:0;min-height:100vh;background:radial-gradient(circle at 78% 18%,rgba(7,148,63,.06),transparent 26%),linear-gradient(180deg,#fff 0%,#fbfdfc 100%);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);overflow-x:hidden}
+    body::after{content:"";position:fixed;left:-80px;right:-80px;bottom:-90px;height:210px;pointer-events:none;opacity:.18;background:repeating-radial-gradient(ellipse at center,rgba(7,148,63,.30) 0 1px,transparent 1px 9px);mask-image:linear-gradient(to top,#000,transparent 78%);transform:skewY(-3deg);z-index:0}
+    .shell{position:relative;z-index:1;width:min(1180px,calc(100% - 72px));min-height:100vh;margin:0 auto;padding:42px 0 34px;display:grid;gap:12px}
+    .kicker{margin:0 0 12px;color:var(--green);font-size:14px;letter-spacing:.13em;text-transform:uppercase;font-weight:1000}
+    h1{margin:0;color:var(--navy);font-size:clamp(34px,2.95vw,50px);line-height:1;letter-spacing:-.055em;font-weight:1000;white-space:nowrap;overflow:hidden}
+    .subtitle{margin:5px 0 0;color:var(--muted);font-size:17px;line-height:1.25;font-weight:550}
+    .context{margin-top:4px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .pill{height:30px;padding:0 11px;border-radius:999px;border:1px solid #dceee2;background:#f6faf8;color:#0b6f37;font-size:12px;font-weight:900;display:inline-flex;align-items:center}
+    .questions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 14px;max-width:1120px;margin-top:4px}
+    .q-card{position:relative;height:48px;min-height:48px;width:100%;padding:6px 34px 6px 90px;border:1px solid #e0e8f1;border-radius:11px;background:rgba(255,255,255,.94);box-shadow:var(--shadow);display:flex;align-items:center;text-align:left;color:var(--navy);overflow:hidden}
+    .q-card.available{border-color:var(--green);background:linear-gradient(135deg,rgba(7,148,63,.075),rgba(255,255,255,.98));box-shadow:0 12px 30px rgba(7,148,63,.10)}
+    .q-card.soon{opacity:.74}
+    .q-no{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:999px;display:grid;place-items:center;background:#fff;border:1px solid #e1e9f2;color:var(--green);font-size:11px;font-weight:1000}
+    .q-ico{position:absolute;left:48px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:999px;display:grid;place-items:center;background:var(--soft);color:var(--green);font-size:16px}
+    .q-title{display:block;font-size:11.6px;line-height:1;letter-spacing:-.01em;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .badge{position:absolute;right:32px;top:50%;transform:translateY(-50%);height:18px;padding:0 6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:#eef8f1;border:1px solid #cfeadb;color:var(--green);font-size:8px;line-height:1;font-weight:1000;white-space:nowrap}
+    .check{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:21px;height:21px;border-radius:999px;background:var(--green);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:1000}
+    .info{margin-top:8px;border:1px solid #dfe8f1;background:#fff;border-radius:15px;padding:12px 14px;color:#5d6f89;font-size:13px;line-height:1.45;font-weight:650}
+    .bottom{margin-top:4px;padding-top:16px;border-top:1px solid #e4ebf2;display:flex;justify-content:space-between;align-items:center;gap:18px}
+    .btn{width:210px;min-width:210px;height:50px;border-radius:12px;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:15px;line-height:1;font-weight:1000;text-decoration:none;cursor:pointer;font-family:inherit}
+    .btn.back{color:var(--navy);background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.045)}
+    .btn.next{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--green),var(--green2));box-shadow:0 14px 30px rgba(7,148,63,.18)}
+    @media(max-width:760px){.shell{width:calc(100% - 28px)}h1{white-space:normal}.questions{grid-template-columns:1fr}.bottom{flex-direction:column-reverse;align-items:stretch}.btn{width:100%;min-width:0}}
   </style>
 </head>
-
-<body class="svt-trial-v37">
-  <main class="svt-trial-shell">
-    <section class="svt-trial-head" aria-labelledby="trialTitle">
-      <p class="svt-trial-kicker">SVT ENERGY NAVIGATOR</p>
-      <h1 class="svt-trial-title" id="trialTitle">Alege întrebarea care te interesează cel mai mult</h1>
-      <p class="svt-trial-subtitle">Începem cu un singur obiectiv, apoi construim analiza pas cu pas.</p>
+<body>
+  <main class="shell">
+    <section aria-labelledby="trialTitle">
+      <p class="kicker">SVT ENERGY NAVIGATOR</p>
+      <h1 id="trialTitle">Alege întrebarea care te interesează cel mai mult</h1>
+      <p class="subtitle" id="subtitle">Îți afișăm doar întrebările relevante pentru datele încărcate.</p>
+      <div class="context" id="contextPills"></div>
     </section>
 
-    <section class="svt-trial-options" aria-label="Întrebări disponibile">
-      <button class="svt-option-card is-active" type="button" data-target="./incarcare-curba-sarcina.html"><span class="svt-option-number">01</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-5 3 3 5-7"/><path d="M17 6h2v2"/></svg></span><span class="svt-option-title">Când consum din rețea energie scumpă?</span><span class="svt-option-check">✓</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">02</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v9h14v-9"/><path d="M9 19v-6h6v6"/><path d="M8 21h8"/></svg></span><span class="svt-option-title">Când nu valorific optim energia produsă local?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">03</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M5 5h14v16H5z"/><path d="M14 14h4"/><path d="M16 12v4"/></svg></span><span class="svt-option-title">Cât va produce estimativ sistemul meu în următoarele 24 ore?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">04</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></span><span class="svt-option-title">Câtă energie aș mai putea produce local?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">05</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M12 3v9h9"/><path d="M21 12A9 9 0 1 1 12 3"/><path d="M16 4.5a9 9 0 0 1 4.5 4.5"/></svg></span><span class="svt-option-title">Cât din energia suplimentar produsă ar fi utilizabilă?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">06</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/><path d="M12 7v5l4 2"/></svg></span><span class="svt-option-title">Ce consumuri aș putea muta în timp?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">07</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="18" rx="1.8"/><path d="M10 7h4"/><path d="M10 17h4"/><path d="M12 10v4"/><path d="M10.5 12h3"/></svg></span><span class="svt-option-title">Ce economie aș obține cu BESS, pompă de căldură, boiler, puffer sau cogenerare?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">08</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 16 4-5 3 3 5-8"/></svg></span><span class="svt-option-title">Ce economie aș obține astăzi cu tarif dinamic PZU?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">09</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><path d="M4 19h16"/><rect x="6" y="11" width="3" height="8"/><rect x="11" y="7" width="3" height="12"/><rect x="16" y="3" width="3" height="16"/><path d="m16 3 3 3"/></svg></span><span class="svt-option-title">Cât m-ar costa o investiție integrată pentru reducerea costurilor electrice și termice?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-      <button class="svt-option-card is-disabled" type="button" disabled><span class="svt-option-number">10</span><span class="svt-option-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3"/><path d="M22 12h-3"/><path d="M12 22v-3"/><path d="M2 12h3"/></svg></span><span class="svt-option-title">Ce ar trebui să fac mâine pentru a reduce costul?</span><span class="svt-soon-badge">În curând</span><span class="svt-option-arrow">›</span></button>
-    </section>
+    <section class="questions" id="questions" aria-label="Întrebări disponibile"></section>
 
-    <footer class="svt-trial-bottom">
-      <a class="svt-bottom-btn back" href="./index.html">← Pagina principală</a>
-      <button class="svt-bottom-btn next" type="button" id="svtContinueBtn">Continuă ›</button>
+    <div class="info" id="infoBox"></div>
+
+    <footer class="bottom">
+      <a class="btn back" href="./incarcare-curba-sarcina.html">← Înapoi la date</a>
+      <button class="btn next" type="button" id="continueBtn">Continuă ›</button>
     </footer>
   </main>
 
   <script>
-    document.getElementById('svtContinueBtn')?.addEventListener('click', () => {
-      window.location.href = './incarcare-curba-sarcina.html';
-    });
-  </script>
+    const allQuestions = [
+      {id:1, icon:'📈', title:'Când consum din rețea energie scumpă?', groups:['electric'], active:true},
+      {id:2, icon:'☀️', title:'Când nu valorific optim energia produsă local?', groups:['electric','pv']},
+      {id:3, icon:'🌤️', title:'Cât va produce estimativ sistemul meu în următoarele 24 ore?', groups:['electric','pv','forecast']},
+      {id:4, icon:'➕', title:'Câtă energie ar mai putea fi produsă local?', groups:['electric','pv','site']},
+      {id:5, icon:'🔁', title:'Cât din energia suplimentar produsă ar fi utilizabilă util?', groups:['electric','pv']},
+      {id:6, icon:'⏱️', title:'Ce consumuri aș putea muta în timp pentru că procesul tehnologic permite?', groups:['electric','thermal','flex']},
+      {id:7, icon:'🔋', title:'Ce economie aș obține cu BESS, pompă de căldură, boiler, puffer sau cogenerare?', groups:['electric','thermal','investment']},
+      {id:8, icon:'📊', title:'Ce economie aș obține astăzi pe consumurile reale dacă aș avea tarif dinamic PZU?', groups:['electric','pzu']},
+      {id:9, icon:'🏗️', title:'Cât m-ar costa o investiție integrată care reduce costurile electrice și termice?', groups:['electric','thermal','investment']},
+      {id:10, icon:'🎯', title:'Ce ar trebui să fac mâine pentru a reduce costul?', groups:['electric','thermal','forecast']}
+    ];
 
-  <script>
-    // v37.2 safety: force two columns except on very small phones.
-    function svtForceTrialTwoColumns(){
-      const grid = document.querySelector('.svt-trial-options');
-      if(!grid) return;
-      grid.style.gridTemplateColumns = window.innerWidth <= 560 ? '1fr' : 'repeat(2, minmax(0, 1fr))';
+    function getContext(){
+      try { return JSON.parse(sessionStorage.getItem('svtNavigatorContext') || localStorage.getItem('svtNavigatorContext') || '{}'); }
+      catch(e){ return {}; }
     }
-    window.addEventListener('load', svtForceTrialTwoColumns);
-    window.addEventListener('resize', svtForceTrialTwoColumns);
-    svtForceTrialTwoColumns();
-  </script>
 
+    function relevantQuestions(ctx){
+      const mode = ctx.selectedMode || 'electric';
+      if(mode === 'termic'){
+        return allQuestions.filter(q => q.groups.includes('thermal'));
+      }
+      return allQuestions.filter(q => q.groups.includes('electric'));
+    }
+
+    function render(){
+      const ctx = getContext();
+      const mode = ctx.selectedMode || 'electric';
+      const questions = relevantQuestions(ctx);
+      const grid = document.getElementById('questions');
+      const pills = document.getElementById('contextPills');
+      const info = document.getElementById('infoBox');
+
+      const modeLabel = mode === 'termic' ? 'Termic' : 'Electric';
+      const dataLabel = mode === 'termic'
+        ? (ctx.thermal?.annualValue ? `Consum termic: ${ctx.thermal.annualValue} ${ctx.thermal.unit || ''}` : 'Date termice de bază')
+        : (ctx.hasHourlyFile ? 'Curba orară încărcată' : ctx.hasInvoiceOnly ? 'Factură lunară / estimare' : 'Date electrice');
+      const prodLabel = ctx.hasProduction ? 'Producție locală inclusă' : 'Fără producție locală';
+
+      pills.innerHTML = `
+        <span class="pill">${modeLabel}</span>
+        <span class="pill">${dataLabel}</span>
+        ${mode === 'electric' ? `<span class="pill">${prodLabel}</span>` : ''}
+        ${ctx.fixedTariffRonKwh ? `<span class="pill">Tarif fix: ${Number(ctx.fixedTariffRonKwh).toLocaleString('ro-RO',{maximumFractionDigits:3})} lei/kWh</span>` : ''}
+      `;
+
+      grid.innerHTML = questions.map(q => {
+        const isActive = q.id === 1 && mode === 'electric';
+        return `
+          <button class="q-card ${isActive ? 'available' : 'soon'}" type="button" data-q="${q.id}">
+            <span class="q-no">${String(q.id).padStart(2,'0')}</span>
+            <span class="q-ico">${q.icon}</span>
+            <span class="q-title">${q.title}</span>
+            ${isActive ? '<span class="check">✓</span>' : '<span class="badge">În curând</span>'}
+          </button>
+        `;
+      }).join('');
+
+      if(mode === 'termic'){
+        info.textContent = 'Ai ales modul Termic. Din lista actuală, întrebările relevante sunt cele despre flexibilitate proces, pompă de căldură, boiler, puffer, cogenerare, investiție integrată și recomandări. Momentan sunt marcate „În curând”, pentru că întrebarea 1 este electrică.';
+      } else {
+        info.textContent = 'Ai ales modul Electric. Întrebarea 1 este disponibilă pe baza datelor încărcate. Restul întrebărilor electrice sunt afișate ca relevante, dar rămân momentan „În curând” până adăugăm datele suplimentare necesare.';
+      }
+    }
+
+    // Momentan butonul Continuă nu face nimic, conform cerinței.
+    document.getElementById('continueBtn')?.addEventListener('click', () => {});
+    render();
+  </script>
 </body>
 </html>
