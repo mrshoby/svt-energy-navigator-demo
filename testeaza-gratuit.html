@@ -13,6 +13,7 @@
   <!-- SVT V54 FULL FIX -->
   <!-- SVT V55 CLEAN DROPDOWN SCROLL LISTS -->
   <!-- SVT V56 Q2 HORIZONTAL SURPLUS TABLE -->
+  <!-- SVT V57 Q5 USEFUL ADDITIONAL ENERGY -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -406,6 +407,79 @@
       padding-right:0 !important;
     }
 
+  
+    /* v57: Q5 useful additional energy analysis */
+    .q5-form{
+      border:1px dashed #b9d7c5;
+      background:linear-gradient(180deg,#fbfefc,#f6fbf8);
+      border-radius:16px;
+      padding:16px;
+      display:grid;
+      gap:14px;
+    }
+    .q5-form h2{margin:0;color:var(--navy);font-size:19px;font-weight:1000;letter-spacing:-.03em}
+    .q5-form p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;font-weight:700}
+    .q5-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .q5-field{display:grid;gap:6px}
+    .q5-field label{color:var(--navy);font-size:11.5px;font-weight:1000;text-transform:uppercase;letter-spacing:.04em}
+    .q5-field input,.q5-field select{
+      width:100%;height:42px;border:1px solid #dce5ef;border-radius:11px;background:#fff;padding:0 11px;
+      font-family:inherit;font-size:13px;font-weight:750;color:var(--navy);outline:none;
+    }
+    .q5-field input:focus,.q5-field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(7,148,63,.10)}
+    .q5-actions{display:flex;justify-content:flex-end;gap:10px;align-items:center}
+    .q5-note{font-size:12px;color:#64748b;font-weight:700;line-height:1.35}
+    .q5-result-meta{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .q5-chip{
+      height:28px;padding:0 10px;border-radius:999px;background:#f1f8f4;border:1px solid #d4ecdc;color:#086b36;
+      display:inline-flex;align-items:center;font-size:11px;font-weight:1000;
+    }
+    .q5-prereq{
+      border:1px solid #fed7aa;
+      background:#fff7ed;
+      border-radius:16px;
+      padding:16px;
+      display:grid;
+      gap:10px;
+    }
+    .q5-prereq strong{color:#9a3412;font-size:15px;font-weight:1000}
+    .q5-prereq p{color:#7c2d12;font-size:13px;font-weight:750;line-height:1.45;margin:0}
+    .q5-day-board{
+      margin-top:14px;
+      border:1px solid #e1eadf;
+      background:#fbfefc;
+      border-radius:18px;
+      padding:14px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scrollbar-width:thin;
+      scrollbar-color:#b8d8c5 #f8fbf9;
+    }
+    .q5-day-board::-webkit-scrollbar{height:9px}
+    .q5-day-board::-webkit-scrollbar-track{background:#f8fbf9;border-radius:99px}
+    .q5-day-board::-webkit-scrollbar-thumb{background:#b8d8c5;border-radius:99px}
+    .q5-day-grid{display:flex;gap:12px;min-width:max-content;align-items:stretch;padding-bottom:4px}
+    .q5-day-card{
+      width:340px;flex:0 0 340px;border:1px solid #dfe9e4;background:#fff;border-radius:16px;
+      box-shadow:0 10px 24px rgba(15,23,42,.045);overflow:hidden;
+    }
+    .q5-day-head{padding:12px 13px;background:linear-gradient(135deg,#f1f8f4,#ffffff);border-bottom:1px solid #e1eadf}
+    .q5-day-head strong{display:block;color:var(--navy);font-size:13px;font-weight:1000;letter-spacing:-.015em}
+    .q5-day-head span{display:block;margin-top:3px;color:#64748b;font-size:11px;font-weight:800}
+    .q5-hour-table{display:grid;grid-template-columns:52px 1fr 1fr 1fr 1fr;gap:0;font-size:11px}
+    .q5-hour-row{display:contents}
+    .q5-hour-row > div{
+      padding:7px 7px;border-bottom:1px solid #eef3f0;color:#334155;font-weight:800;white-space:nowrap;text-align:right;
+    }
+    .q5-hour-row > div:first-child{text-align:left}
+    .q5-hour-row.header > div{
+      background:#fbfefc;color:#64748b;font-size:9.6px;text-transform:uppercase;letter-spacing:.04em;font-weight:1000;
+    }
+    .q5-useful-val{color:#067436 !important;font-weight:1000 !important}
+    .q5-surplus-val{color:#b45309 !important;font-weight:1000 !important}
+    @media(max-width:900px){.q5-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.q5-grid{grid-template-columns:1fr}.q5-actions{justify-content:stretch}.q5-actions .btn{width:100%;min-width:0}}
+
   </style>
 </head>
 <body>
@@ -475,15 +549,16 @@
         const hasPvData = !!(ctx.hasProduction || analysis?.meta?.hasProduction || (analysis?.chartRows || []).some(r => Number(r.productionKwh || 0) > 0));
         const q3Stored = !!sessionStorage.getItem('svtForecastQ3');
         const q4Stored = !!sessionStorage.getItem('svtPotentialQ4');
-        const isAvailable = mode === 'electric' && analysis?.chartRows?.length && (q.id === 1 || q.id === 2 || q.id === 3 || q.id === 4);
-        const needsData = mode === 'electric' && analysis?.chartRows?.length && ((q.id === 2 && !hasPvData) || (q.id === 3 && !q3Stored) || (q.id === 4 && !q4Stored));
+        const q5Stored = !!sessionStorage.getItem('svtUsefulEnergyQ5');
+        const isAvailable = mode === 'electric' && analysis?.chartRows?.length && (q.id === 1 || q.id === 2 || q.id === 3 || q.id === 4 || q.id === 5);
+        const needsData = mode === 'electric' && analysis?.chartRows?.length && ((q.id === 2 && !hasPvData) || (q.id === 3 && !q3Stored) || (q.id === 4 && !q4Stored) || (q.id === 5 && !q5Stored));
         const isActive = isAvailable;
         return `
           <div class="q-item" data-q-item="${q.id}">
             <button class="q-card ${q.title.length > 92 ? 'is-xlong' : q.title.length > 64 ? 'is-long' : ''} ${needsData ? 'needs-data' : isActive ? 'available' : 'soon'}" type="button" data-q="${q.id}" ${isActive ? '' : 'disabled'}>
               <span class="q-no">${displayNumber(idx)}</span>
               <span class="q-title">${esc(q.title)}</span>
-              ${needsData ? '<span class="badge incomplete">Date incomplete · completează datele necesare</span>' : isActive ? '<span class="answer-slot" title="Aici apare bifa după răspuns">✓</span>' : '<span class="badge">În curând</span>'}
+              ${needsData ? `<span class="badge incomplete">${q.id === 5 ? 'Date incomplete · estimează producția suplimentară' : 'Date incomplete · completează datele necesare'}</span>` : isActive ? '<span class="answer-slot" title="Aici apare bifa după răspuns">✓</span>' : '<span class="badge">În curând</span>'}
             </button>
             ${isActive ? `<div class="details" id="details-q${q.id}"></div>` : ''}
           </div>
@@ -497,6 +572,7 @@
           if(q === 2) handleQuestion2(card);
           if(q === 3) handleQuestion3(card);
           if(q === 4) handleQuestion4(card);
+          if(q === 5) handleQuestion5(card);
         });
       });
     }
@@ -1476,6 +1552,402 @@
           scales:{x:{grid:{display:false}}, y:{beginAtZero:true,title:{display:true,text:'MWh/lună'}}}
         }
       });
+    }
+
+
+
+    function getQ5Defaults(){
+      const ds = (() => { try{return JSON.parse(sessionStorage.getItem('svtDataset') || '{}')}catch(e){return {}} })();
+      const q4 = (() => { try{return JSON.parse(sessionStorage.getItem('svtPotentialQ4') || '{}')}catch(e){return {}} })();
+      const ctx = getContext();
+      const fixed = Number(ds?.meta?.fixedPriceRonKwh || ctx.fixedTariffRonKwh || 0.75);
+      const zeroExport = q4?.inputs?.zeroExport || 'unknown';
+      const exportLimitKw = q4?.inputs?.exportLimitKw || '';
+      return {
+        tariffConsumption:String(fixed || 0.75),
+        exportTariff:'0.20',
+        zeroExport:String(zeroExport || 'unknown'),
+        exportLimitKw:String(exportLimitKw || ''),
+        flexibleMode:'unknown',
+        flexibleKwhDay:'',
+        bessMode:'no',
+        bessCapacityKwh:'',
+        bessEfficiency:'90'
+      };
+    }
+
+    function handleQuestion5(cardArg){
+      const card = cardArg || document.querySelector('.q-card[data-q="5"]');
+      const box = document.getElementById('details-q5');
+      if(!box) return;
+
+      const stored = sessionStorage.getItem('svtUsefulEnergyQ5');
+      card.classList.add('loading');
+      card.classList.remove('done');
+      box.classList.add('open');
+
+      window.setTimeout(() => {
+        card.classList.remove('loading');
+        if(stored){
+          try{
+            renderQuestion5Result(box, JSON.parse(stored));
+            card.classList.add('done');
+            return;
+          }catch(e){}
+        }
+        renderQuestion5Form(box, card);
+      }, 450);
+    }
+
+    function renderQuestion5Form(box, card){
+      const q4 = (() => { try{return JSON.parse(sessionStorage.getItem('svtPotentialQ4') || '{}')}catch(e){return {}} })();
+      const ds = (() => { try{return JSON.parse(sessionStorage.getItem('svtDataset') || '{}')}catch(e){return {}} })();
+
+      if(!q4?.results?.annualKwh){
+        box.innerHTML = `
+          <div class="q5-prereq">
+            <strong>Date incomplete · este necesară estimarea producției suplimentare</strong>
+            <p>Pentru această întrebare trebuie calculată mai întâi întrebarea 4: „Câtă energie ar mai putea fi produsă local?”. Fără producția suplimentară estimată nu avem baza pentru a calcula cât este utilizabil local.</p>
+            <button class="btn next" type="button" id="q5OpenQ4Btn">Deschide întrebarea 4 ›</button>
+          </div>
+        `;
+        document.getElementById('q5OpenQ4Btn')?.addEventListener('click', () => {
+          const q4Card = document.querySelector('.q-card[data-q="4"]');
+          if(q4Card){
+            q4Card.scrollIntoView({behavior:'smooth', block:'center'});
+            window.setTimeout(() => q4Card.click(), 250);
+          }
+        });
+        return;
+      }
+
+      if(!ds?.rows?.length){
+        box.innerHTML = `
+          <div class="q5-prereq">
+            <strong>Date incomplete · lipsește curba de consum</strong>
+            <p>Pentru a calcula energia utilizabilă local este necesară curba de consum electric. Revino la pagina de încărcare și adaugă consumul.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const d = getQ5Defaults();
+      const addMwh = (q4.results.annualKwh || 0) / 1000;
+      const addKwp = q4.results.additionalKwp || 0;
+
+      box.innerHTML = `
+        <div class="q5-form">
+          <div>
+            <h2>Cât din energia suplimentar produsă ar fi utilizabilă util?</h2>
+            <p>Preluăm automat curba de consum și producția suplimentară estimată la întrebarea 4. Completează doar ipotezele despre export, flexibilitate, stocare și tarife.</p>
+          </div>
+
+          <div class="q5-result-meta">
+            <span class="q5-chip">PV suplimentar: ${fmt(addKwp,1)} kWp</span>
+            <span class="q5-chip">Producție suplimentară: ${fmt(addMwh,1)} MWh/an</span>
+            <span class="q5-chip">Curba consum: ${fmt(ds.rows.length,0)} intervale</span>
+          </div>
+
+          <div class="q5-grid">
+            <div class="q5-field">
+              <label for="q5ZeroExport">Regim zero-export</label>
+              <select id="q5ZeroExport">
+                <option value="unknown">Nu știu / nu este specificat</option>
+                <option value="no">Nu</option>
+                <option value="yes">Da</option>
+              </select>
+            </div>
+            <div class="q5-field">
+              <label for="q5ExportLimit">Limitare injecție [kW]</label>
+              <input id="q5ExportLimit" type="number" min="0" step="1" value="${esc(d.exportLimitKw)}" placeholder="opțional">
+            </div>
+            <div class="q5-field">
+              <label for="q5FlexibleMode">Consumuri mutabile</label>
+              <select id="q5FlexibleMode">
+                <option value="unknown">Nu știu</option>
+                <option value="no">Nu</option>
+                <option value="yes">Da</option>
+              </select>
+            </div>
+            <div class="q5-field">
+              <label for="q5FlexibleKwhDay">Energie mutabilă [kWh/zi]</label>
+              <input id="q5FlexibleKwhDay" type="number" min="0" step="1" value="${esc(d.flexibleKwhDay)}" placeholder="ex. 300">
+            </div>
+            <div class="q5-field">
+              <label for="q5BessMode">BESS / stocare</label>
+              <select id="q5BessMode">
+                <option value="no">Nu</option>
+                <option value="yes">Da</option>
+              </select>
+            </div>
+            <div class="q5-field">
+              <label for="q5BessCapacity">Capacitate BESS [kWh]</label>
+              <input id="q5BessCapacity" type="number" min="0" step="1" value="${esc(d.bessCapacityKwh)}" placeholder="ex. 1000">
+            </div>
+            <div class="q5-field">
+              <label for="q5BessEfficiency">Randament BESS [%]</label>
+              <input id="q5BessEfficiency" type="number" min="50" max="100" step="1" value="${esc(d.bessEfficiency)}">
+            </div>
+            <div class="q5-field">
+              <label for="q5TariffConsumption">Tarif consum [lei/kWh]</label>
+              <input id="q5TariffConsumption" type="number" min="0" step="0.001" value="${esc(d.tariffConsumption)}">
+            </div>
+            <div class="q5-field">
+              <label for="q5ExportTariff">Tarif export [lei/kWh]</label>
+              <input id="q5ExportTariff" type="number" min="0" step="0.001" value="${esc(d.exportTariff)}">
+            </div>
+          </div>
+
+          <div class="q5-actions">
+            <span class="q5-note">Calculul separă energia utilizată direct, energia ce poate fi valorificată prin consum flexibil/BESS și surplusul exportat sau limitat.</span>
+            <button class="btn next" type="button" id="q5RunBtn">Calculează utilizabilul ›</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('q5ZeroExport').value = d.zeroExport;
+      document.getElementById('q5FlexibleMode').value = d.flexibleMode;
+      document.getElementById('q5BessMode').value = d.bessMode;
+      document.getElementById('q5RunBtn')?.addEventListener('click', () => calculateQ5UsefulEnergy(box, card));
+    }
+
+    function buildQ5AdditionalProfile(ds, q4){
+      const rows = ds.rows || [];
+      const annualKwh = Number(q4?.results?.annualKwh || 0);
+      if(!rows.length || !(annualKwh > 0)) return [];
+
+      const start = new Date(rows[0].timestamp);
+      const end = new Date(rows[rows.length-1].timestamp);
+      const days = Math.max(1, (end - start) / 86400000);
+      const targetPeriodKwh = annualKwh * days / 365;
+
+      const existingPvTotal = rows.reduce((a,r)=>a + Number(r.pvKwh || 0),0);
+      const monthShare = {0:.040,1:.055,2:.085,3:.105,4:.120,5:.125,6:.130,7:.120,8:.095,9:.065,10:.035,11:.025};
+
+      if(existingPvTotal > 0){
+        return rows.map(r => ({timestamp:r.timestamp, additionalPvKwh:Number(r.pvKwh || 0) / existingPvTotal * targetPeriodKwh}));
+      }
+
+      const weights = rows.map(r => {
+        const d = new Date(r.timestamp);
+        const h = Number(r.hour ?? d.getHours());
+        const solarHour = h >= 5 && h <= 20 ? Math.sin(Math.PI * (h - 5) / 15) : 0;
+        const month = isNaN(d) ? 6 : d.getMonth();
+        return Math.max(0, solarHour) * (monthShare[month] || .08);
+      });
+      const totalWeight = weights.reduce((a,b)=>a+b,0) || 1;
+      return rows.map((r,i) => ({timestamp:r.timestamp, additionalPvKwh:weights[i] / totalWeight * targetPeriodKwh}));
+    }
+
+    function calculateQ5UsefulEnergy(box, card){
+      try{
+        const ds = JSON.parse(sessionStorage.getItem('svtDataset') || '{}');
+        const q4 = JSON.parse(sessionStorage.getItem('svtPotentialQ4') || '{}');
+        if(!ds?.rows?.length) throw new Error('Lipsește curba de consum.');
+        if(!q4?.results?.annualKwh) throw new Error('Lipsește producția suplimentară estimată din întrebarea 4.');
+
+        const zeroExport = document.getElementById('q5ZeroExport')?.value || 'unknown';
+        const exportLimitKw = Number(document.getElementById('q5ExportLimit')?.value || 0);
+        const flexibleMode = document.getElementById('q5FlexibleMode')?.value || 'unknown';
+        const flexibleKwhDay = flexibleMode === 'yes' ? Number(document.getElementById('q5FlexibleKwhDay')?.value || 0) : 0;
+        const bessMode = document.getElementById('q5BessMode')?.value || 'no';
+        const bessCapacityKwh = bessMode === 'yes' ? Number(document.getElementById('q5BessCapacity')?.value || 0) : 0;
+        const bessEfficiency = Number(document.getElementById('q5BessEfficiency')?.value || 90) / 100;
+        const tariffConsumption = Number(document.getElementById('q5TariffConsumption')?.value || 0);
+        const exportTariff = Number(document.getElementById('q5ExportTariff')?.value || 0);
+
+        const profile = buildQ5AdditionalProfile(ds, q4);
+        const byTimestamp = new Map(profile.map(x => [String(new Date(x.timestamp).getTime()), x.additionalPvKwh]));
+
+        let direct = 0, rawSurplus = 0, remainingDeficit = 0, totalAdd = 0, existingPvTotal = 0;
+        const intervalRows = [];
+        const dayMap = new Map();
+
+        for(const r of ds.rows || []){
+          const d = new Date(r.timestamp);
+          const key = String(d.getTime());
+          const addPv = Number(byTimestamp.get(key) || 0);
+          const consumption = Number(r.electricKwh || r.consumptionKwh || 0);
+          const existingPv = Number(r.pvKwh || 0);
+          const demandAfterExisting = Math.max(0, consumption - existingPv);
+          const localDirect = Math.min(demandAfterExisting, addPv);
+          const surplus = Math.max(0, addPv - localDirect);
+          const deficitAfter = Math.max(0, demandAfterExisting - localDirect);
+          const day = isNaN(d) ? 'n/a' : d.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit', year:'numeric'});
+          const hour = isNaN(d) ? '' : d.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'});
+
+          totalAdd += addPv;
+          existingPvTotal += existingPv;
+          direct += localDirect;
+          rawSurplus += surplus;
+          remainingDeficit += deficitAfter;
+
+          const out = {timestamp:r.timestamp, day, hour, consumption, demandAfterExisting, additionalPvKwh:addPv, directKwh:localDirect, surplusKwh:surplus, deficitAfterKwh:deficitAfter};
+          intervalRows.push(out);
+
+          if(!dayMap.has(day)) dayMap.set(day, {day, rows:[], surplus:0, direct:0, add:0, deficit:0});
+          const g = dayMap.get(day);
+          g.rows.push(out); g.surplus += surplus; g.direct += localDirect; g.add += addPv; g.deficit += deficitAfter;
+        }
+
+        let flexUseful = 0, bessUseful = 0, exportKwh = 0, curtailedKwh = 0;
+        const days = Array.from(dayMap.values());
+
+        for(const g of days){
+          let s = g.surplus;
+          const flex = Math.min(s, Math.max(0, flexibleKwhDay));
+          flexUseful += flex;
+          s -= flex;
+
+          if(bessMode === 'yes' && bessCapacityKwh > 0){
+            const charge = Math.min(s, bessCapacityKwh, g.deficit / Math.max(.5, bessEfficiency));
+            const discharged = charge * Math.max(.5, Math.min(1, bessEfficiency));
+            bessUseful += discharged;
+            s -= charge;
+          }
+
+          if(zeroExport === 'yes') curtailedKwh += s;
+          else exportKwh += s;
+        }
+
+        const usefulTotal = direct + flexUseful + bessUseful;
+        const usefulPercent = totalAdd > 0 ? usefulTotal / totalAdd * 100 : 0;
+        const surplusPercent = totalAdd > 0 ? (exportKwh + curtailedKwh) / totalAdd * 100 : 0;
+        const localValue = usefulTotal * tariffConsumption;
+        const exportValue = exportKwh * exportTariff;
+        const lostOpportunity = (exportKwh + curtailedKwh) * Math.max(0, tariffConsumption - exportTariff);
+
+        const payload = {
+          inputs:{zeroExport, exportLimitKw, flexibleMode, flexibleKwhDay, bessMode, bessCapacityKwh, bessEfficiency:bessEfficiency*100, tariffConsumption, exportTariff},
+          source:{q4AnnualKwh:q4.results.annualKwh, q4AdditionalKwp:q4.results.additionalKwp, datasetRows:ds.rows.length, existingPvTotal},
+          totals:{totalAdd, direct, flexUseful, bessUseful, usefulTotal, exportKwh, curtailedKwh, remainingDeficit, usefulPercent, surplusPercent, localValue, exportValue, lostOpportunity},
+          days,
+          intervalRows,
+          createdAt:new Date().toISOString()
+        };
+
+        sessionStorage.setItem('svtUsefulEnergyQ5', JSON.stringify(payload));
+        renderQuestion5Result(box, payload);
+        card.classList.remove('loading','needs-data');
+        card.classList.add('available','done');
+        const badge = card.querySelector('.badge.incomplete');
+        if(badge) badge.outerHTML = '<span class="answer-slot" title="Răspuns calculat">✓</span>';
+      }catch(err){
+        box.innerHTML = `
+          <div class="q5-prereq">
+            <strong>Date insuficiente</strong>
+            <p>${esc(err.message || 'Verifică datele introduse.')}</p>
+            <button class="btn back" type="button" onclick="renderQuestion5Form(document.getElementById('details-q5'), document.querySelector('.q-card[data-q=&quot;5&quot;]'))">Completează din nou</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderQuestion5Result(box, data){
+      const t = data.totals || {};
+      box.innerHTML = `
+        <div class="q5-result-meta">
+          <span class="q5-chip">PV suplimentar: ${fmt((data.source?.q4AdditionalKwp || 0),1)} kWp</span>
+          <span class="q5-chip">Tarif consum: ${fmt(data.inputs?.tariffConsumption || 0,3)} lei/kWh</span>
+          <span class="q5-chip">Export: ${data.inputs?.zeroExport === 'yes' ? 'zero-export' : fmt(data.inputs?.exportTariff || 0,3) + ' lei/kWh'}</span>
+        </div>
+
+        <div class="answer-summary">
+          <div class="summary-card"><strong>${fmt(t.totalAdd/1000,1)} MWh/an</strong><span>producție suplimentară estimată</span></div>
+          <div class="summary-card"><strong>${fmt(t.usefulTotal/1000,1)} MWh/an</strong><span>energie utilizabilă local direct/flexibil/BESS</span></div>
+          <div class="summary-card"><strong>${fmt(t.usefulPercent,1)}%</strong><span>procent utilizabil local</span></div>
+        </div>
+
+        <div class="chart-wrap"><canvas id="question5Chart"></canvas></div>
+
+        <div class="top-list">
+          <div class="top-row">
+            <div class="rank">1</div>
+            <div><strong>Utilizare directă locală</strong><small>PV suplimentar consumat simultan cu consumul disponibil</small></div>
+            <div class="cost" style="color:#067436">${fmt(t.direct/1000,1)} MWh</div>
+          </div>
+          <div class="top-row">
+            <div class="rank">2</div>
+            <div><strong>Flexibilitate / mutare consum</strong><small>energie suplimentară absorbită prin procese mutabile</small></div>
+            <div class="cost" style="color:#067436">${fmt(t.flexUseful/1000,1)} MWh</div>
+          </div>
+          <div class="top-row">
+            <div class="rank">3</div>
+            <div><strong>BESS / stocare</strong><small>surplus stocat și consumat ulterior, cu randamentul introdus</small></div>
+            <div class="cost" style="color:#067436">${fmt(t.bessUseful/1000,1)} MWh</div>
+          </div>
+          <div class="top-row">
+            <div class="rank">4</div>
+            <div><strong>Export / surplus rămas</strong><small>energie care nu este utilizată local direct, flexibil sau prin BESS</small></div>
+            <div class="cost" style="color:#b45309">${fmt((t.exportKwh+t.curtailedKwh)/1000,1)} MWh</div>
+          </div>
+          <div class="top-row">
+            <div class="rank">5</div>
+            <div><strong>Valoare economică estimată</strong><small>valoare locală + valoare export; oportunitate pierdută calculată separat</small></div>
+            <div class="cost">${fmt(t.localValue + t.exportValue,0)} lei/an</div>
+          </div>
+        </div>
+
+        ${renderQ5DayBoard(data.intervalRows || [])}
+      `;
+
+      if(activeCharts.q5) activeCharts.q5.destroy();
+      activeCharts.q5 = new Chart(document.getElementById('question5Chart'), {
+        type:'bar',
+        data:{
+          labels:['Utilizat direct','Flexibil','BESS','Export','Limitat/pierdut'],
+          datasets:[{
+            label:'Energie suplimentară',
+            data:[t.direct/1000,t.flexUseful/1000,t.bessUseful/1000,t.exportKwh/1000,t.curtailedKwh/1000],
+            backgroundColor:['rgba(7,148,63,.68)','rgba(37,99,235,.58)','rgba(124,58,237,.58)','rgba(245,158,11,.62)','rgba(239,68,68,.55)'],
+            borderRadius:8
+          }]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${Number(ctx.parsed.y||0).toLocaleString('ro-RO',{maximumFractionDigits:1})} MWh/an`}}},
+          scales:{x:{grid:{display:false}}, y:{beginAtZero:true,title:{display:true,text:'MWh/an'}}}
+        }
+      });
+    }
+
+    function renderQ5DayBoard(rows){
+      const relevant = (rows || []).filter(r => Number(r.additionalPvKwh || 0) > 0 || Number(r.directKwh || 0) > 0 || Number(r.surplusKwh || 0) > 0);
+      if(!relevant.length) return '';
+      const groups = new Map();
+      for(const r of relevant){
+        if(!groups.has(r.day)) groups.set(r.day, []);
+        groups.get(r.day).push(r);
+      }
+      const cards = Array.from(groups.entries()).map(([day,list]) => {
+        const add = list.reduce((a,x)=>a+Number(x.additionalPvKwh||0),0);
+        const use = list.reduce((a,x)=>a+Number(x.directKwh||0),0);
+        const sur = list.reduce((a,x)=>a+Number(x.surplusKwh||0),0);
+        const body = list.map(x => `
+          <div class="q5-hour-row">
+            <div>${esc(x.hour)}</div>
+            <div>${fmt(x.demandAfterExisting)} kWh</div>
+            <div>${fmt(x.additionalPvKwh)} kWh</div>
+            <div class="q5-useful-val">${fmt(x.directKwh)} kWh</div>
+            <div class="q5-surplus-val">${fmt(x.surplusKwh)} kWh</div>
+          </div>
+        `).join('');
+        return `
+          <section class="q5-day-card">
+            <div class="q5-day-head">
+              <strong>${esc(day)}</strong>
+              <span>PV supl. ${fmt(add)} kWh · utilizat ${fmt(use)} kWh · surplus ${fmt(sur)} kWh</span>
+            </div>
+            <div class="q5-hour-table">
+              <div class="q5-hour-row header">
+                <div>Ora</div><div>Consum disp.</div><div>PV supl.</div><div>Utilizat</div><div>Surplus</div>
+              </div>
+              ${body}
+            </div>
+          </section>
+        `;
+      }).join('');
+      return `<div class="q5-day-board"><div class="q5-day-grid">${cards}</div></div>`;
     }
 
 
