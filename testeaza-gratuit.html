@@ -12,6 +12,7 @@
   <!-- SVT V53 Q3 MIDNIGHT FORECAST -->
   <!-- SVT V54 FULL FIX -->
   <!-- SVT V55 CLEAN DROPDOWN SCROLL LISTS -->
+  <!-- SVT V56 Q2 HORIZONTAL SURPLUS TABLE -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -310,6 +311,100 @@
     .top-list::-webkit-scrollbar-track{background:#f8fbf9;border-radius:99px}
     .top-list::-webkit-scrollbar-thumb{background:#b8d8c5;border-radius:99px}
     .top-list .top-row{min-height:66px}
+
+  
+    /* v56: Q2 all surplus intervals in horizontal day/hour cards */
+    .q2-surplus-board{
+      margin-top:14px;
+      border:1px solid #e1eadf;
+      background:#fbfefc;
+      border-radius:18px;
+      padding:14px;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scrollbar-width:thin;
+      scrollbar-color:#b8d8c5 #f8fbf9;
+    }
+    .q2-surplus-board::-webkit-scrollbar{height:9px}
+    .q2-surplus-board::-webkit-scrollbar-track{background:#f8fbf9;border-radius:99px}
+    .q2-surplus-board::-webkit-scrollbar-thumb{background:#b8d8c5;border-radius:99px}
+    .q2-day-grid{
+      display:flex;
+      gap:12px;
+      min-width:max-content;
+      align-items:stretch;
+      padding-bottom:4px;
+    }
+    .q2-day-card{
+      width:260px;
+      flex:0 0 260px;
+      border:1px solid #dfe9e4;
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 10px 24px rgba(15,23,42,.045);
+      overflow:hidden;
+    }
+    .q2-day-head{
+      padding:12px 13px;
+      background:linear-gradient(135deg,#f1f8f4,#ffffff);
+      border-bottom:1px solid #e1eadf;
+    }
+    .q2-day-head strong{
+      display:block;
+      color:var(--navy);
+      font-size:13px;
+      font-weight:1000;
+      letter-spacing:-.015em;
+    }
+    .q2-day-head span{
+      display:block;
+      margin-top:3px;
+      color:#64748b;
+      font-size:11px;
+      font-weight:800;
+    }
+    .q2-hour-table{
+      display:grid;
+      grid-template-columns:58px 1fr 1fr;
+      gap:0;
+      font-size:11.5px;
+    }
+    .q2-hour-row{display:contents}
+    .q2-hour-row > div{
+      padding:8px 8px;
+      border-bottom:1px solid #eef3f0;
+      color:#334155;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .q2-hour-row.header > div{
+      background:#fbfefc;
+      color:#64748b;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:1000;
+    }
+    .q2-hour-row:last-child > div{border-bottom:0}
+    .q2-surplus-val{color:#b45309 !important;font-weight:1000 !important;text-align:right}
+    .q2-prod-val{text-align:right}
+    .q2-empty-board{
+      margin-top:14px;
+      border:1px solid #dfe9e4;
+      background:#fbfefc;
+      border-radius:16px;
+      padding:14px;
+      color:#475569;
+      font-size:13px;
+      font-weight:800;
+    }
+
+  
+    #topSurplusIntervals.top-list{
+      max-height:none !important;
+      overflow:visible !important;
+      padding-right:0 !important;
+    }
 
   </style>
 </head>
@@ -714,7 +809,7 @@
         const consumption = Number(r.consumptionKwh || 0);
         const surplus = Math.max(production - consumption, Number(r.surplusKwh || 0), 0);
         return {...r, surplusKwh:surplus};
-      }).filter(r => r.surplusKwh > 0).sort((a,b)=>b.surplusKwh - a.surplusKwh).slice(0,60);
+      }).filter(r => r.surplusKwh > 0).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
 
       box.innerHTML = `
         <div class="answer-summary" id="answerSummaryQ2">
@@ -745,17 +840,61 @@
       });
 
       const target = document.getElementById('topSurplusIntervals');
-      target.innerHTML = topSurplus.length ? topSurplus.map((x, i) => `
-        <div class="top-row">
-          <div class="rank">${i+1}</div>
-          <div><strong>${esc(x.localLabel)}</strong><small>Producție: ${fmt(x.productionKwh)} kWh · consum: ${fmt(x.consumptionKwh)} kWh</small></div>
-          <div class="cost" style="color:#b45309">${fmt(x.surplusKwh)} kWh surplus</div>
-        </div>
-      `).join('') : `
-        <div class="top-row">
-          <div class="rank">✓</div>
-          <div><strong>Nu am detectat surplus local relevant</strong><small>Producția este consumată local în intervalele analizate.</small></div>
-          <div class="cost" style="color:#07943f">OK</div>
+      target.innerHTML = renderQ2SurplusBoard(topSurplus);
+    }
+
+    function renderQ2SurplusBoard(rows){
+      if(!rows || !rows.length){
+        return `
+          <div class="q2-empty-board">
+            Nu am detectat surplus local relevant. Producția este consumată local în intervalele analizate.
+          </div>
+        `;
+      }
+
+      const groups = new Map();
+      for(const r of rows){
+        const d = new Date(r.timestamp);
+        const dayKey = isNaN(d) ? String(r.localLabel || '').slice(0,10) : d.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit', year:'numeric'});
+        const hourLabel = isNaN(d) ? String(r.localLabel || '') : d.toLocaleTimeString('ro-RO', {hour:'2-digit', minute:'2-digit'});
+        if(!groups.has(dayKey)) groups.set(dayKey, []);
+        groups.get(dayKey).push({...r, dayKey, hourLabel});
+      }
+
+      const dayCards = Array.from(groups.entries()).map(([day, list]) => {
+        const totalSurplus = list.reduce((a,x)=>a + Number(x.surplusKwh || 0),0);
+        const totalProduction = list.reduce((a,x)=>a + Number(x.productionKwh || 0),0);
+        const rowsHtml = list.map(x => `
+          <div class="q2-hour-row">
+            <div>${esc(x.hourLabel)}</div>
+            <div class="q2-prod-val">${fmt(x.productionKwh)} kWh</div>
+            <div class="q2-surplus-val">${fmt(x.surplusKwh)} kWh</div>
+          </div>
+        `).join('');
+
+        return `
+          <section class="q2-day-card">
+            <div class="q2-day-head">
+              <strong>${esc(day)}</strong>
+              <span>${list.length} intervale · surplus total ${fmt(totalSurplus)} kWh · producție ${fmt(totalProduction)} kWh</span>
+            </div>
+            <div class="q2-hour-table">
+              <div class="q2-hour-row header">
+                <div>Ora</div>
+                <div>Producție</div>
+                <div>Surplus</div>
+              </div>
+              ${rowsHtml}
+            </div>
+          </section>
+        `;
+      }).join('');
+
+      return `
+        <div class="q2-surplus-board" aria-label="Tabel orizontal cu surplusul pe zile și ore">
+          <div class="q2-day-grid">
+            ${dayCards}
+          </div>
         </div>
       `;
     }
