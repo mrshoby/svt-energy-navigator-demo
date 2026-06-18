@@ -9,6 +9,7 @@
   <!-- SVT V50 Q3 REAL WEATHER PV FORECAST -->
   <!-- SVT V51 ENGINE LOAD FIX -->
   <!-- SVT V52 Q4 LOCAL PRODUCTION POTENTIAL -->
+  <!-- SVT V53 Q3 MIDNIGHT FORECAST -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -800,7 +801,7 @@
         url.searchParams.set('latitude', String(lat));
         url.searchParams.set('longitude', String(lon));
         url.searchParams.set('hourly', 'shortwave_radiation,temperature_2m,cloud_cover');
-        url.searchParams.set('forecast_days', '2');
+        url.searchParams.set('forecast_days', '3');
         url.searchParams.set('timezone', 'auto');
 
         const res = await fetch(url.toString());
@@ -812,16 +813,33 @@
         const temp = hourly.temperature_2m || [];
         const cloud = hourly.cloud_cover || [];
 
-        const now = Date.now();
-        let rows = times.map((t,i) => ({
+        const nowLocal = new Date();
+        // v53: pentru grafic clar, alegem o zi calendaristică completă:
+        // de la următorul 00:00 până la 23:00, nu de la ora curentă.
+        const forecastStart = new Date(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate() + 1, 0, 0, 0, 0);
+        const forecastEnd = new Date(forecastStart.getTime() + 24 * 3600000);
+
+        let allRows = times.map((t,i) => ({
           time:t,
           date:new Date(t),
           ghi:Number(ghi[i] || 0),
           temp:Number(temp[i] || 0),
           cloud:Number(cloud[i] || 0)
-        })).filter(r => !isNaN(r.date) && r.date.getTime() >= now - 3600000).slice(0,24);
+        })).filter(r => !isNaN(r.date));
 
-        if(rows.length < 6) rows = times.map((t,i)=>({time:t,date:new Date(t),ghi:Number(ghi[i]||0),temp:Number(temp[i]||0),cloud:Number(cloud[i]||0)})).slice(0,24);
+        let rows = allRows.filter(r => r.date >= forecastStart && r.date < forecastEnd).slice(0,24);
+
+        // fallback: dacă API-ul returnează altă fereastră, luăm prima zi completă disponibilă de la 00:00.
+        if(rows.length < 20){
+          const firstMidnight = allRows.find(r => r.date.getHours() === 0);
+          if(firstMidnight){
+            const start = new Date(firstMidnight.date.getFullYear(), firstMidnight.date.getMonth(), firstMidnight.date.getDate(), 0, 0, 0, 0);
+            const end = new Date(start.getTime() + 24 * 3600000);
+            rows = allRows.filter(r => r.date >= start && r.date < end).slice(0,24);
+          }
+        }
+
+        if(rows.length < 6) rows = allRows.slice(0,24);
         if(!rows.length) throw new Error('Nu am primit date orare de radiație solară din API.');
 
         const orientationFactor = clamp(1 - Math.abs(azimuth) / 180 * 0.28, 0.62, 1.02);
@@ -833,7 +851,7 @@
           const moduleTemp = r.temp + (r.ghi / 800) * 20;
           const tempDerate = clamp(1 - 0.004 * (moduleTemp - 25), 0.78, 1.06);
           const kwh = Math.max(0, kwp * (r.ghi / 1000) * orientationFactor * tiltFactor * lossFactor * tempDerate);
-          const label = r.date.toLocaleString('ro-RO', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
+          const label = r.date.toLocaleString('ro-RO', {hour:'2-digit', minute:'2-digit'});
           total += kwh;
           irradiation += Math.max(0, r.ghi) / 1000;
           if(kwh > peak.kwh) peak = {kwh,label};
@@ -843,6 +861,11 @@
         const payload = {
           source:'Open-Meteo Forecast API',
           url:url.toString(),
+          forecastWindow:{
+            start: forecastStart ? forecastStart.toISOString() : null,
+            end: forecastEnd ? forecastEnd.toISOString() : null,
+            label: forecastStart ? forecastStart.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit', year:'numeric'}) : 'zi disponibilă'
+          },
           inputs:{kwp,lat,lon,tilt,azimuth,losses,orientationFactor,tiltFactor,lossFactor},
           totals:{productionKwh:total, irradiationKwhM2:irradiation, peakKwh:peak.kwh, peakLabel:peak.label},
           rows:forecastRows,
@@ -882,6 +905,7 @@
               <span class="q3-chip">${fmt(data.inputs?.tilt || 0,0)}° înclinare</span>
               <span class="q3-chip">${fmt(data.inputs?.azimuth || 0,0)}° azimut</span>
               <span class="q3-chip">${fmt(data.inputs?.losses || 0,1)}% pierderi</span>
+              <span class="q3-chip">Interval: ${esc(data.forecastWindow?.label || 'ziua următoare')} · 00:00–23:00</span>
             </div>
           </div>
         </div>
