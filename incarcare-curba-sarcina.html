@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <!-- SVT V48 REQUIRED CONSUMPTION BEFORE CONTINUE -->
+  <!-- SVT V51 ENGINE LOAD FIX -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -286,8 +287,8 @@
     </main>
   </div>
 
-  <script src="./assets/js/svt-load-curve-profiles.js?v=48-q2-inline-upload"></script>
-  <script src="./assets/js/svt-analysis-engine.js?v=48-q2-inline-upload"></script>
+  <script src="./assets/js/svt-load-curve-profiles.js?v=51-engine-fix"></script>
+  <script src="./assets/js/svt-analysis-engine.js?v=51-engine-fix"></script>
   <script>
     const tabElectric = document.getElementById('tabElectric');
     const tabTermic = document.getElementById('tabTermic');
@@ -560,6 +561,14 @@
 
     async function continueFlow(){
       try{
+        if(!window.SVTLoadCurveProfiles || !window.SVTAnalysisEngine){
+          console.error('SVT modules missing', {
+            SVTLoadCurveProfiles: !!window.SVTLoadCurveProfiles,
+            SVTAnalysisEngine: !!window.SVTAnalysisEngine
+          });
+          showMessage('err', 'Modulele de analiză nu s-au încărcat corect. Reîncarcă pagina cu Ctrl+F5. Dacă eroarea persistă, verifică dacă fișierele din assets/js există pe GitHub Pages.');
+          return;
+        }
         showMessage('warn', 'Procesăm datele...');
         const tariff = Number(fixedTariff.value || 0.75);
 
