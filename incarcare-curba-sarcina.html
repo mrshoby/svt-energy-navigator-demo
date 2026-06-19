@@ -12,6 +12,7 @@
   <!-- SVT V63 LOGIC UX CLEAN AUDIT FIX -->
   <!-- SVT V64 Q1 PROFESSIONAL HEATMAP VISUAL KIT -->
   <!-- SVT V65 DISTRIBUTOR EXPORT TUTORIAL MODAL -->
+  <!-- SVT V65.1 FORCE DISTRIBUTOR HELP VISIBLE -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -357,6 +358,47 @@
       .svt-modal-close{margin-top:12px}
     }
 
+  
+    /* v65.1 force visible distributor help block */
+    .svt-force-help-block{
+      margin-top:14px;
+      border:1px solid #cfe8d8;
+      background:linear-gradient(135deg,#f7fdf9,#ffffff);
+      border-radius:16px;
+      padding:14px 15px;
+      display:grid;
+      gap:8px;
+      box-shadow:0 12px 26px rgba(15,23,42,.045);
+    }
+    .svt-force-help-block strong{
+      color:#071826;
+      font-size:14px;
+      font-weight:1000;
+      letter-spacing:-.015em;
+    }
+    .svt-force-help-block p{
+      margin:0;
+      color:#64748b;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:750;
+    }
+    .svt-force-help-btn{
+      appearance:none;
+      width:max-content;
+      border:1px solid #07943f;
+      background:#07943f;
+      color:#fff;
+      border-radius:999px;
+      padding:9px 13px;
+      font:inherit;
+      font-size:12.5px;
+      font-weight:1000;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(7,148,63,.20);
+    }
+    .svt-force-help-btn:hover{background:#067a35}
+
   </style>
 </head>
 <body>
@@ -394,6 +436,11 @@
             <p class="note"> <strong>Cum preferi să încarci datele de consum electric?</strong><br>
               Dacă ai fișierul orar, acesta este varianta recomandată. <strong>De unde obții fișierul?</strong> Intri pe portalul distribuitorului tău (ex. myeer.ro, myeon.ro) → Consum → Export date orare.
             </p>
+                <div class="svt-force-help-block" data-v65-force-help="true">
+                  <strong>De unde obții fișierul?</strong>
+                  <p>Fișierul orar / curba de sarcină se descarcă de obicei din portalul distribuitorului: DEER, Rețele Electrice, Delgaz Grid sau Distribuție Oltenia. Apasă pe buton pentru pași clari și exemple vizuale.</p>
+                  <button type="button" class="svt-force-help-btn" id="openDistributorHelpForced">Vezi tutorial distribuitori</button>
+                </div>
 
             <div id="fileModeBox">
               <div class="upload-zone" id="dropZone">
@@ -1021,6 +1068,22 @@
       tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.distTab)));
     }
 
+
+    document.addEventListener('DOMContentLoaded', initDistributorHelpModal);
+
+
+    function initDistributorHelpModalForcedV651(){
+      const openBtn = document.getElementById('openDistributorHelpForced');
+      const modal = document.getElementById('distributorHelpModal');
+      if(!openBtn || !modal) return;
+      openBtn.addEventListener('click', () => {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initDistributorHelpModalForcedV651);
 
     document.addEventListener('DOMContentLoaded', initDistributorHelpModal);
 </script>
