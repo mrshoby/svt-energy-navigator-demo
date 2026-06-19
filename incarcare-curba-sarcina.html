@@ -18,6 +18,7 @@
   <!-- SVT V65.4 SINGLE HYPERLINK FIX -->
   <!-- SVT V66 UPLOAD PAGE REFERENCE 1TO1 COMPACT -->
   <!-- SVT V67 COMPACT 1TO1 LAYOUT THERMAL RESTORE -->
+  <!-- SVT V68 THERMIC BACK TO ELECTRIC 1TO1 FIX -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -946,6 +947,111 @@
       .btn-back,.btn-next{width:100%;min-width:0}
     }
 
+  
+    /* v68: tighter 1:1 compact polish + functional thermal tab mirror */
+    .hero{
+      width:min(1040px,100%) !important;
+      padding-top:28px !important;
+      padding-bottom:24px !important;
+    }
+    .wizard{max-width:900px !important}
+    .steps{margin-bottom:20px !important}
+    .wizard h1,
+    h1{
+      font-size:48px !important;
+      margin-bottom:12px !important;
+    }
+    .sub{margin-bottom:20px !important}
+    .ref-flow{gap:11px !important}
+    .ref-step-row{
+      min-height:82px !important;
+      padding:12px 15px !important;
+      grid-template-columns:50px 32px minmax(205px,238px) minmax(0,1fr) 18px !important;
+    }
+    .ref-step-upload{
+      grid-template-columns:50px 32px minmax(205px,238px) minmax(300px,1fr) 18px !important;
+    }
+    .ref-step-tariff{
+      grid-template-columns:50px 32px minmax(190px,230px) minmax(390px,1fr) 18px !important;
+      align-items:center !important;
+      min-height:126px !important;
+    }
+    .ref-icon{width:42px !important;height:42px !important}
+    .ref-number{width:26px !important;height:26px !important}
+    .ref-copy h3{font-size:17px !important}
+    .ref-copy p{font-size:12px !important}
+    .ref-tariff-grid{
+      grid-template-columns:minmax(150px,1fr) minmax(96px,112px) minmax(250px,1.35fr) !important;
+      align-items:start !important;
+      gap:10px !important;
+    }
+    .ref-tariff-grid .wide{grid-column:auto !important}
+    .fixed-pill{
+      min-height:40px !important;
+      height:40px !important;
+      justify-content:center !important;
+      text-align:center !important;
+      padding:0 10px !important;
+      line-height:1.1 !important;
+    }
+    .control{
+      height:40px !important;
+      min-width:0 !important;
+    }
+    #consumptionDataSource{
+      max-width:100% !important;
+    }
+    .hint{
+      max-width:100% !important;
+      overflow-wrap:anywhere !important;
+    }
+    .ref-methods{max-width:415px !important}
+    .ref-energy-controls{max-width:330px !important}
+    .method-card,.segment{height:42px !important}
+    .termic-flow .ref-step-row{
+      min-height:82px !important;
+    }
+    .termic-fields-row{
+      grid-template-columns:50px 32px minmax(205px,238px) minmax(300px,1fr) 18px !important;
+    }
+    .termic-grid{
+      grid-template-columns:1fr 1fr !important;
+      gap:10px !important;
+    }
+    .termic-status-card{
+      height:42px !important;
+      min-height:42px !important;
+      max-width:360px !important;
+      justify-self:end !important;
+    }
+    .ref-actions{
+      margin-top:16px !important;
+      padding-top:16px !important;
+    }
+    .btn{
+      height:44px !important;
+      border-radius:12px !important;
+    }
+    @media(max-width:980px){
+      .ref-step-row,
+      .ref-step-upload,
+      .ref-step-tariff,
+      .ref-step-pv,
+      .termic-info-row,
+      .termic-fields-row,
+      .compact-note-row{
+        grid-template-columns:48px 30px minmax(0,1fr) !important;
+      }
+      .ref-tariff-grid,
+      .termic-grid{
+        grid-template-columns:1fr !important;
+      }
+      .termic-status-card{
+        max-width:none !important;
+        justify-self:stretch !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1126,8 +1232,8 @@
                 <p>Alege tipul de energie pentru care încarci consumul.</p>
               </div>
               <div class="ref-controls ref-energy-controls" aria-label="Tip consum">
-                <button class="segment" type="button" id="tabElectricThermalMirror" onclick="return false;">⚡ Electric</button>
-                <button class="segment active" type="button" id="tabTermicMirror" onclick="return false;">♨️ Termic</button>
+                <button class="segment" type="button" id="tabElectricThermalMirror">⚡ Electric</button>
+                <button class="segment active" type="button" id="tabTermicMirror">♨️ Termic</button>
               </div>
               <div class="ref-indicator">⌄</div>
             </div>
@@ -1268,8 +1374,10 @@
       const electric = tab === 'electric';
       tabElectric.classList.toggle('active', electric);
       tabTermic.classList.toggle('active', !electric);
-      electricSection.style.display = electric ? 'block' : 'none';
-      termicSection.style.display = electric ? 'none' : 'block';
+      document.getElementById('tabElectricThermalMirror')?.classList.toggle('active', electric);
+      document.getElementById('tabTermicMirror')?.classList.toggle('active', !electric);
+      electricSection.style.display = electric ? 'grid' : 'none';
+      termicSection.style.display = electric ? 'none' : 'grid';
       showMessage(electric ? 'warn' : 'ok', electric ? 'Completează tariful și alege modul de încărcare. Fișierul orar este recomandat pentru răspuns real.' : 'Datele termice sunt salvate pentru analiza integrată, dar întrebarea 1 se calculează pe consum electric.');
       validateForm();
     }
@@ -1644,6 +1752,8 @@
 
     tabElectric.addEventListener('click', () => setTab('electric'));
     tabTermic.addEventListener('click', () => setTab('termic'));
+    document.getElementById('tabElectricThermalMirror')?.addEventListener('click', (e) => { e.preventDefault(); setTab('electric'); });
+    document.getElementById('tabTermicMirror')?.addEventListener('click', (e) => { e.preventDefault(); setTab('termic'); });
     methodFileCard.addEventListener('click', () => setLoadMethod('file'));
     methodInvoiceCard.addEventListener('click', () => setLoadMethod('invoice'));
     hasProduction.addEventListener('change', () => {
