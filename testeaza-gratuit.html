@@ -18,6 +18,7 @@
   <!-- SVT V59 Q5 NATIVE BARS LAYOUT FIX -->
   <!-- SVT V60 HOTFIX TESTEAZA RENDER RESTORE -->
   <!-- SVT V61 Q5 STABLE RESULT LAYOUT -->
+  <!-- SVT V62 Q6 FLEXIBLE CONSUMPTION SHIFTING -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -715,6 +716,44 @@
       .q5-detail-head span{display:block;margin-top:4px}
     }
 
+  
+    /* v62: Q6 flexible consumption shifting */
+    .q6-form{border:1px dashed #b9d7c5;background:linear-gradient(180deg,#fbfefc,#f6fbf8);border-radius:16px;padding:16px;display:grid;gap:14px;max-width:100%;box-sizing:border-box;overflow:hidden}
+    .q6-form h2{margin:0;color:var(--navy);font-size:19px;font-weight:1000;letter-spacing:-.03em}
+    .q6-form p{margin:0;color:var(--muted);font-size:13px;line-height:1.45;font-weight:700}
+    .q6-auto-strip{display:flex;gap:8px;flex-wrap:wrap}
+    .q6-chip{height:28px;padding:0 10px;border-radius:999px;background:#f1f8f4;border:1px solid #d4ecdc;color:#086b36;display:inline-flex;align-items:center;font-size:11px;font-weight:1000}
+    .q6-process-list{display:grid;gap:12px}
+    .q6-process-card{border:1px solid #dfe9e4;background:#fff;border-radius:16px;padding:14px;box-shadow:0 10px 24px rgba(15,23,42,.04);display:grid;gap:10px}
+    .q6-process-title{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .q6-process-title strong{font-size:13px;color:#0f172a;font-weight:1000}
+    .q6-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+    .q6-field{display:grid;gap:5px}
+    .q6-field label{color:var(--navy);font-size:10.5px;font-weight:1000;text-transform:uppercase;letter-spacing:.04em}
+    .q6-field input,.q6-field select{width:100%;height:40px;border:1px solid #dce5ef;border-radius:10px;background:#fff;padding:0 10px;font-family:inherit;font-size:12px;font-weight:750;color:var(--navy);outline:none}
+    .q6-field input:focus,.q6-field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(7,148,63,.10)}
+    .q6-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+    .q6-note{font-size:12px;color:#64748b;font-weight:700;line-height:1.35}
+    .q6-result-wrap{max-width:100%;width:100%;overflow:hidden;box-sizing:border-box;contain:layout paint}
+    .q6-bars{margin-top:14px;border:1px solid #e1eadf;background:#fbfefc;border-radius:18px;padding:14px;display:grid;gap:10px}
+    .q6-bar-row{display:grid;grid-template-columns:minmax(140px,210px) minmax(0,1fr) minmax(78px,110px);gap:10px;align-items:center}
+    .q6-bar-name{color:#0f172a;font-size:12px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .q6-bar-track{height:15px;border-radius:999px;background:#eaf2ed;border:1px solid #dcebe2;overflow:hidden;min-width:0}
+    .q6-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#07943f,#4ade80)}
+    .q6-bar-fill.warn{background:linear-gradient(90deg,#f59e0b,#facc15)}
+    .q6-bar-value{text-align:right;color:#334155;font-size:12px;font-weight:1000;white-space:nowrap}
+    .q6-table-box{max-width:100%;width:100%;box-sizing:border-box;border:1px solid #e1eadf;border-radius:18px;background:#fff;overflow:hidden;margin-top:14px}
+    .q6-table-head{padding:13px 14px;background:#fbfefc;border-bottom:1px solid #e1eadf}
+    .q6-table-head strong{display:block;color:#0f172a;font-size:13px;font-weight:1000}
+    .q6-table-head span{display:block;margin-top:4px;color:#64748b;font-size:12px;font-weight:800}
+    .q6-table-scroll{overflow:auto;max-width:100%;max-height:420px}
+    .q6-table{width:100%;min-width:980px;border-collapse:collapse;table-layout:fixed;font-size:11.5px}
+    .q6-table th,.q6-table td{padding:8px 9px;border-bottom:1px solid #edf3ef;text-align:left;color:#334155;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .q6-table th{position:sticky;top:0;z-index:1;background:#f8fbf9;color:#64748b;text-transform:uppercase;font-size:10px;letter-spacing:.04em;font-weight:1000}
+    .q6-impact-low{color:#067436!important;font-weight:1000!important}.q6-impact-med{color:#b45309!important;font-weight:1000!important}.q6-impact-high{color:#b91c1c!important;font-weight:1000!important}
+    @media(max-width:1000px){.q6-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.q6-grid{grid-template-columns:1fr}.q6-actions{display:grid}.q6-bar-row{grid-template-columns:1fr}.q6-bar-value{text-align:left}}
+
   </style>
 </head>
 <body>
@@ -785,15 +824,16 @@
         const q3Stored = !!sessionStorage.getItem('svtForecastQ3');
         const q4Stored = !!sessionStorage.getItem('svtPotentialQ4');
         const q5Stored = !!sessionStorage.getItem('svtUsefulEnergyQ5');
-        const isAvailable = mode === 'electric' && analysis?.chartRows?.length && (q.id === 1 || q.id === 2 || q.id === 3 || q.id === 4 || q.id === 5);
-        const needsData = mode === 'electric' && analysis?.chartRows?.length && ((q.id === 2 && !hasPvData) || (q.id === 3 && !q3Stored) || (q.id === 4 && !q4Stored) || (q.id === 5 && !q5Stored));
+        const q6Stored = !!sessionStorage.getItem('svtFlexibleLoadsQ6');
+        const isAvailable = mode === 'electric' && analysis?.chartRows?.length && (q.id === 1 || q.id === 2 || q.id === 3 || q.id === 4 || q.id === 5 || q.id === 6);
+        const needsData = mode === 'electric' && analysis?.chartRows?.length && ((q.id === 2 && !hasPvData) || (q.id === 3 && !q3Stored) || (q.id === 4 && !q4Stored) || (q.id === 5 && !q5Stored) || (q.id === 6 && !q6Stored));
         const isActive = isAvailable;
         return `
           <div class="q-item" data-q-item="${q.id}">
             <button class="q-card ${q.title.length > 92 ? 'is-xlong' : q.title.length > 64 ? 'is-long' : ''} ${needsData ? 'needs-data' : isActive ? 'available' : 'soon'}" type="button" data-q="${q.id}" ${isActive ? '' : 'disabled'}>
               <span class="q-no">${displayNumber(idx)}</span>
               <span class="q-title">${esc(q.title)}</span>
-              ${needsData ? `<span class="badge incomplete">${q.id === 5 ? 'Date incomplete · estimează producția suplimentară' : 'Date incomplete · completează datele necesare'}</span>` : isActive ? '<span class="answer-slot" title="Aici apare bifa după răspuns">✓</span>' : '<span class="badge">În curând</span>'}
+              ${needsData ? `<span class="badge incomplete">${q.id === 5 ? 'Date incomplete · estimează producția suplimentară' : q.id === 6 ? 'Date incomplete · completează consumuri mutabile' : 'Date incomplete · completează datele necesare'}</span>` : isActive ? '<span class="answer-slot" title="Aici apare bifa după răspuns">✓</span>' : '<span class="badge">În curând</span>'}
             </button>
             ${isActive ? `<div class="details" id="details-q${q.id}"></div>` : ''}
           </div>
@@ -808,6 +848,7 @@
           if(q === 3) handleQuestion3(card);
           if(q === 4) handleQuestion4(card);
           if(q === 5) handleQuestion5(card);
+          if(q === 6) handleQuestion6(card);
         });
       });
     }
@@ -2348,6 +2389,271 @@
         `;
       }).join('');
       return `<div class="q5-day-board"><div class="q5-day-grid">${cards}</div></div>`;
+    }
+
+
+
+    function getQ6Defaults(){
+      const ds = (() => { try{return JSON.parse(sessionStorage.getItem('svtDataset') || '{}')}catch(e){return {}} })();
+      const q5 = (() => { try{return JSON.parse(sessionStorage.getItem('svtUsefulEnergyQ5') || '{}')}catch(e){return {}} })();
+      const ctx = getContext();
+      const tariff = Number(ds?.meta?.fixedPriceRonKwh || q5?.inputs?.tariffConsumption || ctx.fixedTariffRonKwh || 0.75);
+      const exportTariff = Number(q5?.inputs?.exportTariff || 0.20);
+      const surplusMwh = ((Number(q5?.totals?.exportKwh || 0) + Number(q5?.totals?.curtailedKwh || 0)) / 1000) || 0;
+      return {tariff, exportTariff, surplusMwh, rows:ds.rows || []};
+    }
+
+    function handleQuestion6(cardArg){
+      const card = cardArg || document.querySelector('.q-card[data-q="6"]');
+      const box = document.getElementById('details-q6');
+      if(!box) return;
+      const stored = sessionStorage.getItem('svtFlexibleLoadsQ6');
+      card.classList.add('loading');
+      card.classList.remove('done');
+      box.classList.add('open');
+      window.setTimeout(() => {
+        card.classList.remove('loading');
+        if(stored){
+          try{
+            renderQuestion6Result(box, JSON.parse(stored));
+            card.classList.add('done');
+            return;
+          }catch(e){}
+        }
+        renderQuestion6Form(box, card);
+      }, 350);
+    }
+
+    function renderQuestion6Form(box, card){
+      const d = getQ6Defaults();
+      if(!d.rows.length){
+        box.innerHTML = `
+          <div class="q5-prereq">
+            <strong>Date incomplete · lipsește curba de consum</strong>
+            <p>Pentru a recomanda consumuri mutabile este necesară curba de consum electric încărcată inițial.</p>
+          </div>
+        `;
+        return;
+      }
+
+      box.innerHTML = `
+        <div class="q6-form">
+          <div>
+            <h2>Ce consumuri aș putea muta în timp?</h2>
+            <p>Preluăm automat curba de consum, tariful, surplusul PV și rezultatele anterioare. Completează doar procesele care pot fi mutate tehnologic.</p>
+          </div>
+
+          <div class="q6-auto-strip">
+            <span class="q6-chip">Curba consum: ${fmt(d.rows.length,0)} intervale</span>
+            <span class="q6-chip">Tarif consum: ${fmt(d.tariff,3)} lei/kWh</span>
+            <span class="q6-chip">Export: ${fmt(d.exportTariff,3)} lei/kWh</span>
+            <span class="q6-chip">Surplus Q5: ${fmt(d.surplusMwh,1)} MWh/an</span>
+          </div>
+
+          <div class="q6-process-list" id="q6ProcessList"></div>
+
+          <div class="q6-actions">
+            <button class="btn back" type="button" id="q6AddProcessBtn">+ Adaugă consumator</button>
+            <span class="q6-note">Completează consumatorii flexibili: compresoare, pompe, chillere, boilere, EV/stivuitoare, HVAC sau procese auxiliare.</span>
+            <button class="btn next" type="button" id="q6RunBtn">Calculează mutarea ›</button>
+          </div>
+        </div>
+      `;
+
+      const defaults = [
+        {name:'Compresor', category:'compresor', power:30, duration:2, currentStart:'18:00', currentEnd:'20:00', allowedStart:'10:00', allowedEnd:'15:00', flexibility:'same_day', priority:'medie'},
+        {name:'Încărcare EV / stivuitor', category:'ev', power:22, duration:3, currentStart:'16:00', currentEnd:'19:00', allowedStart:'10:00', allowedEnd:'16:00', flexibility:'same_day', priority:'scazuta'},
+        {name:'Boiler / pompă / HVAC', category:'hvac', power:15, duration:2, currentStart:'06:00', currentEnd:'08:00', allowedStart:'11:00', allowedEnd:'15:00', flexibility:'partial', priority:'medie'}
+      ];
+      defaults.forEach(x => addQ6ProcessRow(x));
+      document.getElementById('q6AddProcessBtn')?.addEventListener('click', () => addQ6ProcessRow({}));
+      document.getElementById('q6RunBtn')?.addEventListener('click', () => calculateQ6Shifting(box, card));
+    }
+
+    function addQ6ProcessRow(values){
+      const list = document.getElementById('q6ProcessList');
+      if(!list) return;
+      const idx = list.querySelectorAll('.q6-process-card').length + 1;
+      const v = Object.assign({name:'', category:'altul', power:'', duration:'', energy:'', currentStart:'18:00', currentEnd:'20:00', allowedStart:'10:00', allowedEnd:'16:00', flexibility:'partial', interruptible:'partial', operator:'yes', impact:'low', priority:'medie', days:'5'}, values || {});
+      const node = document.createElement('section');
+      node.className = 'q6-process-card';
+      node.innerHTML = `
+        <div class="q6-process-title">
+          <strong>Consumator / proces ${idx}</strong>
+          <button class="btn back" type="button" data-q6-remove>Șterge</button>
+        </div>
+        <div class="q6-grid">
+          <div class="q6-field"><label>Denumire</label><input data-q6="name" value="${esc(v.name)}" placeholder="ex. Compresor 1"></div>
+          <div class="q6-field"><label>Categorie</label><select data-q6="category">
+            <option value="compresor">Compresor</option><option value="pompa">Pompă</option><option value="chiller">Chiller</option><option value="boiler">Boiler</option><option value="ev">EV / stivuitor</option><option value="hvac">HVAC</option><option value="proces">Proces auxiliar</option><option value="altul">Altul</option>
+          </select></div>
+          <div class="q6-field"><label>Putere [kW]</label><input data-q6="power" type="number" min="0" step="0.1" value="${esc(v.power)}"></div>
+          <div class="q6-field"><label>Durată [h]</label><input data-q6="duration" type="number" min="0" step="0.25" value="${esc(v.duration)}"></div>
+          <div class="q6-field"><label>Consum ciclu [kWh]</label><input data-q6="energy" type="number" min="0" step="0.1" value="${esc(v.energy)}" placeholder="opțional"></div>
+          <div class="q6-field"><label>Start actual</label><input data-q6="currentStart" type="time" value="${esc(v.currentStart)}"></div>
+          <div class="q6-field"><label>Stop actual</label><input data-q6="currentEnd" type="time" value="${esc(v.currentEnd)}"></div>
+          <div class="q6-field"><label>Start permis</label><input data-q6="allowedStart" type="time" value="${esc(v.allowedStart)}"></div>
+          <div class="q6-field"><label>Stop permis</label><input data-q6="allowedEnd" type="time" value="${esc(v.allowedEnd)}"></div>
+          <div class="q6-field"><label>Zile/săpt.</label><input data-q6="days" type="number" min="1" max="7" step="1" value="${esc(v.days)}"></div>
+          <div class="q6-field"><label>Flexibilitate</label><select data-q6="flexibility">
+            <option value="full">Flexibil total</option><option value="partial">Flexibil parțial</option><option value="same_day">În aceeași zi</option><option value="unknown">Nu știu</option>
+          </select></div>
+          <div class="q6-field"><label>Poate fi întrerupt?</label><select data-q6="interruptible">
+            <option value="no">Nu</option><option value="partial">Parțial</option><option value="yes">Da</option>
+          </select></div>
+          <div class="q6-field"><label>Necesită operator?</label><select data-q6="operator">
+            <option value="yes">Da</option><option value="no">Nu</option><option value="unknown">Nu știu</option>
+          </select></div>
+          <div class="q6-field"><label>Impact proces</label><select data-q6="impact">
+            <option value="low">Scăzut</option><option value="med">Mediu</option><option value="high">Ridicat</option>
+          </select></div>
+          <div class="q6-field"><label>Prioritate</label><select data-q6="priority">
+            <option value="scazuta">Scăzută</option><option value="medie">Medie</option><option value="critica">Critică</option>
+          </select></div>
+        </div>
+      `;
+      list.appendChild(node);
+      ['category','flexibility','interruptible','operator','impact','priority'].forEach(k => {
+        const el = node.querySelector(`[data-q6="${k}"]`);
+        if(el && v[k]) el.value = v[k];
+      });
+      node.querySelector('[data-q6-remove]')?.addEventListener('click', () => node.remove());
+    }
+
+    function timeToMinutes(value){
+      const [h,m] = String(value || '00:00').split(':').map(Number);
+      return (isNaN(h)?0:h)*60 + (isNaN(m)?0:m);
+    }
+    function hourInWindow(hour, startStr, endStr){
+      const minute = hour * 60;
+      const start = timeToMinutes(startStr);
+      const end = timeToMinutes(endStr);
+      if(start <= end) return minute >= start && minute <= end;
+      return minute >= start || minute <= end;
+    }
+
+    function collectQ6Processes(){
+      return Array.from(document.querySelectorAll('.q6-process-card')).map((card, i) => {
+        const val = k => card.querySelector(`[data-q6="${k}"]`)?.value || '';
+        const power = Number(val('power') || 0);
+        const duration = Number(val('duration') || 0);
+        const explicitEnergy = Number(val('energy') || 0);
+        const energy = explicitEnergy > 0 ? explicitEnergy : power * duration;
+        return {id:i+1, name:val('name') || `Consumator ${i+1}`, category:val('category') || 'altul', power, duration, energy, currentStart:val('currentStart') || '18:00', currentEnd:val('currentEnd') || '20:00', allowedStart:val('allowedStart') || '10:00', allowedEnd:val('allowedEnd') || '16:00', days:Number(val('days') || 5), flexibility:val('flexibility') || 'partial', interruptible:val('interruptible') || 'partial', operator:val('operator') || 'yes', impact:val('impact') || 'low', priority:val('priority') || 'medie'};
+      }).filter(x => x.energy > 0 && x.duration > 0);
+    }
+
+    function buildQ6HourlySignals(){
+      const ds = (() => { try{return JSON.parse(sessionStorage.getItem('svtDataset') || '{}')}catch(e){return {}} })();
+      const rows = ds.rows || [];
+      const buckets = Array.from({length:24}, (_,h)=>({hour:h, consumption:0, surplus:0, count:0, pv:0}));
+      for(const r of rows){
+        const d = new Date(r.timestamp);
+        const h = Number(r.hour ?? d.getHours());
+        if(h < 0 || h > 23) continue;
+        const consumption = Number(r.electricKwh || r.consumptionKwh || 0);
+        const pv = Number(r.pvKwh || 0);
+        const surplus = Math.max(0, pv - consumption);
+        buckets[h].consumption += consumption;
+        buckets[h].pv += pv;
+        buckets[h].surplus += surplus;
+        buckets[h].count += 1;
+      }
+      return buckets.map(b => {
+        const c = Math.max(1,b.count);
+        const solarHour = b.hour >= 6 && b.hour <= 19 ? Math.sin(Math.PI * (b.hour - 6) / 13) : 0;
+        return {hour:b.hour, avgConsumption:b.consumption / c, avgPv:b.pv / c, avgSurplus:b.surplus / c, solarScore:Math.max(0, solarHour)};
+      });
+    }
+
+    function calculateQ6Shifting(box, card){
+      try{
+        const processes = collectQ6Processes();
+        if(!processes.length) throw new Error('Adaugă cel puțin un consumator flexibil cu putere/durată sau consum ciclu.');
+        const defaults = getQ6Defaults();
+        const signals = buildQ6HourlySignals();
+        const maxConsumption = Math.max(1, ...signals.map(x => x.avgConsumption));
+        const maxSurplus = Math.max(1, ...signals.map(x => x.avgSurplus));
+
+        const results = processes.map(p => {
+          const allowed = signals.filter(s => hourInWindow(s.hour, p.allowedStart, p.allowedEnd));
+          const candidates = allowed.length ? allowed : signals;
+          let best = candidates[0];
+          let bestScore = -Infinity;
+          for(const s of candidates){
+            const surplusScore = s.avgSurplus / maxSurplus;
+            const lowPeakScore = 1 - s.avgConsumption / maxConsumption;
+            const solarScore = s.solarScore;
+            const score = surplusScore * 0.55 + solarScore * 0.25 + lowPeakScore * 0.20;
+            if(score > bestScore){ bestScore = score; best = s; }
+          }
+          const currentStartHour = Math.floor(timeToMinutes(p.currentStart) / 60);
+          const currentSignal = signals[currentStartHour] || {avgSurplus:0, avgConsumption:0};
+          const currentUseful = Math.min(p.energy, currentSignal.avgSurplus || 0);
+          const recommendedUseful = Math.min(p.energy, best.avgSurplus || 0);
+          const extraAbsorbed = Math.max(0, recommendedUseful - currentUseful);
+          const annualCycles = p.days * 52;
+          const annualMoved = p.energy * annualCycles / 1000;
+          const annualUseful = extraAbsorbed * annualCycles / 1000;
+          const annualSaving = extraAbsorbed * annualCycles * Math.max(0, defaults.tariff - defaults.exportTariff);
+          const impactClass = p.impact === 'high' || p.priority === 'critica' ? 'q6-impact-high' : p.impact === 'med' ? 'q6-impact-med' : 'q6-impact-low';
+          const recStart = `${String(best.hour).padStart(2,'0')}:00`;
+          const recEndHour = Math.min(23, best.hour + Math.ceil(p.duration));
+          const recEnd = `${String(recEndHour).padStart(2,'0')}:00`;
+          return {...p, recommendedStart:recStart, recommendedEnd:recEnd, score:bestScore, avgSurplusAtTarget:best.avgSurplus, currentUseful, recommendedUseful, extraAbsorbed, annualMoved, annualUseful, annualSaving, impactClass};
+        });
+
+        const totalMovedMwh = results.reduce((a,x)=>a+x.annualMoved,0);
+        const totalUsefulMwh = results.reduce((a,x)=>a+x.annualUseful,0);
+        const totalSaving = results.reduce((a,x)=>a+x.annualSaving,0);
+        const bestCount = results.filter(x => x.annualUseful > 0).length;
+        const payload = {compact:true, inputs:{tariff:defaults.tariff, exportTariff:defaults.exportTariff}, totals:{totalMovedMwh,totalUsefulMwh,totalSaving,bestCount,processCount:results.length}, results, createdAt:new Date().toISOString()};
+        try{ sessionStorage.setItem('svtFlexibleLoadsQ6', JSON.stringify(payload)); }catch(e){ console.warn('Q6 compact storage skipped', e); }
+        renderQuestion6Result(box, payload);
+        card.classList.remove('loading','needs-data');
+        card.classList.add('available','done');
+        const badge = card.querySelector('.badge.incomplete');
+        if(badge) badge.outerHTML = '<span class="answer-slot" title="Răspuns calculat">✓</span>';
+      }catch(err){
+        box.innerHTML = `<div class="q5-prereq"><strong>Date insuficiente</strong><p>${esc(err.message || 'Verifică datele introduse.')}</p><button class="btn back" type="button" onclick="renderQuestion6Form(document.getElementById('details-q6'), document.querySelector('.q-card[data-q=&quot;6&quot;]'))">Completează din nou</button></div>`;
+      }
+    }
+
+    function renderQuestion6Result(box, data){
+      const t = data.totals || {};
+      const rows = data.results || [];
+      box.innerHTML = `
+        <div class="q6-result-wrap">
+          <div class="q6-auto-strip">
+            <span class="q6-chip">${fmt(t.processCount || 0,0)} consumatori analizați</span>
+            <span class="q6-chip">${fmt(t.totalMovedMwh || 0,1)} MWh/an mutabili</span>
+            <span class="q6-chip">${fmt(t.totalUsefulMwh || 0,1)} MWh/an absorbiți util</span>
+            <span class="q6-chip">${fmt(t.totalSaving || 0,0)} lei/an economie estimată</span>
+          </div>
+          <div class="answer-summary">
+            <div class="summary-card"><strong>${fmt(t.totalMovedMwh || 0,1)} MWh/an</strong><span>consum mutabil estimat</span></div>
+            <div class="summary-card"><strong>${fmt(t.totalUsefulMwh || 0,1)} MWh/an</strong><span>surplus PV absorbit util</span></div>
+            <div class="summary-card"><strong>${fmt(t.totalSaving || 0,0)} lei/an</strong><span>economie orientativă</span></div>
+          </div>
+          ${renderQ6Bars(data)}
+          <div class="insight-grid">
+            <div class="insight-card"><h3>Interpretare</h3><p>${esc(t.totalUsefulMwh > 0 ? 'Există consumuri care pot fi mutate în ore mai bune energetic. Recomandarea urmărește în primul rând orele cu surplus PV și în al doilea rând evitarea vârfurilor de consum.' : 'Nu s-a identificat suficient surplus disponibil pentru procesele introduse. Poate fi nevoie de ferestre tehnologice mai largi, BESS sau redimensionarea PV suplimentar.')}</p></div>
+            <div class="insight-card"><h3>Recomandări</h3><ul><li>Mută consumatorii cu impact scăzut în orele recomandate din tabel.</li><li>Consumatorii critici trebuie validați cu responsabilul de producție înainte de programare automată.</li><li>Pentru surplus rămas mare, combină flexibilizarea cu BESS sau limitare controlată a invertorului.</li></ul></div>
+          </div>
+          <div class="q6-table-box">
+            <div class="q6-table-head"><strong>Consumuri recomandate pentru mutare</strong><span>Intervalele sunt orientative și trebuie validate cu procesul tehnologic.</span></div>
+            <div class="q6-table-scroll"><table class="q6-table"><thead><tr><th>Consumator</th><th>Categorie</th><th>Consum/ciclu</th><th>Actual</th><th>Recomandat</th><th>Util absorbit</th><th>Economie</th><th>Impact</th></tr></thead><tbody>
+              ${rows.map(r => `<tr><td>${esc(r.name)}</td><td>${esc(r.category)}</td><td>${fmt(r.energy)} kWh</td><td>${esc(r.currentStart)}–${esc(r.currentEnd)}</td><td>${esc(r.recommendedStart)}–${esc(r.recommendedEnd)}</td><td>${fmt(r.annualUseful,1)} MWh/an</td><td>${fmt(r.annualSaving,0)} lei/an</td><td class="${esc(r.impactClass)}">${esc(r.impact === 'high' ? 'Ridicat' : r.impact === 'med' ? 'Mediu' : 'Scăzut')}</td></tr>`).join('')}
+            </tbody></table></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQ6Bars(data){
+      const rows = data.results || [];
+      const max = Math.max(1, ...rows.map(x => Number(x.annualUseful || 0)));
+      return `<div class="q6-bars">${rows.map(x => `<div class="q6-bar-row"><div class="q6-bar-name">${esc(x.name)}</div><div class="q6-bar-track"><div class="q6-bar-fill ${x.annualUseful <= 0 ? 'warn' : ''}" style="width:${Math.max(2, Math.round(Number(x.annualUseful || 0) / max * 100))}%"></div></div><div class="q6-bar-value">${fmt(x.annualUseful || 0,1)} MWh/an</div></div>`).join('')}</div>`;
     }
 
 
