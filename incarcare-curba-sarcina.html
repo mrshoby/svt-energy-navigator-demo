@@ -9,6 +9,7 @@
   <!-- SVT V54 FULL FIX -->
   <!-- SVT V55 CLEAN DROPDOWN SCROLL LISTS -->
   <!-- SVT V60 HOTFIX TESTEAZA RENDER RESTORE -->
+  <!-- SVT V63 LOGIC UX CLEAN AUDIT FIX -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -220,6 +221,15 @@
                 <label>Tip tarif actual</label>
                 <div class="fixed-pill">Tarif fix</div>
                 <div class="hint">Pentru PZU / tarif dinamic folosim o întrebare separată.</div>
+              </div>
+              <div class="field">
+                <label for="consumptionDataSource">Fișierul de consum reprezintă</label>
+                <select class="control" id="consumptionDataSource">
+                  <option value="total" selected>Consum total al amplasamentului</option>
+                  <option value="grid">Consum din rețea / import din rețea</option>
+                  <option value="unknown">Nu știu</option>
+                </select>
+                <div class="hint">Această alegere ajută întrebările 2–6 să nu supraestimeze autoconsumul și surplusul.</div>
               </div>
             </div>
 
@@ -562,6 +572,42 @@
       }};
     }
 
+
+    function createSVTDataFingerprint(dataset, tariff, loadMethod, sourceType){
+      const rows = dataset?.rows || [];
+      const totalConsumption = rows.reduce((a,r)=>a + Number(r.electricKwh || r.consumptionKwh || 0),0);
+      const totalProduction = rows.reduce((a,r)=>a + Number(r.pvKwh || 0),0);
+      const first = rows[0]?.timestamp || '';
+      const last = rows[rows.length-1]?.timestamp || '';
+      const files = [
+        ...(dataset?.meta?.fileNames || []),
+        ...(dataset?.meta?.productionFileNames || [])
+      ].join('|');
+      return [
+        loadMethod || '',
+        sourceType || 'total',
+        Number(tariff || 0).toFixed(4),
+        rows.length,
+        totalConsumption.toFixed(3),
+        totalProduction.toFixed(3),
+        first,
+        last,
+        files
+      ].join('::');
+    }
+
+    function clearDerivedQuestionResults(){
+      [
+        'svtForecastQ3',
+        'svtPotentialQ4',
+        'svtUsefulEnergyQ5',
+        'svtFlexibleLoadsQ6'
+      ].forEach(k => {
+        try{ sessionStorage.removeItem(k); }catch(e){}
+      });
+    }
+
+
     async function continueFlow(){
       try{
         if(!window.SVTLoadCurveProfiles || !window.SVTAnalysisEngine){
@@ -574,6 +620,7 @@
         }
         showMessage('warn', 'Procesăm datele...');
         const tariff = Number(fixedTariff.value || 0.75);
+        const consumptionDataSource = document.getElementById('consumptionDataSource')?.value || 'total';
 
         if(currentTab === 'termic'){
           const navigatorContext = {
@@ -621,11 +668,16 @@
         }
 
         dataset.meta.fixedPriceRonKwh = tariff;
+        dataset.meta.consumptionDataSource = consumptionDataSource;
+        dataset.meta.dataFingerprint = createSVTDataFingerprint(dataset, tariff, loadMethod, consumptionDataSource);
+        clearDerivedQuestionResults();
         const analysis = SVTAnalysisEngine.analyzeQuestion1(dataset, {fixedTariffRonKwh:tariff});
         analysis.meta.loadMethod = loadMethod;
         analysis.meta.invoiceFileName = invoiceFile ? invoiceFile.name : null;
         analysis.meta.fileNames = dataset.meta.fileNames || [];
         analysis.meta.productionFileNames = dataset.meta.productionFileNames || [];
+        analysis.meta.consumptionDataSource = consumptionDataSource;
+        analysis.meta.dataFingerprint = dataset.meta.dataFingerprint;
 
         sessionStorage.setItem('svtDataset', JSON.stringify(dataset));
         sessionStorage.setItem('svtAnalysis', JSON.stringify(analysis));
@@ -633,6 +685,8 @@
           question:analysis.question,
           fixedTariffRonKwh:tariff,
           loadMethod,
+          consumptionDataSource,
+          dataFingerprint: dataset.meta.dataFingerprint,
           hasProduction:analysis.meta.hasProduction || !!dataset.meta.hasEmbeddedProduction,
           invoiceFileName:invoiceFile ? invoiceFile.name : null,
           fileNames:dataset.meta.fileNames || [],
@@ -648,6 +702,8 @@
           hasInvoiceOnly: loadMethod === 'invoice',
           hasHourlyFile: loadMethod === 'file' && consumptionFiles.length > 0,
           fixedTariffRonKwh: tariff,
+          consumptionDataSource,
+          dataFingerprint: dataset.meta.dataFingerprint,
           fileCount: consumptionFiles.length,
           productionFileCount: productionFiles.length,
           thermal: {
@@ -682,6 +738,7 @@
       }
     });
     fixedTariff.addEventListener('input', validateForm);
+    document.getElementById('consumptionDataSource')?.addEventListener('change', validateForm);
     document.getElementById('invoiceConsumption').addEventListener('input', validateForm);
     document.getElementById('invoiceDays').addEventListener('input', validateForm);
     continueBtn.addEventListener('click', continueFlow);

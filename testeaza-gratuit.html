@@ -19,6 +19,7 @@
   <!-- SVT V60 HOTFIX TESTEAZA RENDER RESTORE -->
   <!-- SVT V61 Q5 STABLE RESULT LAYOUT -->
   <!-- SVT V62 Q6 FLEXIBLE CONSUMPTION SHIFTING -->
+  <!-- SVT V63 LOGIC UX CLEAN AUDIT FIX -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -754,6 +755,66 @@
     @media(max-width:1000px){.q6-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:620px){.q6-grid{grid-template-columns:1fr}.q6-actions{display:grid}.q6-bar-row{grid-template-columns:1fr}.q6-bar-value{text-align:left}}
 
+  
+    /* v63: Logic & UX clean audit fix */
+    .svt-source-warning{
+      border:1px solid #fed7aa;
+      background:#fff7ed;
+      color:#7c2d12;
+      border-radius:16px;
+      padding:13px 14px;
+      margin-bottom:12px;
+      font-size:13px;
+      font-weight:800;
+      line-height:1.45;
+    }
+    details.svt-advanced{
+      border:1px solid #dfe9e4;
+      background:#fbfefc;
+      border-radius:16px;
+      padding:12px 14px;
+      margin-top:12px;
+    }
+    details.svt-advanced > summary{
+      cursor:pointer;
+      color:#0f172a;
+      font-size:13px;
+      font-weight:1000;
+      list-style:none;
+    }
+    details.svt-advanced > summary::-webkit-details-marker{display:none}
+    details.svt-advanced > summary::after{
+      content:'›';
+      float:right;
+      color:#07943f;
+      transform:rotate(90deg);
+      transition:.18s ease;
+    }
+    details.svt-advanced:not([open]) > summary::after{transform:rotate(0)}
+    .q4-surface-list{display:grid;gap:10px;margin-top:12px}
+    .q4-surface-card{
+      border:1px solid #dfe9e4;
+      background:#fff;
+      border-radius:15px;
+      padding:12px;
+      display:grid;
+      gap:10px;
+      box-shadow:0 10px 20px rgba(15,23,42,.035);
+    }
+    .q4-surface-title{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .q4-surface-title strong{font-size:13px;color:#0f172a;font-weight:1000}
+    .client-short-answer{
+      border:1px solid #dfe9e4;
+      background:linear-gradient(180deg,#ffffff,#fbfefc);
+      border-radius:16px;
+      padding:14px;
+      margin:12px 0;
+      color:#0f172a;
+      font-size:14px;
+      font-weight:850;
+      line-height:1.45;
+    }
+
   </style>
 </head>
 <body>
@@ -797,6 +858,44 @@
       try { return JSON.parse(sessionStorage.getItem('svtAnalysis') || '{}'); }
       catch(e){ return {}; }
     }
+
+    function getDataset(){
+      try { return JSON.parse(sessionStorage.getItem('svtDataset') || '{}'); }
+      catch(e){ return {}; }
+    }
+    function getActiveDataFingerprint(){
+      const ctx = getContext();
+      const analysis = getAnalysis();
+      const dataset = getDataset();
+      return ctx.dataFingerprint || analysis?.meta?.dataFingerprint || dataset?.meta?.dataFingerprint || '';
+    }
+    function resetDerivedResultsIfDataChanged(){
+      const fp = getActiveDataFingerprint();
+      if(!fp) return;
+      const prev = sessionStorage.getItem('svtActiveDataFingerprint');
+      if(prev && prev !== fp){
+        ['svtForecastQ3','svtPotentialQ4','svtUsefulEnergyQ5','svtFlexibleLoadsQ6'].forEach(k => {
+          try{ sessionStorage.removeItem(k); }catch(e){}
+        });
+      }
+      sessionStorage.setItem('svtActiveDataFingerprint', fp);
+    }
+    function getConsumptionDataSource(){
+      const ctx = getContext();
+      const analysis = getAnalysis();
+      const dataset = getDataset();
+      return ctx.consumptionDataSource || analysis?.meta?.consumptionDataSource || dataset?.meta?.consumptionDataSource || 'total';
+    }
+    function sourceWarningHtml(question){
+      const source = getConsumptionDataSource();
+      if(source === 'total') return '';
+      const text = source === 'grid'
+        ? 'Fișierul încărcat pare să fie consum din rețea/import, nu consum total. Rezultatele sunt estimative dacă există deja producție locală, deoarece autoconsumul existent nu apare complet în import.'
+        : 'Tipul curbei de consum nu este sigur. Rezultatele sunt tratate ca estimare și trebuie validate cu date din contor/invertor.';
+      return `<div class="svt-source-warning"><strong>Notă de interpretare ${question ? '· ' + esc(question) : ''}:</strong> ${esc(text)}</div>`;
+    }
+
+
     function relevantQuestions(ctx){
       const mode = ctx.selectedMode || 'electric';
       if(mode === 'termic') return allQuestions.filter(q => q.groups.includes('thermal'));
@@ -1164,6 +1263,7 @@
       }).filter(r => r.surplusKwh > 0).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
 
       box.innerHTML = `
+        ${sourceWarningHtml('Q2')}
         <div class="answer-summary" id="answerSummaryQ2">
           <div class="summary-card"><strong>${fmt(totals.production)} kWh</strong><span>producție locală totală</span></div>
           <div class="summary-card"><strong>${fmt(totals.self)} kWh</strong><span>energie consumată local</span></div>
@@ -1171,6 +1271,10 @@
         </div>
         <div class="chart-wrap"><canvas id="question2Chart"></canvas></div>
         <div class="top-list" id="topSurplusIntervals"></div>
+        <div class="insight-grid">
+          <div class="insight-card"><h3>Interpretare</h3><p>Surplusul apare în intervalele în care producția locală este mai mare decât consumul disponibil. Cu cât surplusul este mai mare, cu atât este mai importantă mutarea consumurilor, stocarea sau exportul controlat.</p></div>
+          <div class="insight-card"><h3>Recomandare</h3><ul><li>Mută consumuri flexibile în orele cu surplus.</li><li>Analizează BESS dacă surplusul apare zilnic și consumul crește seara.</li><li>Verifică dacă datele sunt consum total sau doar import din rețea.</li></ul></div>
+        </div>
       `;
 
       if(activeCharts.q2) activeCharts.q2.destroy();
@@ -1487,6 +1591,7 @@
           <div class="summary-card"><strong>${fmt(peak)} kWh</strong><span>vârf orar estimat · ${esc(peakLabel)}</span></div>
           <div class="summary-card"><strong>${fmt(irradiation,2)} kWh/m²</strong><span>radiație solară orară cumulată</span></div>
         </div>
+        <div class="client-short-answer">Răspuns pe scurt: acesta este potențialul estimat de producție PV pentru ziua următoare, pe baza prognozei meteo reale. Este o estimare operațională rapidă, nu o simulare finală bancabilă.</div>
         <div class="chart-wrap"><canvas id="question3Chart"></canvas></div>
         <div class="top-list" id="q3HourlyList"></div>
       `;
@@ -1592,6 +1697,63 @@
         renderQuestion4Form(box, card);
       }, 450);
     }
+
+
+    function addQ4SurfaceRow(values){
+      const list = document.getElementById('q4SurfaceList');
+      if(!list) return;
+      const idx = list.querySelectorAll('.q4-surface-card').length + 2;
+      const v = Object.assign({name:`Suprafață ${idx}`, surfaceM2:'', usablePercent:'70', mounting:'roof_flat', density:'5.5', tilt:'15', azimuth:'0'}, values || {});
+      const node = document.createElement('section');
+      node.className = 'q4-surface-card';
+      node.innerHTML = `
+        <div class="q4-surface-title">
+          <strong>${esc(v.name)}</strong>
+          <button class="btn back" type="button" data-q4-remove>Șterge</button>
+        </div>
+        <div class="q4-grid">
+          <div class="q4-field"><label>Suprafață [m²]</label><input data-q4-surface="surfaceM2" type="number" min="0" step="1" value="${esc(v.surfaceM2)}"></div>
+          <div class="q4-field"><label>Utilizabil [%]</label><input data-q4-surface="usablePercent" type="number" min="1" max="100" step="1" value="${esc(v.usablePercent)}"></div>
+          <div class="q4-field"><label>Tip montaj</label><select data-q4-surface="mounting"><option value="roof_flat">Acoperiș plat</option><option value="roof_tilted">Acoperiș înclinat</option><option value="ground">Teren</option><option value="carport">Carport</option><option value="facade">Fațadă</option><option value="other">Altceva</option></select></div>
+          <div class="q4-field"><label>Densitate [m²/kWp]</label><input data-q4-surface="density" type="number" min="3" max="12" step="0.1" value="${esc(v.density)}"></div>
+          <div class="q4-field"><label>Înclinare [°]</label><input data-q4-surface="tilt" type="number" min="0" max="90" step="1" value="${esc(v.tilt)}"></div>
+          <div class="q4-field"><label>Azimut [°]</label><input data-q4-surface="azimuth" type="number" min="-180" max="180" step="1" value="${esc(v.azimuth)}"></div>
+        </div>
+      `;
+      list.appendChild(node);
+      const mounting = node.querySelector('[data-q4-surface="mounting"]');
+      if(mounting) mounting.value = v.mounting || 'roof_flat';
+      node.querySelector('[data-q4-remove]')?.addEventListener('click', () => node.remove());
+    }
+
+    function collectQ4Surfaces(baseInputs){
+      const surfaces = [{
+        name:'Suprafață principală',
+        surfaceM2:baseInputs.surfaceM2,
+        usablePercent:baseInputs.usablePercent,
+        mounting:baseInputs.mounting,
+        density:baseInputs.density,
+        tilt:baseInputs.tilt,
+        azimuth:baseInputs.azimuth
+      }];
+      document.querySelectorAll('.q4-surface-card').forEach((card, i) => {
+        const val = k => card.querySelector(`[data-q4-surface="${k}"]`)?.value || '';
+        const surfaceM2 = Number(val('surfaceM2') || 0);
+        if(surfaceM2 > 0){
+          surfaces.push({
+            name:`Suprafață ${i+2}`,
+            surfaceM2,
+            usablePercent:Number(val('usablePercent') || 70),
+            mounting:val('mounting') || 'roof_flat',
+            density:Number(val('density') || 5.5),
+            tilt:Number(val('tilt') || baseInputs.tilt || 15),
+            azimuth:Number(val('azimuth') || baseInputs.azimuth || 0)
+          });
+        }
+      });
+      return surfaces.filter(s => Number(s.surfaceM2 || 0) > 0);
+    }
+
 
     function renderQuestion4Form(box, card){
       const d = getQ4Defaults();
@@ -1731,10 +1893,18 @@
         if(!(density > 0)) throw new Error('Densitatea m²/kWp trebuie să fie pozitivă.');
         if(!(specificYieldGross > 0)) throw new Error('Producția specifică trebuie să fie pozitivă.');
 
-        const usableArea = surfaceM2 * usablePercent / 100;
-        const additionalKwp = usableArea / density;
+        const baseSurface = {surfaceM2, usablePercent, mounting, density, tilt, azimuth};
+        const surfaces = collectQ4Surfaces(baseSurface);
+        if(!surfaces.length) throw new Error('Introdu cel puțin o suprafață disponibilă pentru PV.');
         const netSpecificYield = specificYieldGross * Math.max(0.45, 1 - losses/100);
-        const annualKwh = additionalKwp * netSpecificYield;
+        let usableArea = 0, additionalKwp = 0, annualKwh = 0;
+        surfaces.forEach(s => {
+          const ua = Number(s.surfaceM2 || 0) * Number(s.usablePercent || 0) / 100;
+          const kwp = ua / Math.max(0.1, Number(s.density || density || 5.5));
+          usableArea += ua;
+          additionalKwp += kwp;
+          annualKwh += kwp * netSpecificYield;
+        });
 
         const monthShare = [
           ['Ian',4.0],['Feb',5.5],['Mar',8.5],['Apr',10.5],['Mai',12.0],['Iun',12.5],
@@ -1751,7 +1921,7 @@
         if(zeroExport === 'yes') gridNote = 'Ai selectat zero-export: potențialul tehnic există, dar surplusul trebuie consumat local, stocat sau limitat.';
 
         const payload = {
-          inputs:{lat,lon,surfaceM2,usablePercent,density,tilt,azimuth,losses,specificYieldGross,netSpecificYield,existingKwp,exportLimitKw,zeroExport,mounting},
+          inputs:{lat,lon,surfaceM2,usablePercent,density,tilt,azimuth,losses,specificYieldGross,netSpecificYield,existingKwp,exportLimitKw,zeroExport,mounting,surfaces},
           results:{usableArea,additionalKwp,annualKwh,usefulKwh,surplusKwh,annualDayKwh:c.annualDayKwh,annualTotalKwh:c.annualTotalKwh,gridNote},
           monthly,
           createdAt:new Date().toISOString()
@@ -1787,6 +1957,7 @@
               <span class="q4-chip">${fmt(i.usablePercent,0)}% utilizabil</span>
               <span class="q4-chip">${fmt(i.density,1)} m²/kWp</span>
               <span class="q4-chip">${fmt(i.netSpecificYield,0)} kWh/kWp/an net</span>
+              <span class="q4-chip">${(i.surfaces || []).length || 1} suprafețe</span>
             </div>
         <div class="answer-summary">
           <div class="summary-card"><strong>${fmt(r.additionalKwp,1)} kWp</strong><span>putere PV suplimentară posibilă</span></div>
@@ -1929,6 +2100,7 @@
             <span class="q5-chip">Curba consum: ${fmt(ds.rows.length,0)} intervale</span>
           </div>
 
+          <details class="svt-advanced"><summary>Modifică ipotezele avansate</summary>
           <div class="q5-grid">
             <div class="q5-field">
               <label for="q5ZeroExport">Regim zero-export</label>
@@ -1979,8 +2151,9 @@
             </div>
           </div>
 
+          </details>
           <div class="q5-actions">
-            <span class="q5-note">Calculul separă energia utilizată direct, energia ce poate fi valorificată prin consum flexibil/BESS și surplusul exportat sau limitat.</span>
+            <span class="q5-note">Calculul afișează întâi scenariul simplu: energie utilizabilă local vs surplus. Ipotezele avansate pot fi modificate doar la nevoie.</span>
             <button class="btn next" type="button" id="q5RunBtn">Calculează utilizabilul ›</button>
           </div>
         </div>
@@ -2255,6 +2428,7 @@
             <div class="summary-card"><strong>${fmt(exportMwh,1)} MWh/an</strong><span>export / surplus / limitare</span></div>
           </div>
 
+          <div class="client-short-answer">Răspuns pe scurt: ${fmt(usefulMwh,1)} MWh/an din producția suplimentară ar putea fi utilizată local, iar ${fmt(exportMwh,1)} MWh/an rămân export/surplus/limitare.</div>
           ${renderQ5StableBars(t)}
 
           <div class="insight-grid">
@@ -2440,7 +2614,7 @@
         <div class="q6-form">
           <div>
             <h2>Ce consumuri aș putea muta în timp?</h2>
-            <p>Preluăm automat curba de consum, tariful, surplusul PV și rezultatele anterioare. Completează doar procesele care pot fi mutate tehnologic.</p>
+            <p>Preluăm automat curba de consum, tariful, surplusul PV existent și surplusul estimat din producția suplimentară Q4/Q5. Completează doar procesele care pot fi mutate tehnologic.</p>
           </div>
 
           <div class="q6-auto-strip">
@@ -2448,6 +2622,7 @@
             <span class="q6-chip">Tarif consum: ${fmt(d.tariff,3)} lei/kWh</span>
             <span class="q6-chip">Export: ${fmt(d.exportTariff,3)} lei/kWh</span>
             <span class="q6-chip">Surplus Q5: ${fmt(d.surplusMwh,1)} MWh/an</span>
+            <span class="q6-chip">Include surplus Q4/Q5 în recomandări</span>
           </div>
 
           <div class="q6-process-list" id="q6ProcessList"></div>
@@ -2545,24 +2720,32 @@
 
     function buildQ6HourlySignals(){
       const ds = (() => { try{return JSON.parse(sessionStorage.getItem('svtDataset') || '{}')}catch(e){return {}} })();
+      const q4 = (() => { try{return JSON.parse(sessionStorage.getItem('svtPotentialQ4') || '{}')}catch(e){return {}} })();
       const rows = ds.rows || [];
-      const buckets = Array.from({length:24}, (_,h)=>({hour:h, consumption:0, surplus:0, count:0, pv:0}));
+      const additionalProfile = q4?.results?.annualKwh ? buildQ5AdditionalProfile(ds, q4) : [];
+      const addByTs = new Map(additionalProfile.map(x => [String(new Date(x.timestamp).getTime()), Number(x.additionalPvKwh || 0)]));
+      const buckets = Array.from({length:24}, (_,h)=>({hour:h, consumption:0, surplus:0, count:0, pv:0, additionalPv:0}));
       for(const r of rows){
         const d = new Date(r.timestamp);
         const h = Number(r.hour ?? d.getHours());
         if(h < 0 || h > 23) continue;
         const consumption = Number(r.electricKwh || r.consumptionKwh || 0);
-        const pv = Number(r.pvKwh || 0);
-        const surplus = Math.max(0, pv - consumption);
+        const existingPv = Number(r.pvKwh || 0);
+        const additionalPv = Number(addByTs.get(String(d.getTime())) || 0);
+        const demandAfterExisting = Math.max(0, consumption - existingPv);
+        const surplusFromAdditional = Math.max(0, additionalPv - demandAfterExisting);
+        const existingSurplus = Math.max(0, existingPv - consumption);
+        const surplus = surplusFromAdditional + existingSurplus;
         buckets[h].consumption += consumption;
-        buckets[h].pv += pv;
+        buckets[h].pv += existingPv;
+        buckets[h].additionalPv += additionalPv;
         buckets[h].surplus += surplus;
         buckets[h].count += 1;
       }
       return buckets.map(b => {
         const c = Math.max(1,b.count);
         const solarHour = b.hour >= 6 && b.hour <= 19 ? Math.sin(Math.PI * (b.hour - 6) / 13) : 0;
-        return {hour:b.hour, avgConsumption:b.consumption / c, avgPv:b.pv / c, avgSurplus:b.surplus / c, solarScore:Math.max(0, solarHour)};
+        return {hour:b.hour, avgConsumption:b.consumption / c, avgPv:b.pv / c, avgAdditionalPv:b.additionalPv / c, avgSurplus:b.surplus / c, solarScore:Math.max(0, solarHour)};
       });
     }
 
@@ -2659,6 +2842,7 @@
 
     // Momentan butonul Continuă nu face nimic.
     document.getElementById('continueBtn')?.addEventListener('click', () => {});
+    resetDerivedResultsIfDataChanged();
     render();
   </script>
 </body>
