@@ -20,6 +20,7 @@
   <!-- SVT V61 Q5 STABLE RESULT LAYOUT -->
   <!-- SVT V62 Q6 FLEXIBLE CONSUMPTION SHIFTING -->
   <!-- SVT V63 LOGIC UX CLEAN AUDIT FIX -->
+  <!-- SVT V64 Q1 PROFESSIONAL HEATMAP VISUAL KIT -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -815,6 +816,220 @@
       line-height:1.45;
     }
 
+  
+    /* v64: reusable SVT Visual Kit + Q1 professional heatmap */
+    .svt-viz-shell{
+      display:grid;
+      gap:14px;
+      max-width:100%;
+      overflow:hidden;
+      box-sizing:border-box;
+    }
+    .svt-viz-card{
+      border:1px solid #dfe9e4;
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 14px 34px rgba(15,23,42,.055);
+      padding:16px;
+      box-sizing:border-box;
+      max-width:100%;
+      overflow:hidden;
+    }
+    .svt-viz-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:12px;
+    }
+    .svt-viz-head h3{
+      margin:0;
+      color:#0f172a;
+      font-size:16px;
+      font-weight:1000;
+      letter-spacing:-.025em;
+    }
+    .svt-viz-head p{
+      margin:5px 0 0;
+      color:#64748b;
+      font-size:12.5px;
+      font-weight:750;
+      line-height:1.4;
+    }
+    .svt-viz-pill{
+      flex:0 0 auto;
+      border:1px solid #d4ecdc;
+      background:#f1f8f4;
+      color:#08713a;
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:11px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .svt-heatmap-wrap{
+      max-width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-bottom:6px;
+      scrollbar-width:thin;
+      scrollbar-color:#b8d8c5 #f8fbf9;
+    }
+    .svt-heatmap{
+      display:grid;
+      gap:7px;
+      min-width:980px;
+    }
+    .svt-heatmap-hour-row,
+    .svt-heatmap-row{
+      display:grid;
+      grid-template-columns:72px repeat(24, minmax(28px, 1fr));
+      gap:4px;
+      align-items:center;
+    }
+    .svt-heatmap-hour{
+      color:#64748b;
+      font-size:9.5px;
+      font-weight:900;
+      text-align:center;
+    }
+    .svt-heatmap-day{
+      color:#0f172a;
+      font-size:11px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .svt-heat-cell{
+      height:28px;
+      border-radius:8px;
+      border:1px solid rgba(15,23,42,.05);
+      cursor:default;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .svt-heat-cell:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 16px rgba(15,23,42,.12);
+    }
+    .svt-heat-0{background:#f8fafc}
+    .svt-heat-1{background:#dcfce7}
+    .svt-heat-2{background:#bbf7d0}
+    .svt-heat-3{background:#fde68a}
+    .svt-heat-4{background:#fb923c}
+    .svt-heat-5{background:#ef4444}
+    .svt-heat-legend{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+      color:#64748b;
+      font-size:11px;
+      font-weight:800;
+    }
+    .svt-legend-dot{
+      width:24px;
+      height:10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.06);
+    }
+    .svt-hour-bars{
+      display:grid;
+      gap:8px;
+    }
+    .svt-hour-row{
+      display:grid;
+      grid-template-columns:70px minmax(0,1fr) 120px;
+      gap:10px;
+      align-items:center;
+    }
+    .svt-hour-label{
+      color:#0f172a;
+      font-size:12px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .svt-hour-track{
+      min-width:0;
+      height:14px;
+      border-radius:999px;
+      background:#eef5f1;
+      border:1px solid #dfe9e4;
+      overflow:hidden;
+    }
+    .svt-hour-fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#07943f,#f59e0b,#ef4444);
+      min-width:3px;
+    }
+    .svt-hour-value{
+      text-align:right;
+      color:#334155;
+      font-size:12px;
+      font-weight:1000;
+      white-space:nowrap;
+    }
+    .svt-q1-layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);
+      gap:14px;
+      align-items:start;
+    }
+    .svt-critical-day{
+      display:grid;
+      gap:8px;
+      max-height:360px;
+      overflow:auto;
+      padding-right:4px;
+    }
+    .svt-critical-row{
+      display:grid;
+      grid-template-columns:72px minmax(0,1fr) 94px;
+      gap:10px;
+      align-items:center;
+      border:1px solid #edf3ef;
+      border-radius:12px;
+      padding:8px 10px;
+      background:#fff;
+    }
+    .svt-critical-hour{font-size:12px;font-weight:1000;color:#0f172a}
+    .svt-critical-bar{height:12px;border-radius:999px;background:#eef5f1;overflow:hidden}
+    .svt-critical-fill{height:100%;border-radius:999px;background:#ef4444}
+    .svt-critical-cost{text-align:right;color:#b91c1c;font-size:12px;font-weight:1000}
+    .svt-top-table{
+      width:100%;
+      border-collapse:collapse;
+      table-layout:fixed;
+      font-size:12px;
+    }
+    .svt-top-table th,.svt-top-table td{
+      padding:10px 8px;
+      border-bottom:1px solid #edf3ef;
+      text-align:left;
+      color:#334155;
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .svt-top-table th{
+      color:#64748b;
+      text-transform:uppercase;
+      font-size:10px;
+      letter-spacing:.04em;
+      font-weight:1000;
+    }
+    .svt-top-table td:last-child{text-align:right;color:#b91c1c;font-weight:1000}
+    @media(max-width:1050px){
+      .svt-q1-layout{grid-template-columns:1fr}
+    }
+    @media(max-width:640px){
+      .svt-viz-head{display:block}
+      .svt-viz-pill{display:inline-flex;margin-top:10px}
+      .svt-hour-row{grid-template-columns:1fr;gap:5px}
+      .svt-hour-value{text-align:left}
+    }
+
   </style>
 </head>
 <body>
@@ -975,93 +1190,308 @@
       }, 850);
     }
 
+    /*
+     * SVT Visual Kit v64
+     * Reusable native visual components for all active questions:
+     * - heatmap by weekday/hour
+     * - ranked hour bars
+     * - critical-day detail rows
+     * - stable top table
+     * This avoids overloaded line charts and can be reused by Q2–Q6.
+     */
+    function svtDateFromRow(row){
+      const d = new Date(row?.timestamp || row?.label || '');
+      return isNaN(d) ? null : d;
+    }
+
+    function svtHourFromRow(row){
+      if(Number.isFinite(Number(row?.hour))) return Number(row.hour);
+      const d = svtDateFromRow(row);
+      return d ? d.getHours() : 0;
+    }
+
+    function svtDayKey(row){
+      const d = svtDateFromRow(row);
+      if(!d) return String(row?.label || '');
+      return d.toISOString().slice(0,10);
+    }
+
+    function svtShortDay(row){
+      const d = svtDateFromRow(row);
+      return d ? d.toLocaleDateString('ro-RO', {day:'2-digit', month:'2-digit', year:'numeric'}) : String(row?.label || '-');
+    }
+
+    function svtWeekdayIndex(row){
+      const d = svtDateFromRow(row);
+      if(!d) return 1;
+      return (d.getDay() + 6) % 7;
+    }
+
+    function svtLevel(value, max){
+      const ratio = max > 0 ? value / max : 0;
+      if(ratio <= 0.02) return 0;
+      if(ratio <= 0.20) return 1;
+      if(ratio <= 0.40) return 2;
+      if(ratio <= 0.62) return 3;
+      if(ratio <= 0.82) return 4;
+      return 5;
+    }
+
+    function svtBuildWeekHourHeatmap(rows, valueKey){
+      const days = ['Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă','Duminică'];
+      const cells = Array.from({length:7}, (_,day)=>Array.from({length:24}, (_,hour)=>({day,hour,sum:0,count:0,grid:0,cost:0})));
+      (rows || []).forEach(r => {
+        const day = svtWeekdayIndex(r);
+        const hour = Math.max(0, Math.min(23, svtHourFromRow(r)));
+        const value = Number(r?.[valueKey] || 0);
+        cells[day][hour].sum += value;
+        cells[day][hour].grid += Number(r.gridKwh || 0);
+        cells[day][hour].cost += Number(r.gridCostRon || 0);
+        cells[day][hour].count += 1;
+      });
+      let max = 0;
+      cells.forEach(row => row.forEach(c => {
+        c.avg = c.count ? c.sum / c.count : 0;
+        c.avgGrid = c.count ? c.grid / c.count : 0;
+        c.avgCost = c.count ? c.cost / c.count : 0;
+        max = Math.max(max, c.avg);
+      }));
+      return {days,cells,max};
+    }
+
+    function svtRenderHeatmap({title, subtitle, rows, valueKey='gridCostRon', unit='lei'}){
+      const map = svtBuildWeekHourHeatmap(rows, valueKey);
+      const hourHeader = `<div class="svt-heatmap-hour-row"><div></div>${Array.from({length:24}, (_,h)=>`<div class="svt-heatmap-hour">${String(h).padStart(2,'0')}</div>`).join('')}</div>`;
+      const body = map.cells.map((dayCells, i) => `
+        <div class="svt-heatmap-row">
+          <div class="svt-heatmap-day">${map.days[i]}</div>
+          ${dayCells.map(c => {
+            const level = svtLevel(c.avg, map.max);
+            const title = `${map.days[i]} ${String(c.hour).padStart(2,'0')}:00 · medie ${fmt(c.avg,2)} ${unit} · consum rețea ${fmt(c.avgGrid)} kWh`;
+            return `<div class="svt-heat-cell svt-heat-${level}" title="${esc(title)}"></div>`;
+          }).join('')}
+        </div>
+      `).join('');
+      return `
+        <div class="svt-viz-card">
+          <div class="svt-viz-head">
+            <div><h3>${esc(title)}</h3><p>${esc(subtitle)}</p></div>
+            <span class="svt-viz-pill">7 zile × 24 ore</span>
+          </div>
+          <div class="svt-heatmap-wrap">
+            <div class="svt-heatmap">${hourHeader}${body}</div>
+          </div>
+          <div class="svt-heat-legend">
+            <span>Cost mic</span>
+            <span class="svt-legend-dot svt-heat-1"></span>
+            <span class="svt-legend-dot svt-heat-2"></span>
+            <span class="svt-legend-dot svt-heat-3"></span>
+            <span class="svt-legend-dot svt-heat-4"></span>
+            <span class="svt-legend-dot svt-heat-5"></span>
+            <span>Cost ridicat</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function svtBuildHourlyRanking(rows, valueKey='gridCostRon'){
+      const hours = Array.from({length:24}, (_,h)=>({hour:h,sum:0,count:0,grid:0,cost:0}));
+      (rows || []).forEach(r => {
+        const h = Math.max(0, Math.min(23, svtHourFromRow(r)));
+        const value = Number(r?.[valueKey] || 0);
+        hours[h].sum += value;
+        hours[h].grid += Number(r.gridKwh || 0);
+        hours[h].cost += Number(r.gridCostRon || 0);
+        hours[h].count += 1;
+      });
+      return hours.map(h => ({
+        ...h,
+        avg:h.count ? h.sum / h.count : 0,
+        avgGrid:h.count ? h.grid / h.count : 0,
+        avgCost:h.count ? h.cost / h.count : 0
+      })).sort((a,b)=>b.avg-a.avg);
+    }
+
+    function svtRenderHourBars({title, subtitle, rows, valueKey='gridCostRon', unit='lei', top=8}){
+      const ranked = svtBuildHourlyRanking(rows, valueKey).slice(0, top);
+      const max = Math.max(1, ...ranked.map(x => x.avg));
+      return `
+        <div class="svt-viz-card">
+          <div class="svt-viz-head">
+            <div><h3>${esc(title)}</h3><p>${esc(subtitle)}</p></div>
+            <span class="svt-viz-pill">Top ${top}</span>
+          </div>
+          <div class="svt-hour-bars">
+            ${ranked.map(x => `
+              <div class="svt-hour-row">
+                <div class="svt-hour-label">${String(x.hour).padStart(2,'0')}:00</div>
+                <div class="svt-hour-track"><div class="svt-hour-fill" style="width:${Math.max(2, Math.round(x.avg / max * 100))}%"></div></div>
+                <div class="svt-hour-value">${fmt(x.avg,2)} ${unit}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function svtRenderTopTable({title, subtitle, intervals, limit=10}){
+      const rows = (intervals || []).slice(0, limit);
+      return `
+        <div class="svt-viz-card">
+          <div class="svt-viz-head">
+            <div><h3>${esc(title)}</h3><p>${esc(subtitle)}</p></div>
+            <span class="svt-viz-pill">${rows.length} intervale</span>
+          </div>
+          <table class="svt-top-table">
+            <thead><tr><th>#</th><th>Data și ora</th><th>Consum rețea</th><th>Cost</th></tr></thead>
+            <tbody>
+              ${rows.map(x => `
+                <tr>
+                  <td>${x.rank || ''}</td>
+                  <td>${esc(x.localLabel || '-')}</td>
+                  <td>${fmt(x.gridKwh || 0)} kWh</td>
+                  <td>${fmt(x.gridCostRon || 0)} lei</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function svtRenderCriticalDay(rows, topInterval){
+      const key = topInterval?.timestamp ? String(new Date(topInterval.timestamp).toISOString().slice(0,10)) : null;
+      const dayRows = key
+        ? (rows || []).filter(r => {
+            const d = svtDateFromRow(r);
+            return d && d.toISOString().slice(0,10) === key;
+          })
+        : [];
+      const grouped = Array.from({length:24}, (_,h)=>({hour:h,cost:0,grid:0,count:0}));
+      dayRows.forEach(r => {
+        const h = Math.max(0, Math.min(23, svtHourFromRow(r)));
+        grouped[h].cost += Number(r.gridCostRon || 0);
+        grouped[h].grid += Number(r.gridKwh || 0);
+        grouped[h].count += 1;
+      });
+      const valid = grouped.filter(x => x.cost > 0 || x.grid > 0);
+      const max = Math.max(1, ...valid.map(x => x.cost));
+      return `
+        <div class="svt-viz-card">
+          <div class="svt-viz-head">
+            <div>
+              <h3>Ziua critică, detaliat</h3>
+              <p>${esc(key ? `Ziua cu cel mai scump interval: ${svtShortDay({timestamp:key})}` : 'Detaliu pe zi indisponibil')}</p>
+            </div>
+            <span class="svt-viz-pill">24 ore</span>
+          </div>
+          <div class="svt-critical-day">
+            ${valid.map(x => `
+              <div class="svt-critical-row">
+                <div class="svt-critical-hour">${String(x.hour).padStart(2,'0')}:00</div>
+                <div class="svt-critical-bar"><div class="svt-critical-fill" style="width:${Math.max(3, Math.round(x.cost / max * 100))}%"></div></div>
+                <div class="svt-critical-cost">${fmt(x.cost,2)} lei</div>
+              </div>
+            `).join('') || '<div class="q6-note">Nu există suficiente date pentru detaliul pe zi.</div>'}
+          </div>
+        </div>
+      `;
+    }
+
     function renderQuestion1Result(box, data){
       const ctx = getContext();
       const rows = data.chartRows || [];
-      const step = Math.max(1, Math.ceil(rows.length / 280));
-      const sampled = rows.filter((_, i) => i % step === 0);
-      const hasProd = sampled.some(r => Number(r.productionKwh || 0) > 0);
-      const expensive = sampled.map(r => r.isExpensive ? r.gridKwh : null);
+      const hasProd = rows.some(r => Number(r.productionKwh || 0) > 0);
       const isInvoice = data.meta?.loadMethod === 'invoice' || ctx.hasInvoiceOnly;
 
-      box.innerHTML = `
-        <div class="answer-summary" id="answerSummary"></div>
-        <div class="chart-wrap"><canvas id="question1Chart"></canvas></div>
-        <div class="top-list" id="topIntervals"></div>
-      `;
+      if(activeCharts.q1){
+        activeCharts.q1.destroy();
+        activeCharts.q1 = null;
+      }
 
       const topInterval = (data.expensiveIntervals || [])[0] || {};
       const totals = data.totals || {};
-      const summary = document.getElementById('answerSummary');
-      if(summary){
-        const pvText = hasProd ? `Producție locală: ${fmt(totals.productionKwh || 0)} kWh` : 'Fără producție locală inclusă';
-        summary.innerHTML = `
-          <div class="summary-card"><strong>${esc(topInterval.localLabel || '-')}</strong><span>intervalul cu cel mai mare cost</span></div>
-          <div class="summary-card"><strong>${fmt(topInterval.gridCostRon || 0)} lei</strong><span>cost în acel interval</span></div>
-          <div class="summary-card"><strong>${fmt(totals.gridKwh || 0)} kWh</strong><span>consum total din rețea · ${pvText}</span></div>
-        `;
-      }
+      const hourly = svtBuildHourlyRanking(rows, 'gridCostRon');
+      const topHour = hourly[0]?.hour;
+      const secondHour = hourly[1]?.hour;
+      const topWindow = Number.isFinite(topHour)
+        ? `${String(topHour).padStart(2,'0')}:00${Number.isFinite(secondHour) ? '–' + String(Math.min(23, Math.max(topHour, secondHour)+1)).padStart(2,'0') + ':00' : ''}`
+        : '-';
+      const shortAnswer = isInvoice
+        ? 'Ai introdus o estimare pe factură. Pentru intervale exacte, încarcă o curbă orară sau la 15 minute.'
+        : `Cele mai mari costuri apar în jurul orei ${topWindow}. Pentru tarif fix, „scump” înseamnă intervale în care cumperi mult din rețea.`;
 
-      const datasets = [
-        {label:'Consum total',data:sampled.map(r=>r.consumptionKwh),borderColor:'#94a3b8',backgroundColor:'rgba(148,163,184,.08)',fill:false,tension:.28,pointRadius:0,borderWidth:1.8},
-        {label:'Consum din rețea',data:sampled.map(r=>r.gridKwh),borderColor:'#07943f',backgroundColor:'rgba(7,148,63,.13)',fill:true,tension:.28,pointRadius:0,borderWidth:2.4},
-        {label:'Puncte cost ridicat',data:expensive,borderColor:'#dc2626',backgroundColor:'#dc2626',showLine:false,pointRadius:4,pointHoverRadius:6}
-      ];
-      if(hasProd) datasets.splice(1,0,{label:'Producție locală',data:sampled.map(r=>r.productionKwh),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',fill:false,tension:.28,pointRadius:0,borderWidth:2});
-
-      if(activeCharts.q1) activeCharts.q1.destroy();
-      activeCharts.q1 = new Chart(document.getElementById('question1Chart'), {
-        type:'line',
-        data:{labels:sampled.map(r=>r.label), datasets},
-        options:{
-          responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
-          plugins:{legend:{position:'bottom'}, tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${Number(ctx.parsed.y||0).toLocaleString('ro-RO',{maximumFractionDigits:2})} kWh`}}},
-          scales:{x:{ticks:{maxTicksLimit:9}}, y:{beginAtZero:true,title:{display:true,text:'kWh / interval'}}}
-        }
-      });
-
-      const top = (data.expensiveIntervals || []).slice(0,60);
-      document.getElementById('topIntervals').innerHTML = top.map(x => `
-        <div class="top-row">
-          <div class="rank">${x.rank}</div>
-          <div><strong>${esc(x.localLabel)}</strong><small>Consum rețea: ${fmt(x.gridKwh)} kWh · tarif fix: ${fmt(x.tariffRonKwh,3)} lei/kWh</small></div>
-          <div class="cost">${fmt(x.gridCostRon)} lei</div>
-        </div>
-      `).join('');
-
-      const hasPv = !!(data?.meta?.hasProduction || rows.some(r => Number(r.productionKwh || 0) > 0));
-      const firstTop = top[0] || {};
-      const interpretation = hasPv
-        ? `Punctele roșii arată intervalele în care costul rămâne ridicat după scăderea producției locale. Cu tarif fix, problema nu este prețul orar, ci cantitatea de energie cumpărată din rețea. Dacă vârfurile apar seara sau noaptea, producția PV nu acoperă acele ore.`
-        : `Punctele roșii arată intervalele cu cel mai mare cost. Pentru că tariful este fix, costul crește direct cu consumul din rețea. Graficul indică orele în care consumul este cel mai mare și unde merită analizate pornirile simultane de echipamente.`;
-
-      const recommendationItems = hasPv
+      const pvText = hasProd ? `Producție locală inclusă: ${fmt(totals.productionKwh || 0)} kWh` : 'Fără producție locală inclusă';
+      const recommendationItems = hasProd
         ? [
-            'Mută, unde procesul permite, consumurile flexibile în intervalele cu producție PV locală.',
-            'Analizează BESS dacă vârfurile costisitoare apar după apus sau înainte de producția solară.',
-            'Verifică echipamentele care pornesc simultan în intervalul cel mai scump: ' + (firstTop.localLabel || 'intervalul marcat cu roșu') + '.'
+            'Mută procesele flexibile în orele cu producție locală, nu în orele marcate cu roșu.',
+            'Analizează stocare dacă vârfurile apar seara sau dimineața devreme.',
+            'Verifică simultaneitatea echipamentelor mari în ziua critică.'
           ]
         : [
-            'Identifică procesele care generează vârfurile roșii și verifică dacă pot fi eșalonate.',
-            'Analizează potențial PV local pentru acoperirea consumului diurn.',
-            'Dacă vârfurile apar constant în același interval, stabilește reguli operaționale de pornire pe rând a consumatorilor mari.'
+            'Eșalonează pornirea consumatorilor mari în orele cu vârf.',
+            'Analizează PV local pentru acoperirea consumului diurn.',
+            'Folosește întrebarea 6 pentru a identifica procesele care pot fi mutate.'
           ];
 
-      const parent = document.getElementById('topIntervals');
-      if(parent && !document.getElementById('q1InsightGrid')){
-        parent.insertAdjacentHTML('afterend', `
+      box.innerHTML = `
+        ${sourceWarningHtml('Q1')}
+        <div class="svt-viz-shell">
+          <div class="answer-summary" id="answerSummary">
+            <div class="summary-card"><strong>${esc(topInterval.localLabel || '-')}</strong><span>cel mai scump interval</span></div>
+            <div class="summary-card"><strong>${fmt(topInterval.gridCostRon || 0)} lei</strong><span>cost în acel interval</span></div>
+            <div class="summary-card"><strong>${fmt(totals.gridKwh || 0)} kWh</strong><span>consum total din rețea · ${esc(pvText)}</span></div>
+          </div>
+
+          <div class="client-short-answer">Răspuns pe scurt: ${esc(shortAnswer)}</div>
+
+          <div class="svt-q1-layout">
+            ${svtRenderHeatmap({
+              title:'Heatmap cost pe ore',
+              subtitle:'Roșu indică orele/zilele în care costul mediu din rețea este cel mai ridicat.',
+              rows,
+              valueKey:'gridCostRon',
+              unit:'lei'
+            })}
+            ${svtRenderHourBars({
+              title:'Top ore scumpe',
+              subtitle:'Media costului din rețea pe fiecare oră a zilei.',
+              rows,
+              valueKey:'gridCostRon',
+              unit:'lei',
+              top:8
+            })}
+          </div>
+
+          <div class="svt-q1-layout">
+            ${svtRenderCriticalDay(rows, topInterval)}
+            ${svtRenderTopTable({
+              title:'Top intervale cu cost ridicat',
+              subtitle:'Cele mai scumpe intervale individuale din curba analizată.',
+              intervals:data.expensiveIntervals || [],
+              limit:10
+            })}
+          </div>
+
           <div class="insight-grid" id="q1InsightGrid">
             <div class="insight-card">
-              <h3>Interpretare grafic</h3>
-              <p>${esc(interpretation)}</p>
+              <h3>Ce înseamnă graficul?</h3>
+              <p>Heatmap-ul arată rapid când se repetă costurile mari. Pentru tarif fix, costul ridicat nu vine din preț orar diferit, ci din cantitatea mare de energie cumpărată din rețea.</p>
             </div>
             <div class="insight-card">
               <h3>Recomandări</h3>
               <ul>${recommendationItems.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
             </div>
           </div>
-        `);
-      }
+
+          <details class="svt-advanced">
+            <summary>Vezi detaliile tehnice</summary>
+            <div class="q6-note" style="margin-top:10px">
+              Calcul: consum din rețea = max(consum total - producție locală, 0). Cost interval = consum din rețea × tarif fix. Datele din heatmap sunt agregate pe zi a săptămânii și oră pentru a face tendințele ușor de înțeles.
+            </div>
+          </details>
+        </div>
+      `;
     }
 
     function handleQuestion2(cardArg){
