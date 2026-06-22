@@ -3,11 +3,12 @@
 ```text
 PASS v84 marker
 PASS upload inline js syntax
-PASS invoice label stabilized
-PASS file label stabilized
-PASS compact source buttons css
-PASS file row compact and right aligned
-PASS equal compact upload boxes
-PASS tariff row short and right aligned
+PASS source buttons equal width
+PASS invoice stays two-line
+PASS upload row class exists
+PASS upload aligned right compact
+PASS tariff row class exists
+PASS tariff compact right
+PASS pv upload equal size
 PASS critical ids kept
 ```

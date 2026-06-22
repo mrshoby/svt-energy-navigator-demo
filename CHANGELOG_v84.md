@@ -1,9 +1,8 @@
-# v84 — Source Buttons + Compact Upload + Tariff Align
+# v84 — Source Align + Compact Upload + Compact Tariff
 
 Modificări:
-- la `2 Sursa datelor`, butonul `Am doar factura lunară` este forțat pe exact 2 rânduri, nu 3;
-- textul butoanelor de la sursa datelor este micșorat și stabilizat prin linii separate;
-- la `3 Încarcă fișierul`, fereastra de upload este mai joasă/compactă;
-- uploadul de la `3 Încarcă fișierul` este aliniat la marginea dreaptă, ca uploadul PV;
-- uploadul de consum și uploadul PV au aceeași lățime și înălțime compactă;
-- la `4 Detalii tarif`, câmpurile `Tarif fix actual` și `Tip tarif actual` sunt mai scurte și aliniate spre marginea dreaptă.
+- la `2 Sursa datelor`, butonul `Am doar factura lunară` nu mai cade pe 3 rânduri;
+- butoanele `Încarc fișierul / orar` și `Am doar factura / lunară` sunt egale ca lățime și aliniate sub butoanele `Electric` / `Termic`;
+- la `3 Încarcă fișierul`, fereastra de upload este mai mică pe înălțime și mutată la marginea dreaptă;
+- la `4 Detalii tarif`, câmpurile `Tarif fix actual` și `Tip tarif actual` sunt mai scurte și aliniate spre dreapta;
+- uploadul PV rămâne egal ca dimensiune cu uploadul principal.
