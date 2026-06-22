@@ -16,6 +16,7 @@
   <!-- SVT V85 RIGHT ALIGN COMPACT UPLOAD TARIFF FIX -->
   <!-- SVT V86 UPLOAD ROW CARD FIX HOME HELP TEXT -->
   <!-- SVT V87 UPLOAD ROW HEIGHT AND EQUAL DASHED BOXES -->
+  <!-- SVT V88 EQUAL WIDTHS STEPPER ALIGN FIX -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -1469,8 +1470,178 @@
       }
     }
 
-  </style>
+  
+    /* v88: center step labels exactly under numbered circles everywhere */
+    .svt-progress-outside{
+      grid-template-columns:28px 82px 28px 82px 28px 82px 28px!important;
+      justify-content:center!important;
+      justify-items:center!important;
+      align-items:center!important;
+      column-gap:6px!important;
+      row-gap:4px!important;
+      width:min(500px,calc(100vw - 36px))!important;
+    }
+    .svt-progress-dot{
+      justify-self:center!important;
+      align-self:center!important;
+    }
+    .svt-progress-label{
+      width:88px!important;
+      max-width:88px!important;
+      justify-self:center!important;
+      align-self:start!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      text-align:center!important;
+      margin-top:3px!important;
+      padding:0!important;
+      transform:translateX(0)!important;
+      line-height:1.05!important;
+    }
+    .svt-progress-label[data-step-label="1"]{grid-column:1!important}
+    .svt-progress-label[data-step-label="2"]{grid-column:3!important}
+    .svt-progress-label[data-step-label="3"]{grid-column:5!important}
+    .svt-progress-label[data-step-label="4"]{grid-column:7!important}
 
+
+    /* v88: one shared sizing system */
+    :root{
+      --svt-small-control-w:154px;
+      --svt-small-gap:10px;
+      --svt-combo-w:318px;
+    }
+
+    /* Electric/Termic and source buttons have same width as one tariff field */
+    .energy-switch-row #tabElectric,
+    .energy-switch-row #tabTermic,
+    .flow-row:nth-of-type(2) #methodFileCard.source-choice,
+    .flow-row:nth-of-type(2) #methodInvoiceCard.source-choice{
+      width:var(--svt-small-control-w)!important;
+      min-width:var(--svt-small-control-w)!important;
+      max-width:var(--svt-small-control-w)!important;
+      flex:0 0 var(--svt-small-control-w)!important;
+      height:40px!important;
+      box-sizing:border-box!important;
+    }
+    .energy-switch-row .row-right,
+    .flow-row:nth-of-type(2) .row-right{
+      justify-content:flex-end!important;
+      align-items:center!important;
+      gap:var(--svt-small-gap)!important;
+      width:100%!important;
+      margin-left:auto!important;
+    }
+
+    /* Tariff group = two equal fields; upload boxes equal this full combined width */
+    .tariff-flow-row .row-right{
+      justify-content:flex-end!important;
+      align-items:center!important;
+      width:100%!important;
+      margin-left:auto!important;
+    }
+    .tariff-flow-row .inline-grid-2{
+      width:var(--svt-combo-w)!important;
+      min-width:var(--svt-combo-w)!important;
+      max-width:var(--svt-combo-w)!important;
+      margin-left:auto!important;
+      justify-self:end!important;
+      grid-template-columns:var(--svt-small-control-w) var(--svt-small-control-w)!important;
+      gap:var(--svt-small-gap)!important;
+    }
+    .tariff-flow-row .control{
+      width:var(--svt-small-control-w)!important;
+      min-width:var(--svt-small-control-w)!important;
+      max-width:var(--svt-small-control-w)!important;
+      height:34px!important;
+      box-sizing:border-box!important;
+    }
+
+    /* Row 3 card is tighter vertically, with equal top/bottom padding */
+    .upload-flow-row{
+      min-height:50px!important;
+      height:auto!important;
+      padding-top:3px!important;
+      padding-bottom:3px!important;
+      align-items:center!important;
+      box-sizing:border-box!important;
+    }
+    .upload-flow-row .flow-left,
+    .upload-flow-row .row-right{
+      align-items:center!important;
+    }
+    .upload-flow-row .row-right{
+      justify-content:flex-end!important;
+      width:100%!important;
+      margin-left:auto!important;
+    }
+
+    /* Both upload dashed boxes equal the tariff-combo width */
+    .upload-flow-row #dropZone.file-inline,
+    .production-box-inline .production-inline{
+      width:var(--svt-combo-w)!important;
+      min-width:var(--svt-combo-w)!important;
+      max-width:var(--svt-combo-w)!important;
+      flex:0 0 var(--svt-combo-w)!important;
+      min-height:46px!important;
+      height:auto!important;
+      padding:6px 10px!important;
+      gap:8px!important;
+      box-sizing:border-box!important;
+      justify-content:flex-start!important;
+      overflow:hidden!important;
+    }
+    .production-box-inline.visible{
+      width:var(--svt-combo-w)!important;
+      min-width:var(--svt-combo-w)!important;
+      max-width:var(--svt-combo-w)!important;
+      flex:0 0 var(--svt-combo-w)!important;
+    }
+    .upload-flow-row #dropZone .file-meta,
+    .production-box-inline .production-inline .file-meta{
+      max-width:184px!important;
+      min-width:0!important;
+      flex:0 1 184px!important;
+      overflow:hidden!important;
+      white-space:nowrap!important;
+    }
+    .upload-flow-row #dropZone .file-meta strong,
+    .upload-flow-row #dropZone .file-meta span,
+    .production-box-inline .production-inline .file-meta strong,
+    .production-box-inline .production-inline .file-meta span{
+      display:block!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+
+    @media(max-width:1100px){
+      .energy-switch-row .row-right,
+      .flow-row:nth-of-type(2) .row-right,
+      .upload-flow-row .row-right,
+      .tariff-flow-row .row-right{
+        justify-content:flex-start!important;
+      }
+      .tariff-flow-row .inline-grid-2,
+      .upload-flow-row #dropZone.file-inline,
+      .production-box-inline .production-inline,
+      .production-box-inline.visible{
+        width:100%!important;
+        min-width:0!important;
+        max-width:100%!important;
+        flex:1 1 100%!important;
+      }
+      .tariff-flow-row .inline-grid-2{
+        grid-template-columns:1fr 1fr!important;
+      }
+      .tariff-flow-row .control{
+        width:100%!important;
+        min-width:0!important;
+        max-width:100%!important;
+      }
+    }
+
+  </style>
 </head>
 <body data-energy-mode="electric">
   <div class="page">
@@ -2101,290 +2272,5 @@
     </div>
   </div>
 
-
-
-<!-- SVT_SURGICAL_EQUALIZER_V3_START -->
-<style id="svt-surgical-equalizer-v3-css">
-  :root {
-    --svt-v3-target-pair-width: 308px;
-    --svt-v3-target-single-width: 148px;
-    --svt-v3-upload-padding-y: 12px;
-  }
-
-  .svt-v3-choice-control {
-    width: var(--svt-v3-target-single-width) !important;
-    min-width: var(--svt-v3-target-single-width) !important;
-    max-width: var(--svt-v3-target-single-width) !important;
-    flex: 0 0 var(--svt-v3-target-single-width) !important;
-    box-sizing: border-box !important;
-    justify-content: center !important;
-    text-align: center !important;
-  }
-
-  .svt-v3-upload-box {
-    width: var(--svt-v3-target-pair-width) !important;
-    min-width: var(--svt-v3-target-pair-width) !important;
-    max-width: var(--svt-v3-target-pair-width) !important;
-    flex: 0 0 var(--svt-v3-target-pair-width) !important;
-    box-sizing: border-box !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
-  }
-
-  .svt-v3-upload-row-compact {
-    padding-top: var(--svt-v3-upload-padding-y) !important;
-    padding-bottom: var(--svt-v3-upload-padding-y) !important;
-    min-height: unset !important;
-    align-items: center !important;
-  }
-
-  .svt-v3-progress-item {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    line-height: 1 !important;
-    vertical-align: middle !important;
-    text-align: center !important;
-  }
-
-  .svt-v3-progress-item .svt-v3-progress-circle,
-  .svt-v3-progress-circle {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    line-height: 1 !important;
-  }
-
-  @media (max-width: 820px) {
-    .svt-v3-choice-control,
-    .svt-v3-upload-box {
-      width: 100% !important;
-      min-width: 0 !important;
-      max-width: 100% !important;
-      flex: 1 1 100% !important;
-    }
-  }
-</style>
-<script id="svt-surgical-equalizer-v3-js">
-(function () {
-  var DEBUG = false;
-  function log() { if (DEBUG && window.console) console.log.apply(console, arguments); }
-
-  function norm(value) {
-    return String(value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function rect(el) {
-    if (!el || !el.getBoundingClientRect) return null;
-    var r = el.getBoundingClientRect();
-    if (!r || r.width < 8 || r.height < 8) return null;
-    return r;
-  }
-
-  function visible(el) {
-    var r = rect(el);
-    return !!(r && r.width > 0 && r.height > 0);
-  }
-
-  function all(sel) {
-    return Array.prototype.slice.call(document.querySelectorAll(sel || 'body *'));
-  }
-
-  function txt(el) { return norm(el && el.textContent); }
-
-  function findByText(re, selector) {
-    var els = all(selector || 'body *');
-    for (var i = 0; i < els.length; i += 1) {
-      var el = els[i];
-      if (!visible(el)) continue;
-      var t = txt(el);
-      if (t && re.test(t)) return el;
-    }
-    return null;
-  }
-
-  function nearestControlLabelOrField(labelEl) {
-    if (!labelEl) return null;
-    var p = labelEl;
-    for (var i = 0; p && p !== document.body && i < 7; i += 1, p = p.parentElement) {
-      var r = rect(p);
-      if (!r) continue;
-      var hasNative = !!p.querySelector('input, select, textarea');
-      var t = txt(p);
-      if (hasNative && r.width >= 80 && r.width <= 260 && r.height >= 26 && r.height <= 90 && t.length <= 120) {
-        return p;
-      }
-    }
-    return null;
-  }
-
-  function tariffPairWidth() {
-    var labelA = findByText(/tarif fix actual/);
-    var labelB = findByText(/tip tarif actual/);
-    var a = nearestControlLabelOrField(labelA);
-    var b = nearestControlLabelOrField(labelB);
-    var ar = rect(a), br = rect(b);
-    if (ar && br) {
-      var width = Math.round(Math.max(ar.right, br.right) - Math.min(ar.left, br.left));
-      if (width >= 240 && width <= 520) return width;
-    }
-
-    // fallback dupa screenshot: doua inputuri de ~150px + gap.
-    return 308;
-  }
-
-  function setTargetWidth() {
-    var pair = tariffPairWidth();
-    var single = Math.max(110, Math.floor((pair - 12) / 2));
-    document.documentElement.style.setProperty('--svt-v3-target-pair-width', pair + 'px');
-    document.documentElement.style.setProperty('--svt-v3-target-single-width', single + 'px');
-    return { pair: pair, single: single };
-  }
-
-  function findChoiceByLabel(re) {
-    // Preferam elementele clickabile, ca sa nu atingem randul/cardul.
-    var candidates = all('button, a, label, [role="button"], div, span');
-    var best = null;
-    candidates.forEach(function (el) {
-      if (!visible(el)) return;
-      var t = txt(el);
-      if (!re.test(t)) return;
-      if (t.length > 80) return;
-      var r = rect(el);
-      if (!r) return;
-      if (r.width < 50 || r.width > 240 || r.height < 26 || r.height > 82) return;
-      var tagScore = /^(BUTTON|A|LABEL)$/i.test(el.tagName) ? 1000 : 0;
-      var area = r.width * r.height;
-      var score = tagScore - area;
-      if (!best || score > best.score) best = { el: el, score: score };
-    });
-    return best && best.el;
-  }
-
-  function equalizeChoices() {
-    [
-      /\belectric\b/,
-      /\btermic\b/,
-      /incarc fisierul orar|incarca fisierul orar|incarci fisierul orar/,
-      /am doar factura/
-    ].forEach(function (re) {
-      var el = findChoiceByLabel(re);
-      if (el) el.classList.add('svt-v3-choice-control');
-    });
-  }
-
-  function findUploadBoxFromTrigger(trigger) {
-    var p = trigger;
-    var best = null;
-    for (var i = 0; p && p !== document.body && i < 9; i += 1, p = p.parentElement) {
-      var r = rect(p);
-      if (!r) continue;
-      var t = txt(p);
-      if (!/alege fisier/.test(t)) continue;
-      var hasHint = /xlsx|xls|csv|html|max\.?\s*10\s*mb|productie pv|inverter|pvgis/.test(t);
-      var cs = window.getComputedStyle(p);
-      var dashed = /dashed|dotted/i.test(cs.borderTopStyle + ' ' + cs.borderRightStyle + ' ' + cs.borderBottomStyle + ' ' + cs.borderLeftStyle);
-      var goodSize = r.width >= 180 && r.width <= 650 && r.height >= 34 && r.height <= 125;
-      var rightSide = r.left > window.innerWidth * 0.45;
-      if (goodSize && rightSide && (hasHint || dashed)) {
-        var score = (dashed ? 1000 : 0) + (hasHint ? 500 : 0) - (r.width * r.height / 1000);
-        if (!best || score > best.score) best = { el: p, score: score };
-      }
-    }
-    return best && best.el;
-  }
-
-  function equalizeUploadBoxes() {
-    var triggers = all('button, a, label, div, span').filter(function (el) {
-      return visible(el) && /alege fisier/.test(txt(el));
-    });
-    var seen = new Set();
-    triggers.forEach(function (trigger) {
-      var box = findUploadBoxFromTrigger(trigger);
-      if (box && !seen.has(box)) {
-        seen.add(box);
-        box.classList.add('svt-v3-upload-box');
-      }
-    });
-  }
-
-  function compactStepThree() {
-    var candidates = all('div, section, article, li').filter(function (el) {
-      if (!visible(el)) return false;
-      var t = txt(el);
-      if (!/incarca fisierul/.test(t)) return false;
-      if (!/fisier cu consum orar/.test(t)) return false;
-      if (!/alege fisier/.test(t)) return false;
-      var r = rect(el);
-      return r && r.width >= 520 && r.height >= 50 && r.height <= 140;
-    });
-    candidates.sort(function (a, b) {
-      var ar = rect(a), br = rect(b);
-      return (ar.width * ar.height) - (br.width * br.height);
-    });
-    if (candidates[0]) candidates[0].classList.add('svt-v3-upload-row-compact');
-  }
-
-  function fixProgress() {
-    ['consum', 'procesare', 'rezultate', 'recomandari'].forEach(function (label, idx) {
-      var num = String(idx + 1);
-      var items = all('a, button, li, div, span').filter(function (el) {
-        if (!visible(el)) return false;
-        var t = txt(el);
-        if (t.length > 80) return false;
-        if (t.indexOf(label) === -1 || t.indexOf(num) === -1) return false;
-        var r = rect(el);
-        return r && r.width >= 50 && r.width <= 240 && r.height >= 18 && r.height <= 70;
-      });
-      items.sort(function (a, b) {
-        var ar = rect(a), br = rect(b);
-        return (ar.width * ar.height) - (br.width * br.height);
-      });
-      var item = items[0];
-      if (!item) return;
-      item.classList.add('svt-v3-progress-item');
-      var allChildren = Array.prototype.slice.call(item.querySelectorAll('*'));
-      allChildren.forEach(function (child) {
-        var cr = rect(child);
-        if (!cr) return;
-        if (txt(child) === num && cr.width >= 16 && cr.width <= 54 && cr.height >= 16 && cr.height <= 54) {
-          child.classList.add('svt-v3-progress-circle');
-        }
-      });
-    });
-  }
-
-  function apply() {
-    try {
-      setTargetWidth();
-      equalizeChoices();
-      equalizeUploadBoxes();
-      compactStepThree();
-      fixProgress();
-    } catch (err) {
-      if (window.console) console.warn('svt-v3 surgical equalizer failed:', err);
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', apply);
-  } else {
-    apply();
-  }
-  window.addEventListener('resize', function () { window.requestAnimationFrame(apply); }, { passive: true });
-})();
-</script>
-<!-- SVT_SURGICAL_EQUALIZER_V3_END -->
 </body>
 </html>
-
-
-
-

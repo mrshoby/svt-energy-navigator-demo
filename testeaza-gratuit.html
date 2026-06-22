@@ -38,6 +38,7 @@
   <!-- SVT V85 RIGHT ALIGN COMPACT UPLOAD TARIFF FIX -->
   <!-- SVT V86 UPLOAD ROW CARD FIX HOME HELP TEXT -->
   <!-- SVT V87 UPLOAD ROW HEIGHT AND EQUAL DASHED BOXES -->
+  <!-- SVT V88 EQUAL WIDTHS STEPPER ALIGN FIX -->
   <title>Întrebări disponibile | SVT Energy Navigator</title>
   <meta name="description" content="Alege întrebarea care poate fi răspunsă pe baza datelor încărcate."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -1119,6 +1120,40 @@
       box-shadow:0 10px 20px rgba(7,148,63,.22);
     }
     body[data-svt-stage="results"] .svt-progress-label[data-step-label="3"]{color:#07943f}
+
+  
+    /* v88: center step labels exactly under numbered circles everywhere */
+    .svt-progress-outside{
+      grid-template-columns:28px 82px 28px 82px 28px 82px 28px!important;
+      justify-content:center!important;
+      justify-items:center!important;
+      align-items:center!important;
+      column-gap:6px!important;
+      row-gap:4px!important;
+      width:min(500px,calc(100vw - 36px))!important;
+    }
+    .svt-progress-dot{
+      justify-self:center!important;
+      align-self:center!important;
+    }
+    .svt-progress-label{
+      width:88px!important;
+      max-width:88px!important;
+      justify-self:center!important;
+      align-self:start!important;
+      display:flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      text-align:center!important;
+      margin-top:3px!important;
+      padding:0!important;
+      transform:translateX(0)!important;
+      line-height:1.05!important;
+    }
+    .svt-progress-label[data-step-label="1"]{grid-column:1!important}
+    .svt-progress-label[data-step-label="2"]{grid-column:3!important}
+    .svt-progress-label[data-step-label="3"]{grid-column:5!important}
+    .svt-progress-label[data-step-label="4"]{grid-column:7!important}
 
   </style>
 </head>
