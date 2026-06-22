@@ -15,6 +15,7 @@
   <!-- SVT V84 SOURCE ALIGN UPLOAD TARIFF COMPACT -->
   <!-- SVT V85 RIGHT ALIGN COMPACT UPLOAD TARIFF FIX -->
   <!-- SVT V86 UPLOAD ROW CARD FIX HOME HELP TEXT -->
+  <!-- SVT V87 UPLOAD ROW HEIGHT AND EQUAL DASHED BOXES -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -1356,6 +1357,115 @@
         min-width:0!important;
         max-width:100%!important;
         flex:1 1 100%!important;
+      }
+    }
+
+  
+    /* v87: smaller row 3 card + equal green dashed upload boxes */
+    .upload-flow-row{
+      min-height:52px!important;
+      height:auto!important;
+      padding-top:4px!important;
+      padding-bottom:4px!important;
+      padding-left:16px!important;
+      padding-right:16px!important;
+      align-items:center!important;
+    }
+    .upload-flow-row .flow-left,
+    .upload-flow-row .row-right{
+      align-items:center!important;
+    }
+    .upload-flow-row .icon-badge{
+      width:34px!important;
+      height:34px!important;
+      min-width:34px!important;
+    }
+    .upload-flow-row .icon-badge svg{
+      width:18px!important;
+      height:18px!important;
+    }
+    .upload-flow-row .count-badge{
+      width:24px!important;
+      height:24px!important;
+      min-width:24px!important;
+      font-size:12.5px!important;
+    }
+    .upload-flow-row .row-title{
+      font-size:14.2px!important;
+      line-height:1.05!important;
+    }
+    .upload-flow-row .row-subtitle{
+      margin-top:1px!important;
+      font-size:10.8px!important;
+      line-height:1.08!important;
+    }
+
+    /* both dashed upload boxes: same exact visible width, no oversized empty right space */
+    .upload-flow-row #dropZone.file-inline,
+    .production-box-inline .production-inline{
+      width:342px!important;
+      min-width:342px!important;
+      max-width:342px!important;
+      height:auto!important;
+      min-height:46px!important;
+      padding:6px 10px!important;
+      gap:8px!important;
+      border-radius:12px!important;
+      justify-content:flex-start!important;
+      overflow:hidden!important;
+    }
+    .upload-flow-row #dropZone .file-button,
+    .production-box-inline .production-inline .file-button{
+      height:34px!important;
+      padding:0 12px!important;
+      font-size:12.5px!important;
+      border-radius:10px!important;
+      gap:6px!important;
+      flex:0 0 auto!important;
+    }
+    .upload-flow-row #dropZone .file-button svg,
+    .production-box-inline .production-inline .file-button svg{
+      width:14px!important;
+      height:14px!important;
+    }
+    .upload-flow-row #dropZone .file-meta,
+    .production-box-inline .production-inline .file-meta{
+      flex:0 1 auto!important;
+      width:auto!important;
+      max-width:205px!important;
+      min-width:0!important;
+      font-size:10.2px!important;
+      line-height:1.12!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+    }
+    .upload-flow-row #dropZone .file-meta strong,
+    .upload-flow-row #dropZone .file-meta span,
+    .production-box-inline .production-inline .file-meta strong,
+    .production-box-inline .production-inline .file-meta span{
+      display:block!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      line-height:1.12!important;
+    }
+    .production-box-inline.visible{
+      max-width:342px!important;
+      flex:0 0 342px!important;
+    }
+
+    @media(max-width:1100px){
+      .upload-flow-row #dropZone.file-inline,
+      .production-box-inline .production-inline,
+      .production-box-inline.visible{
+        width:100%!important;
+        min-width:0!important;
+        max-width:100%!important;
+        flex:1 1 100%!important;
+      }
+      .upload-flow-row #dropZone .file-meta,
+      .production-box-inline .production-inline .file-meta{
+        max-width:none!important;
       }
     }
 
