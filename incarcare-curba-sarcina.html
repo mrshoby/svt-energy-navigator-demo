@@ -11,6 +11,7 @@
   <!-- SVT V80 REMOVE CHEVRONS NARROW ONE ROW -->
   <!-- SVT V81 PV UPLOAD INLINE FIT CONTENT -->
   <!-- SVT V82 SOURCE HELP SPACING PV CHECKBOX BELOW -->
+  <!-- SVT V83 SMALL SOURCE BUTTONS EQUAL UPLOADS -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -841,6 +842,84 @@
       }
     }
 
+  
+    /* v83: source buttons small like Electric/Termic + equal upload boxes */
+    #methodFileCard.source-choice,
+    #methodInvoiceCard.source-choice{
+      min-width:138px!important;
+      max-width:138px!important;
+      width:138px!important;
+      height:42px!important;
+      padding:0 10px!important;
+      font-size:12.5px!important;
+      line-height:1.05!important;
+      white-space:normal!important;
+      text-align:left!important;
+      justify-content:flex-start!important;
+      gap:7px!important;
+    }
+    #methodFileCard.source-choice svg,
+    #methodInvoiceCard.source-choice svg{
+      width:15px!important;
+      height:15px!important;
+      flex:0 0 15px!important;
+    }
+    #methodFileCard.source-choice span,
+    #methodInvoiceCard.source-choice span{
+      display:block!important;
+      line-height:1.05!important;
+      white-space:normal!important;
+    }
+    .flow-row:nth-of-type(2) .row-right{
+      justify-content:flex-start!important;
+      gap:10px!important;
+    }
+    #dropZone.file-inline,
+    .production-box-inline .production-inline{
+      width:390px!important;
+      max-width:390px!important;
+      min-width:390px!important;
+      flex:0 0 390px!important;
+      justify-content:flex-start!important;
+    }
+    #dropZone .file-meta,
+    .production-box-inline .production-inline .file-meta{
+      width:auto!important;
+      min-width:0!important;
+      flex:1 1 auto!important;
+      overflow:hidden!important;
+      white-space:nowrap!important;
+    }
+    #dropZone .file-meta strong,
+    #dropZone .file-meta span,
+    .production-box-inline .production-inline .file-meta strong,
+    .production-box-inline .production-inline .file-meta span{
+      display:block!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+    .production-box-inline.visible{
+      max-width:390px!important;
+      flex:0 0 390px!important;
+    }
+    @media(max-width:1100px){
+      #methodFileCard.source-choice,
+      #methodInvoiceCard.source-choice{
+        width:138px!important;
+        min-width:138px!important;
+        max-width:138px!important;
+      }
+      #dropZone.file-inline,
+      .production-box-inline .production-inline,
+      .production-box-inline.visible{
+        width:100%!important;
+        min-width:0!important;
+        max-width:100%!important;
+        flex:1 1 100%!important;
+      }
+    }
+
   </style>
 </head>
 <body data-energy-mode="electric">
@@ -894,8 +973,8 @@
                 </div>
               </div>
               <div class="row-right">
-                <button class="choice-btn method active" type="button" id="methodFileCard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/></svg>Încarc fișierul orar</button>
-                <button class="choice-btn method" type="button" id="methodInvoiceCard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4"/><path d="M9 11h6M9 15h6"/></svg>Am doar factura lunară</button>
+                <button class="choice-btn method source-choice active" type="button" id="methodFileCard"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z"/></svg><span>Încarc fișierul<br>orar</span></button>
+                <button class="choice-btn method source-choice" type="button" id="methodInvoiceCard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4"/><path d="M9 11h6M9 15h6"/></svg><span>Am doar factura<br>lunară</span></button>
               </div>
               <div class="source-help">
                 <div class="source-help-title">Cum preferi să încarci datele de consum electric?</div>
