@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <!-- SVT V75 REFERENCE EXACT UPLOAD LAYOUT -->
+  <!-- SVT V76 SINGLE WINDOW SWITCH FIX -->
   <title>Curba ta de consum zilnic | SVT Energy Navigator</title>
   <meta name="description" content="Încarcă datele de consum pentru a identifica momentele în care consumi energie scumpă din rețea."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -141,9 +142,34 @@
       .actions{flex-direction:column-reverse}
       .btn{width:100%}
     }
+  
+    /* v76: remove second white window + keep energy switch visible */
+    .wizard-shell{
+      border:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      border-radius:0!important;
+      padding:0!important;
+      max-width:1040px!important;
+    }
+    .hero{
+      padding-top:34px!important;
+    }
+    .energy-switch-row{
+      margin-bottom:16px!important;
+    }
+    #electricSection,
+    #termicSection{
+      margin-top:0!important;
+    }
+    body[data-energy-mode="electric"] #electricSection{display:block!important}
+    body[data-energy-mode="electric"] #termicSection{display:none!important}
+    body[data-energy-mode="termic"] #electricSection{display:none!important}
+    body[data-energy-mode="termic"] #termicSection{display:block!important}
+
   </style>
 </head>
-<body>
+<body data-energy-mode="electric">
   <div class="page">
     <main class="hero">
       <div class="wizard-shell">
@@ -155,9 +181,8 @@
         <h1>Curba ta de consum zilnic</h1>
         <p class="sub">Încarcă datele de consum și completează detaliile minime necesare pentru a identifica exact când consumi energie scumpă din rețea. Dacă ai și producție locală, o poți adăuga opțional.</p>
 
-        <section id="electricSection">
-          <div class="flow-list">
-            <div class="flow-row">
+        <div class="flow-list energy-switch-list">
+            <div class="flow-row energy-switch-row">
               <div class="flow-left">
                 <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></div>
                 <div class="count-badge">1</div>
@@ -172,6 +197,11 @@
               </div>
               <div class="row-chevron"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 7 5 6 5-6"/></svg></div>
             </div>
+          </div>
+
+<section id="electricSection">
+          <div class="flow-list">
+            
 
             <div class="flow-row">
               <div class="flow-left">
@@ -405,6 +435,7 @@
       tabTermic.classList.toggle('active', !electric);
       electricSection.style.display = electric ? 'block' : 'none';
       termicSection.style.display = electric ? 'none' : 'block';
+      document.body.setAttribute('data-energy-mode', electric ? 'electric' : 'termic');
       showMessage(electric ? 'warn' : 'ok', electric ? 'Completează minim tariful și alege modul de încărcare. Pentru varianta recomandată, încarcă fișierul orar de consum.' : 'Datele termice sunt salvate pentru analiza integrată, dar întrebarea 1 se calculează pe consum electric.');
       validateForm();
     }
