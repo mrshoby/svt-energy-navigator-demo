@@ -4782,6 +4782,33 @@
 /* svt-v120-invoice-grid-upload-final END */
 </style>
 
+
+<style id="svt-v130-invoice-upload-force-window-down-css">
+/* svt-v130-invoice-upload-force-window-down START
+   Mută strict fereastra verde punctată „Alege factură / Format acceptat” mai jos.
+   Nu atinge inputurile, nu atinge lățimile și nu atinge height-ul câmpurilor. */
+#invoicePanel .svt130-upload-window,
+.svt130-upload-window {
+  position: relative !important;
+  top: 34px !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  align-self: center !important;
+  justify-self: end !important;
+  z-index: 2 !important;
+}
+#invoicePanel .svt130-upload-window .file-inline,
+#invoicePanel .svt130-upload-window .upload-zone,
+#invoicePanel .svt130-upload-window .invoice-attach,
+.svt130-upload-window .file-inline,
+.svt130-upload-window .upload-zone,
+.svt130-upload-window .invoice-attach {
+  align-items: center !important;
+  justify-content: center !important;
+}
+/* svt-v130-invoice-upload-force-window-down END */
+</style>
 </head>
 <body data-energy-mode="electric">
   <div class="page">
@@ -5713,10 +5740,11 @@
 /* svt-v120-invoice-grid-upload-final END */
 </script>
 
-<script id="svt-v129-invoice-upload-direct-center-only">
-/* svt-v129-invoice-upload-direct-center-only START */
+
+<script id="svt-v130-invoice-upload-force-window-down-js">
+/* svt-v130-invoice-upload-force-window-down START */
 (function(){
-  var MARK = 'svt-v129-invoice-upload-direct-center-only';
+  var SHIFT = 34;
 
   function norm(value){
     return String(value || '')
@@ -5726,154 +5754,114 @@
       .trim();
   }
 
-  function setImportant(el, prop, value){
+  function setImp(el, prop, value){
     if (!el || !el.style) return;
     el.style.setProperty(prop, value, 'important');
   }
 
-  function getInvoiceGrid(){
-    var panel = document.getElementById('invoicePanel') || document;
-    var grids = Array.prototype.slice.call(panel.querySelectorAll('.invoice-grid'));
-    for (var i = 0; i < grids.length; i += 1) {
-      var t = norm(grids[i].textContent);
-      if (t.indexOf('consum total') >= 0 &&
-          t.indexOf('numar zile') >= 0 &&
-          t.indexOf('valoare factura') >= 0 &&
-          t.indexOf('program de') >= 0 &&
-          t.indexOf('alege factura') >= 0) {
-        return grids[i];
+  function visible(el){
+    if (!el || !el.getBoundingClientRect) return false;
+    var r = el.getBoundingClientRect();
+    return r.width > 20 && r.height > 10;
+  }
+
+  function getPanel(){
+    return document.getElementById('invoicePanel') || document;
+  }
+
+  function scoreCandidate(el){
+    if (!visible(el)) return -9999;
+    var txt = norm(el.textContent);
+    if (txt.indexOf('alege factura') < 0) return -9999;
+    var r = el.getBoundingClientRect();
+    var cs = window.getComputedStyle ? window.getComputedStyle(el) : null;
+    var score = 0;
+
+    // Vrem fereastra verde punctata, nu butonul si nu gridul mare.
+    if (txt.indexOf('format acceptat') >= 0) score += 80;
+    if (cs && String(cs.borderStyle || '').indexOf('dashed') >= 0) score += 120;
+    if (el.matches && el.matches('.file-inline, .invoice-attach, .invoice-attach-wrap, .upload-zone, .upload-box, .dropzone')) score += 90;
+    if (r.width >= 240 && r.width <= 520) score += 80;
+    if (r.height >= 38 && r.height <= 90) score += 70;
+    if (r.width > 650) score -= 160; // exclude grid/panel
+    if (el.matches && el.matches('button, label, input, select')) score -= 120; // exclude button itself
+    return score;
+  }
+
+  function findUploadWindow(){
+    var panel = getPanel();
+    var all = Array.prototype.slice.call(panel.querySelectorAll('*'));
+    var best = null;
+    var bestScore = -9999;
+
+    all.forEach(function(el){
+      var sc = scoreCandidate(el);
+      if (sc > bestScore) { bestScore = sc; best = el; }
+    });
+
+    if (best && bestScore > 0) return best;
+
+    // fallback: gaseste textul, apoi urca la primul container rezonabil, dar nu la grid/panel.
+    for (var i = 0; i < all.length; i += 1) {
+      if (norm(all[i].textContent).indexOf('alege factura') < 0) continue;
+      var node = all[i];
+      for (var guard = 0; guard < 6 && node && node.parentElement && node !== panel; guard += 1) {
+        var r = node.getBoundingClientRect ? node.getBoundingClientRect() : {width:0,height:0};
+        var t = norm(node.textContent);
+        if (t.indexOf('alege factura') >= 0 && r.width >= 240 && r.width <= 560 && r.height >= 30 && r.height <= 110) return node;
+        node = node.parentElement;
       }
     }
     return null;
-  }
-
-  function getUploadDirectChild(grid){
-    if (!grid) return null;
-    var children = Array.prototype.slice.call(grid.children || []);
-    for (var i = 0; i < children.length; i += 1) {
-      var t = norm(children[i].textContent);
-      if (t.indexOf('alege factura') >= 0 || t.indexOf('format acceptat') >= 0) {
-        return children[i];
-      }
-    }
-
-    var all = Array.prototype.slice.call(grid.querySelectorAll('*'));
-    for (var j = 0; j < all.length; j += 1) {
-      var txt = norm(all[j].textContent);
-      if (txt.indexOf('alege factura') >= 0 || txt.indexOf('format acceptat') >= 0) {
-        var node = all[j];
-        while (node && node.parentElement && node.parentElement !== grid) {
-          node = node.parentElement;
-        }
-        if (node && node.parentElement === grid) return node;
-        return all[j].closest('.invoice-attach, .file-inline') || all[j];
-      }
-    }
-    return null;
-  }
-
-  function getLeftFields(grid, upload){
-    var children = Array.prototype.slice.call(grid.children || []);
-    var fields = [];
-    for (var i = 0; i < children.length; i += 1) {
-      if (children[i] === upload) continue;
-      var t = norm(children[i].textContent);
-      if (t.indexOf('consum total') >= 0 ||
-          t.indexOf('numar zile') >= 0 ||
-          t.indexOf('valoare factura') >= 0 ||
-          t.indexOf('program de') >= 0) {
-        fields.push(children[i]);
-      }
-    }
-    return fields.slice(0, 4);
-  }
-
-  function resetUpload(upload){
-    setImportant(upload, 'position', 'relative');
-    setImportant(upload, 'top', 'auto');
-    setImportant(upload, 'bottom', 'auto');
-    setImportant(upload, 'margin-top', '0px');
-    setImportant(upload, 'margin-bottom', '0px');
-    setImportant(upload, 'align-self', 'center');
-    setImportant(upload, 'justify-self', 'end');
-    setImportant(upload, 'display', 'flex');
-    setImportant(upload, 'align-items', 'center');
-    setImportant(upload, 'justify-content', 'center');
-    setImportant(upload, 'box-sizing', 'border-box');
   }
 
   function apply(){
-    var grid = getInvoiceGrid();
-    if (!grid) return;
+    var win = findUploadWindow();
+    if (!win) return;
 
-    var upload = getUploadDirectChild(grid);
-    if (!upload) return;
+    win.classList.add('svt130-upload-window');
+    win.setAttribute('data-svt-v130-upload-force-down', String(SHIFT));
 
-    var fields = getLeftFields(grid, upload);
-    if (!fields.length) return;
-
-    grid.setAttribute('data-svt-v129-grid', '1');
-    upload.setAttribute('data-svt-v129-upload-centered', '1');
-    setImportant(grid, 'align-items', 'center');
-
-    resetUpload(upload);
-    setImportant(upload, 'transform', 'translateY(0px)');
-
-    // Masurare dupa reset, apoi deplasare DOAR pe containerul uploadului.
-    var top = Infinity;
-    var bottom = -Infinity;
-    for (var i = 0; i < fields.length; i += 1) {
-      var r = fields[i].getBoundingClientRect();
-      if (r.width <= 0 || r.height <= 0) continue;
-      top = Math.min(top, r.top);
-      bottom = Math.max(bottom, r.bottom);
-    }
-    if (!isFinite(top) || !isFinite(bottom)) return;
-
-    var ur = upload.getBoundingClientRect();
-    if (ur.width <= 0 || ur.height <= 0) return;
-
-    var targetCenter = (top + bottom) / 2;
-    var uploadCenter = ur.top + (ur.height / 2);
-    var delta = Math.round(targetCenter - uploadCenter);
-
-    // In screenshots uploadul este sus; permitem coborare reala. Daca alta regula deja l-a coborat,
-    // formula poate ramane 0. Nu atingem inputuri.
-    if (Math.abs(delta) < 1) delta = 0;
-    setImportant(upload, 'transform', 'translateY(' + delta + 'px)');
-    upload.setAttribute('data-svt-v129-delta', String(delta));
+    // Resetăm încercările vechi pe acest container și apoi mutăm doar containerul.
+    setImp(win, 'position', 'relative');
+    setImp(win, 'top', SHIFT + 'px');
+    setImp(win, 'bottom', 'auto');
+    setImp(win, 'transform', 'none');
+    setImp(win, 'margin-top', '0px');
+    setImp(win, 'margin-bottom', '0px');
+    setImp(win, 'align-self', 'center');
+    setImp(win, 'justify-self', 'end');
+    setImp(win, 'z-index', '2');
   }
 
   function schedule(){
     apply();
-    requestAnimationFrame(apply);
-    setTimeout(apply, 100);
-    setTimeout(apply, 300);
+    if (window.requestAnimationFrame) window.requestAnimationFrame(apply);
+    setTimeout(apply, 50);
+    setTimeout(apply, 150);
+    setTimeout(apply, 400);
     setTimeout(apply, 900);
     setTimeout(apply, 1600);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', schedule);
-  } else {
-    schedule();
-  }
-
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+  else schedule();
   window.addEventListener('load', schedule);
   window.addEventListener('resize', schedule);
   document.addEventListener('click', function(ev){
-    var panel = document.getElementById('invoicePanel');
-    if (panel && panel.contains(ev.target)) schedule();
+    var panel = getPanel();
+    if (panel && panel.contains && panel.contains(ev.target)) schedule();
   }, true);
   document.addEventListener('focusin', function(ev){
-    var panel = document.getElementById('invoicePanel');
-    if (panel && panel.contains(ev.target)) schedule();
+    var panel = getPanel();
+    if (panel && panel.contains && panel.contains(ev.target)) schedule();
   }, true);
 })();
-/* svt-v129-invoice-upload-direct-center-only END */
+/* svt-v130-invoice-upload-force-window-down END */
 </script>
 </body>
 </html>
+
 
 
 
