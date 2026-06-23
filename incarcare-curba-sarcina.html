@@ -4633,7 +4633,7 @@
   .invoice-grid{grid-template-columns:1fr!important;}
 }
 /* /SVT v104 - invoice monthly compact fields hotfix */
-</style data-svt-invoice-upload="v123" style="position:relative !important; top:28px !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:12px !important; min-height:54px !important; height:54px !important; padding-top:0 !important; padding-bottom:0 !important; box-sizing:border-box !important; transform:none !important;">
+</style data-svt-invoice-upload="v123" style="position:relative !important; top:46px !important; display:flex !important; align-items:center !important; justify-content:center !important; gap:12px !important; min-height:54px !important; height:54px !important; padding-top:0 !important; padding-bottom:0 !important; box-sizing:border-box !important; transform:none !important;">
 
 
 
@@ -4790,7 +4790,7 @@
 .invoice-grid [data-svt-invoice-upload="v123"],
 [data-svt-invoice-upload="v123"] {
   position: relative !important;
-  top: 28px !important;
+  top: 46px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -5745,8 +5745,44 @@
 /* svt-v120-invoice-grid-upload-final END */
 </script>
 
+<script id="svt-v124-fixed-invoice-upload-offset">
+(function(){
+  function findInvoiceUpload(){
+    var panel = document.getElementById('invoicePanel');
+    if (!panel) return null;
+    var all = panel.querySelectorAll('*');
+    for (var i = 0; i < all.length; i++) {
+      var node = all[i];
+      var text = (node.textContent || '').replace(/\s+/g, ' ').trim();
+      if (/Alege factur/i.test(text)) {
+        return node.closest('.file-inline') || node.closest('.invoice-attach') || node;
+      }
+    }
+    return null;
+  }
+  function applyInvoiceUploadOffset(){
+    var upload = findInvoiceUpload();
+    if (!upload) return;
+    upload.setAttribute('data-svt-invoice-upload-offset', 'v124-fixed');
+    upload.style.setProperty('position', 'relative', 'important');
+    upload.style.setProperty('top', '46px', 'important');
+    upload.style.setProperty('transform', 'none', 'important');
+    upload.style.setProperty('display', 'flex', 'important');
+    upload.style.setProperty('align-items', 'center', 'important');
+    upload.style.setProperty('justify-content', 'center', 'important');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyInvoiceUploadOffset);
+  } else {
+    applyInvoiceUploadOffset();
+  }
+  window.addEventListener('load', applyInvoiceUploadOffset);
+  document.addEventListener('click', function(){ setTimeout(applyInvoiceUploadOffset, 0); }, true);
+})();
+</script>
 </body>
 </html>
+
 
 
 
