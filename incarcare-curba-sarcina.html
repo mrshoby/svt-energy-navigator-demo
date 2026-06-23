@@ -4781,6 +4781,104 @@
 }
 /* svt-v120-invoice-grid-upload-final END */
 </style>
+
+<style id="svt-v121-invoice-upload-content-center-css">
+/* svt-v121-invoice-upload-content-center START
+   Doar centreaza vertical continutul din fereastra Alege factura.
+   Nu schimba latimile campurilor facturii si nu modifica modalul. */
+#invoicePanel .svt121-invoice-upload-cell,
+#invoicePanel .svt120-invoice-upload-cell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-content: center !important;
+  align-self: end !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+#invoicePanel .svt121-invoice-upload-box,
+#invoicePanel .svt120-invoice-upload-box {
+  height: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  padding: 0 14px !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-content: center !important;
+  gap: 12px !important;
+  line-height: 1.15 !important;
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+#invoicePanel .svt121-invoice-upload-box > *,
+#invoicePanel .svt120-invoice-upload-box > * {
+  align-self: center !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  transform: none !important;
+  position: static !important;
+  top: auto !important;
+  box-sizing: border-box !important;
+}
+
+#invoicePanel .svt121-invoice-upload-button,
+#invoicePanel .svt120-invoice-upload-box button,
+#invoicePanel .svt120-invoice-upload-box label,
+#invoicePanel .svt120-invoice-upload-box .btn,
+#invoicePanel .svt120-invoice-upload-box .file-btn {
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+#invoicePanel .svt121-invoice-upload-format {
+  height: 38px !important;
+  min-height: 38px !important;
+  max-height: 38px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  align-self: center !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1.12 !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+#invoicePanel .svt121-invoice-upload-format *,
+#invoicePanel .svt120-invoice-upload-box .svt121-invoice-upload-format * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1.12 !important;
+}
+/* svt-v121-invoice-upload-content-center END */
+</style>
 </head>
 <body data-energy-mode="electric">
   <div class="page">
@@ -5710,6 +5808,154 @@
   window.addEventListener('resize', function () { setTimeout(applyInvoiceFix, 80); });
 })();
 /* svt-v120-invoice-grid-upload-final END */
+</script>
+
+<script id="svt-v121-invoice-upload-content-center-js">
+/* svt-v121-invoice-upload-content-center START */
+(function () {
+  function norm(s) {
+    return String(s || '')
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function setImp(el, prop, value) {
+    if (el && el.style) el.style.setProperty(prop, value, 'important');
+  }
+
+  function directChildOf(parent, el) {
+    var n = el;
+    while (n && n.parentElement && n.parentElement !== parent) n = n.parentElement;
+    return n && n.parentElement === parent ? n : null;
+  }
+
+  function getInvoiceGrid() {
+    var grids = Array.prototype.slice.call(document.querySelectorAll('#invoicePanel .invoice-grid, .invoice-grid'));
+    for (var i = 0; i < grids.length; i += 1) {
+      var t = norm(grids[i].textContent);
+      if (t.indexOf('consum total') >= 0 && t.indexOf('numar zile') >= 0 && t.indexOf('valoare factura') >= 0 && t.indexOf('program de') >= 0) return grids[i];
+    }
+    return null;
+  }
+
+  function smallestTextElement(root, needle) {
+    var all = Array.prototype.slice.call(root.querySelectorAll('button, label, a, div, span, strong, small, p'));
+    var matches = all.filter(function (el) { return norm(el.textContent).indexOf(needle) >= 0; });
+    matches.sort(function (a, b) { return norm(a.textContent).length - norm(b.textContent).length; });
+    return matches[0] || null;
+  }
+
+  function uploadBoxFromSeed(grid, seed) {
+    if (!seed) return null;
+    var box = seed.closest('.invoice-attach') || seed.closest('.file-inline') || seed.closest('.upload-card') || seed.closest('.file-card') || seed.closest('.file-upload') || seed.closest('label') || seed.parentElement;
+    var n = box;
+    for (var i = 0; n && n !== grid && i < 7; i += 1, n = n.parentElement) {
+      var t = norm(n.textContent);
+      if (t.indexOf('alege factura') >= 0 && t.indexOf('format acceptat') >= 0) box = n;
+    }
+    return box;
+  }
+
+  function applyUploadCenter() {
+    var grid = getInvoiceGrid();
+    if (!grid) return;
+
+    var seed = smallestTextElement(grid, 'alege factura');
+    if (!seed) return;
+
+    var box = uploadBoxFromSeed(grid, seed) || seed.parentElement;
+    if (!box) return;
+
+    var cell = directChildOf(grid, box) || directChildOf(grid, seed) || box.parentElement;
+    if (!cell) return;
+
+    var format = smallestTextElement(box, 'format acceptat');
+    var button = seed.closest('button') || seed.closest('label') || seed.closest('a') || seed;
+
+    cell.classList.add('svt121-invoice-upload-cell');
+    box.classList.add('svt121-invoice-upload-box');
+    if (button) button.classList.add('svt121-invoice-upload-button');
+    if (format) format.classList.add('svt121-invoice-upload-format');
+
+    [cell, box].forEach(function (el) {
+      setImp(el, 'display', 'flex');
+      setImp(el, 'align-items', 'center');
+      setImp(el, 'justify-content', 'center');
+      setImp(el, 'align-content', 'center');
+      setImp(el, 'height', '58px');
+      setImp(el, 'min-height', '58px');
+      setImp(el, 'max-height', '58px');
+      setImp(el, 'margin-top', '0');
+      setImp(el, 'margin-bottom', '0');
+      setImp(el, 'position', 'static');
+      setImp(el, 'top', 'auto');
+      setImp(el, 'transform', 'none');
+      setImp(el, 'box-sizing', 'border-box');
+    });
+
+    setImp(box, 'flex-direction', 'row');
+    setImp(box, 'flex-wrap', 'nowrap');
+    setImp(box, 'gap', '12px');
+    setImp(box, 'padding-top', '0');
+    setImp(box, 'padding-bottom', '0');
+    setImp(box, 'padding-left', '14px');
+    setImp(box, 'padding-right', '14px');
+
+    if (button) {
+      setImp(button, 'height', '38px');
+      setImp(button, 'min-height', '38px');
+      setImp(button, 'max-height', '38px');
+      setImp(button, 'display', 'inline-flex');
+      setImp(button, 'align-items', 'center');
+      setImp(button, 'justify-content', 'center');
+      setImp(button, 'align-self', 'center');
+      setImp(button, 'margin-top', '0');
+      setImp(button, 'margin-bottom', '0');
+      setImp(button, 'line-height', '1');
+      setImp(button, 'white-space', 'nowrap');
+    }
+
+    if (format) {
+      setImp(format, 'height', '38px');
+      setImp(format, 'min-height', '38px');
+      setImp(format, 'max-height', '38px');
+      setImp(format, 'display', 'flex');
+      setImp(format, 'flex-direction', 'column');
+      setImp(format, 'justify-content', 'center');
+      setImp(format, 'align-items', 'flex-start');
+      setImp(format, 'align-self', 'center');
+      setImp(format, 'margin-top', '0');
+      setImp(format, 'margin-bottom', '0');
+      setImp(format, 'line-height', '1.12');
+      setImp(format, 'text-align', 'left');
+    }
+
+    Array.prototype.forEach.call(box.children, function (child) {
+      setImp(child, 'align-self', 'center');
+      setImp(child, 'margin-top', '0');
+      setImp(child, 'margin-bottom', '0');
+      setImp(child, 'transform', 'none');
+      setImp(child, 'top', 'auto');
+    });
+  }
+
+  function schedule() {
+    applyUploadCenter();
+    window.requestAnimationFrame(applyUploadCenter);
+    setTimeout(applyUploadCenter, 80);
+    setTimeout(applyUploadCenter, 300);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+  else schedule();
+  window.addEventListener('load', schedule);
+  document.addEventListener('click', function () { setTimeout(applyUploadCenter, 0); }, true);
+  document.addEventListener('focusin', function () { setTimeout(applyUploadCenter, 0); }, true);
+  window.addEventListener('resize', function () { setTimeout(applyUploadCenter, 80); });
+})();
+/* svt-v121-invoice-upload-content-center END */
 </script>
 </body>
 </html>
