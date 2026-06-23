@@ -4809,6 +4809,27 @@
 }
 /* svt-v130-invoice-upload-force-window-down END */
 </style>
+
+<style id="svt-v131-invoice-labels-down-css">
+/* svt-v131-invoice-labels-down START
+   Mută doar textele labelurilor facturii mai jos, aproape de inputuri.
+   Nu atinge inputurile, lățimile, height-ul, uploadul sau modalul. */
+#invoicePanel .invoice-grid .svt131-label-target,
+#invoicePanel .invoice-grid .svt131-invoice-field-label-down > label,
+#invoicePanel .invoice-grid .svt131-invoice-field-label-down .field-label,
+#invoicePanel .invoice-grid .svt131-invoice-field-label-down .label,
+#invoicePanel .invoice-grid .field.svt131-invoice-field-label-down > :first-child {
+  position: relative !important;
+  top: 14px !important;
+  transform: none !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  z-index: 5 !important;
+}
+/* svt-v131-invoice-labels-down END */
+</style>
 </head>
 <body data-energy-mode="electric">
   <div class="page">
@@ -5859,8 +5880,107 @@
 })();
 /* svt-v130-invoice-upload-force-window-down END */
 </script>
+
+<script id="svt-v131-invoice-labels-down-js">
+/* svt-v131-invoice-labels-down START */
+(function(){
+  var LABEL_TOP = 14;
+  var targets = [
+    'consum total',
+    'numar zile',
+    'valoare factura',
+    'program de lucru'
+  ];
+
+  function norm(value){
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function setImp(el, prop, value){
+    if (!el || !el.style) return;
+    el.style.setProperty(prop, value, 'important');
+  }
+
+  function fieldMatches(field){
+    var text = norm(field.textContent);
+    return targets.some(function(t){ return text.indexOf(t) >= 0; });
+  }
+
+  function findLabel(field){
+    var label = field.querySelector('label');
+    if (label) return label;
+
+    var possible = field.querySelector('.field-label, .label, .input-label, .control-label, .form-label');
+    if (possible) return possible;
+
+    var children = Array.prototype.slice.call(field.children || []);
+    for (var i = 0; i < children.length; i += 1) {
+      var child = children[i];
+      if (!child || !child.textContent) continue;
+      if (norm(child.textContent).length > 0 && !child.matches('input, select, textarea, button')) return child;
+    }
+    return null;
+  }
+
+  function apply(){
+    var panel = document.getElementById('invoicePanel');
+    if (!panel) return;
+
+    var fields = Array.prototype.slice.call(panel.querySelectorAll('.invoice-grid .field'))
+      .filter(function(field){
+        return fieldMatches(field) && !!field.querySelector('input, select, textarea');
+      })
+      .slice(0, 4);
+
+    fields.forEach(function(field){
+      field.classList.add('svt131-invoice-field-label-down');
+      field.setAttribute('data-svt-v131-label-down', '14');
+
+      var label = findLabel(field);
+      if (!label) return;
+      label.classList.add('svt131-label-target');
+      label.setAttribute('data-svt-v131-label-target', 'true');
+      setImp(label, 'position', 'relative');
+      setImp(label, 'top', LABEL_TOP + 'px');
+      setImp(label, 'transform', 'none');
+      setImp(label, 'margin-top', '0px');
+      setImp(label, 'margin-bottom', '0px');
+      setImp(label, 'padding-top', '0px');
+      setImp(label, 'padding-bottom', '0px');
+      setImp(label, 'z-index', '5');
+    });
+  }
+
+  function schedule(){
+    apply();
+    if (window.requestAnimationFrame) window.requestAnimationFrame(apply);
+    setTimeout(apply, 80);
+    setTimeout(apply, 250);
+    setTimeout(apply, 700);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', schedule);
+  else schedule();
+  window.addEventListener('load', schedule);
+  window.addEventListener('resize', schedule);
+  document.addEventListener('click', function(ev){
+    var panel = document.getElementById('invoicePanel');
+    if (panel && panel.contains && panel.contains(ev.target)) schedule();
+  }, true);
+  document.addEventListener('focusin', function(ev){
+    var panel = document.getElementById('invoicePanel');
+    if (panel && panel.contains && panel.contains(ev.target)) schedule();
+  }, true);
+})();
+/* svt-v131-invoice-labels-down END */
+</script>
 </body>
 </html>
+
 
 
 
