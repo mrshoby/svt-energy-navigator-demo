@@ -4560,25 +4560,22 @@
   
 </style>
 
-
-
-<!-- SVT v134 invoice AAA2 exact alignment START -->
-<style id="svt-v134-invoice-aaa2-exact">
-  /* v134: strict AAA2 correction for section 2 monthly invoice only.
-     Goals: keep input boxes compact under their labels; make invoice upload box match row 3 upload width/placement. */
-
+<!-- SVT v133 invoice alignment clean rebuild START -->
+<style id="svt-v133-invoice-align-clean">
+  /* v133: Clean invoice-only layout from actual uploaded file.
+     Target: aaa2 reference. No JavaScript, no transform, no input mutation. */
   #invoiceBox,
   #invoiceBox[style*="grid"] {
     display: grid !important;
-    grid-template-columns: max-content minmax(390px, 1fr) !important;
-    column-gap: 22px !important;
+    grid-template-columns: max-content minmax(320px, 1fr) !important;
+    column-gap: 34px !important;
     row-gap: 0 !important;
     align-items: center !important;
+    padding: 15px 20px 14px 20px !important;
+    margin-top: 0 !important;
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 16px 0 16px 20px !important;
   }
 
   #invoiceBox .invoice-grid {
@@ -4588,10 +4585,10 @@
     flex-wrap: nowrap !important;
     align-items: flex-start !important;
     justify-content: flex-start !important;
-    gap: 0 16px !important;
+    gap: 0 13px !important;
     width: max-content !important;
-    min-width: 0 !important;
     max-width: none !important;
+    min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -4599,53 +4596,42 @@
   #invoiceBox .invoice-field {
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-start !important;
     justify-content: flex-start !important;
-    gap: 8px !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
     margin: 0 !important;
     padding: 0 !important;
     min-width: 0 !important;
-    max-width: none !important;
     flex: 0 0 auto !important;
     box-sizing: border-box !important;
   }
 
-  /* Field widths are intentionally short and tied to the visual label length. */
-  #invoiceBox .invoice-consumption-field { width: 78px !important; flex-basis: 78px !important; }
-  #invoiceBox .invoice-days-field { width: 76px !important; flex-basis: 76px !important; }
-  #invoiceBox .invoice-value-field { width: 112px !important; flex-basis: 112px !important; }
-  #invoiceBox .invoice-program-field { width: 112px !important; flex-basis: 112px !important; }
+  #invoiceBox .invoice-consumption-field { width: 78px !important; max-width: 78px !important; }
+  #invoiceBox .invoice-days-field { width: 76px !important; max-width: 76px !important; }
+  #invoiceBox .invoice-value-field { width: 86px !important; max-width: 86px !important; }
+  #invoiceBox .invoice-program-field { width: 190px !important; max-width: 190px !important; }
 
   #invoiceBox .invoice-field label {
     display: block !important;
     width: 100% !important;
-    min-width: 0 !important;
     max-width: 100% !important;
-    min-height: 25px !important;
+    min-height: 24px !important;
     margin: 0 !important;
     padding: 0 !important;
     transform: none !important;
     position: static !important;
     top: auto !important;
     font-size: 11px !important;
-    line-height: 1.06 !important;
+    line-height: 1.05 !important;
     font-weight: 850 !important;
     letter-spacing: -0.02em !important;
     color: #001739 !important;
     white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
   }
-
-  #invoiceBox .invoice-field label br { display: block !important; }
 
   #invoiceBox .invoice-control,
   #invoiceBox input.invoice-control,
-  #invoiceBox select.invoice-control,
-  #invoiceConsumption,
-  #invoiceDays,
-  #invoiceValue,
-  #workSchedule {
+  #invoiceBox select.invoice-control {
     display: block !important;
     width: 100% !important;
     min-width: 0 !important;
@@ -4654,23 +4640,22 @@
     min-height: 38px !important;
     max-height: 38px !important;
     margin: 0 !important;
+    padding: 0 10px !important;
     box-sizing: border-box !important;
     border-radius: 9px !important;
     font-size: 12.5px !important;
     line-height: 38px !important;
-    padding: 0 10px !important;
   }
 
-  #invoiceBox select.invoice-control,
-  #workSchedule {
-    padding-right: 24px !important;
+  #invoiceBox select.invoice-control {
+    padding-right: 26px !important;
     text-overflow: ellipsis !important;
   }
 
-  #invoiceBox .field-hint,
-  #invoiceBox #invoiceFileName { display: none !important; }
+  #invoiceBox .field-hint {
+    display: none !important;
+  }
 
-  /* Upload invoice: same footprint and right alignment as row 3 "Încarcă fișierul" upload. */
   #invoiceBox .invoice-attach {
     grid-column: 2 !important;
     grid-row: 1 !important;
@@ -4679,96 +4664,72 @@
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    width: 390px !important;
-    min-width: 390px !important;
-    max-width: 390px !important;
-    height: 42px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+    transform: none !important;
     position: static !important;
     top: auto !important;
-    transform: none !important;
   }
 
-  #invoiceBox #invoiceDrop.file-inline,
-  #invoiceDrop.file-inline.upload-zone {
+  #invoiceBox #invoiceDrop.file-inline {
     display: flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 9px !important;
-    width: 390px !important;
-    min-width: 390px !important;
-    max-width: 390px !important;
-    height: 42px !important;
-    min-height: 42px !important;
-    max-height: 42px !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 398px !important;
+    max-width: 398px !important;
+    min-width: 398px !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
     margin: 0 !important;
-    padding: 5px 10px !important;
+    padding: 0 13px !important;
     box-sizing: border-box !important;
-    border-radius: 14px !important;
-    overflow: hidden !important;
+    transform: none !important;
     position: static !important;
     top: auto !important;
-    transform: none !important;
   }
 
-  #invoiceBox #invoiceDrop .file-button,
-  #invoiceChoose.file-button {
+  #invoiceBox #invoiceDrop .file-button {
     flex: 0 0 auto !important;
-    height: 31px !important;
-    min-height: 31px !important;
-    max-height: 31px !important;
-    padding: 0 12px !important;
+    height: 34px !important;
+    min-height: 34px !important;
     margin: 0 !important;
-    border-radius: 9px !important;
-    font-size: 12.5px !important;
-    line-height: 31px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 7px !important;
-    white-space: nowrap !important;
-  }
-
-  #invoiceBox #invoiceDrop .file-button svg,
-  #invoiceChoose.file-button svg {
-    width: 14px !important;
-    height: 14px !important;
   }
 
   #invoiceBox #invoiceDrop .file-meta {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
     margin: 0 !important;
-    font-size: 10.2px !important;
-    line-height: 1.04 !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: flex-start !important;
-    gap: 1px !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
+    line-height: 1.12 !important;
+    min-width: 0 !important;
   }
 
   #invoiceBox #invoiceDrop .file-meta strong,
   #invoiceBox #invoiceDrop .file-meta span {
-    display: block !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 1.04 !important;
+    line-height: 1.12 !important;
   }
 
-  @media (max-width: 900px) {
+  #invoiceBox #invoiceFileName {
+    display: none !important;
+  }
+
+  @media (max-width: 860px) {
     #invoiceBox,
     #invoiceBox[style*="grid"] {
       grid-template-columns: 1fr !important;
       row-gap: 12px !important;
-      padding: 14px 0 14px 0 !important;
+      padding: 14px 16px !important;
     }
     #invoiceBox .invoice-grid {
       width: 100% !important;
@@ -4781,18 +4742,22 @@
     #invoiceBox .invoice-value-field,
     #invoiceBox .invoice-program-field {
       width: calc(50% - 6px) !important;
-      flex-basis: calc(50% - 6px) !important;
+      max-width: calc(50% - 6px) !important;
     }
-    #invoiceBox .invoice-attach,
-    #invoiceBox #invoiceDrop.file-inline,
-    #invoiceDrop.file-inline.upload-zone {
+    #invoiceBox .invoice-attach {
+      grid-column: 1 !important;
+      grid-row: 2 !important;
+      justify-self: stretch !important;
+      width: 100% !important;
+    }
+    #invoiceBox #invoiceDrop.file-inline {
       width: 100% !important;
       min-width: 0 !important;
       max-width: 100% !important;
     }
   }
 </style>
-<!-- SVT v134 invoice AAA2 exact alignment END -->
+<!-- SVT v133 invoice alignment clean rebuild END -->
 
 </head>
 <body data-energy-mode="electric">
